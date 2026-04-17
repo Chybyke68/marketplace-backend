@@ -90,12 +90,8 @@ if (token) {
 
     if (role !== "seller") {
   const box = document.getElementById("sellerOnly");
-  if (box) {
-    box.style.display = "none";
-  }
-    }
+  if (box) box.style.display = "none";
 
-    if (role !== "seller") {
   const btn = document.querySelector('[onclick="showMy()"]');
   if (btn) btn.style.display = "none";
     }
@@ -186,6 +182,7 @@ async function loadAllProducts() {
   const res = await fetch("https://marketplace-5nn2.onrender.com/api/products");
   const data = await res.json();
   allProducts = data; // store globally
+  const data = await res.json();
 
   const container = document.getElementById("products");
   container.innerHTML = "";
@@ -500,14 +497,7 @@ function filterProducts() {
   const max = document.getElementById("maxPrice").value;
   const category = document.getElementById("categoryFilter").value;
   
-  <select id="categoryFilter" class="border p-2 rounded w-full mb-4">
-  <option value="">All Categories</option>
-  <option value="Phones">Phones</option>
-  <option value="Electronics">Electronics</option>
-  <option value="Fashion">Fashion</option>
-  <option value="Services">Services</option>
-</select>
-
+  
   const filtered = allProducts.filter(p => {
     const matchesSearch =
       p.title.toLowerCase().includes(searchValue) ||
@@ -526,8 +516,11 @@ function filterProducts() {
 document.getElementById("searchInput").addEventListener("input", filterProducts);
 document.getElementById("minPrice").addEventListener("input", filterProducts);
 document.getElementById("maxPrice").addEventListener("input", filterProducts);
-document.getElementById("categoryFilter").addEventListener("change", filterProducts);
+//document.getElementById("categoryFilter").addEventListener("change", filterProducts);
+const cat = document.getElementById("categoryFilter");
+if (cat) cat.addEventListener("change", filterProducts);
 
+    
  loadDashboard();
    // loadAllProducts();
     showUser();
