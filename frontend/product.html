@@ -2,46 +2,55 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>CampusDealz - Product</title>
+  <title>Product Details</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100 p-5">
 
-<div class="max-w-4xl mx-auto" id="productDetail"></div>
+<div class="max-w-3xl mx-auto bg-white p-5 rounded shadow">
+
+  <button onclick="goBack()" class="mb-4 text-blue-500">← Back</button>
+
+  <img id="image" class="w-full h-64 object-cover rounded mb-4">
+
+  <h1 id="title" class="text-2xl font-bold"></h1>
+  <p id="category" class="text-blue-500 text-sm mb-2"></p>
+  <p id="description" class="text-gray-700 mb-3"></p>
+  <p id="price" class="text-green-600 text-xl font-bold"></p>
+
+  <button id="contactBtn" 
+    class="w-full bg-blue-600 text-white py-2 mt-4 rounded">
+    Contact Seller
+  </button>
+
+</div>
 
 <script>
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
 
-  async function loadProduct() {
-    const res = await fetch("http://localhost:5000/api/products");
-    const data = await res.json();
+async function loadProduct() {
+  const res = await fetch(`https://marketplace-5nn2.onrender.com/api/products/${id}`);
+  const p = await res.json();
 
-    const product = data.find(p => p.id === id);
+  document.getElementById("image").src = p.image;
+  document.getElementById("title").innerText = p.title;
+  document.getElementById("description").innerText = p.description;
+  document.getElementById("price").innerText = "₦" + p.price;
+  document.getElementById("category").innerText = p.category || "General";
 
-    if (!product) {
-      document.getElementById("productDetail").innerHTML = "<p>Product not found</p>";
-      return;
-    }
+  document.getElementById("contactBtn").onclick = () => {
+    const message = `Hello, I'm interested in "${p.title}"`;
+    alert(message);
+  };
+}
 
-    document.getElementById("productDetail").innerHTML = `
-      <div class="bg-white rounded shadow p-5">
-        <img src="${product.image}" class="w-full h-80 object-cover mb-4">
+function goBack() {
+  window.history.back();
+}
 
-        <h1 class="text-2xl font-bold">${product.title}</h1>
-        <p class="text-gray-600 mt-2">${product.description}</p>
-
-        <p class="text-green-600 text-xl font-bold mt-4">₦${product.price}</p>
-
-        <button onclick="history.back()" 
-          class="mt-5 bg-blue-500 text-white px-4 py-2 rounded">
-          Back
-        </button>
-      </div>
-    `;
-  }
-
-  loadProduct();
+loadProduct();
 </script>
 
 </body>
