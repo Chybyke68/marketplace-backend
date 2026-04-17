@@ -76,7 +76,7 @@ if (!token) {
   window.location.href = "login.html";
 }
 
-    const token = localStorage.getItem("token");
+    
 
 let user = null;
 let role = "buyer";
@@ -86,14 +86,21 @@ if (token) {
   role = user.role;
 }
 
+    console.log("User role:", role);
+
     if (role !== "seller") {
   const box = document.getElementById("sellerOnly");
   if (box) {
     box.style.display = "none";
   }
     }
+
+    if (role !== "seller") {
+  const btn = document.querySelector('[onclick="showMy()"]');
+  if (btn) btn.style.display = "none";
+    }
     
-console.log("User role:", role);
+
 
     let currentView = "all";
     let allProducts = [];
@@ -492,6 +499,14 @@ function filterProducts() {
   const min = document.getElementById("minPrice").value;
   const max = document.getElementById("maxPrice").value;
   const category = document.getElementById("categoryFilter").value;
+  
+  <select id="categoryFilter" class="border p-2 rounded w-full mb-4">
+  <option value="">All Categories</option>
+  <option value="Phones">Phones</option>
+  <option value="Electronics">Electronics</option>
+  <option value="Fashion">Fashion</option>
+  <option value="Services">Services</option>
+</select>
 
   const filtered = allProducts.filter(p => {
     const matchesSearch =
@@ -514,7 +529,7 @@ document.getElementById("maxPrice").addEventListener("input", filterProducts);
 document.getElementById("categoryFilter").addEventListener("change", filterProducts);
 
  loadDashboard();
-    loadAllProducts();
+   // loadAllProducts();
     showUser();
   </script>
 
