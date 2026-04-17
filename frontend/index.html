@@ -227,12 +227,10 @@ if (!token) {
   await loadAllProducts();
 } else {
   await loadMyProducts();
-}
-
- // loadProducts(); // reload products
+  }
 });
 
-function showUser() {
+/*function showUser() {
   const token = localStorage.getItem("token");
 
   if (!token) return;
@@ -245,7 +243,44 @@ function showUser() {
       <button onclick="logout()" class="bg-red-500 text-white px-3 py-1 rounded">Logout</button>
     </div>
   `;
-}
+}*/
+
+    function showUser() {
+  const container = document.getElementById("userInfo");
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    container.innerHTML = `
+      <div class="bg-white p-3 rounded shadow flex justify-between">
+        <span>Not logged in</span>
+        <a href="login.html" class="bg-blue-500 text-white px-3 py-1 rounded">Login</a>
+      </div>
+    `;
+    return;
+  }
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+
+    container.innerHTML = `
+      <div class="bg-white p-3 rounded shadow flex justify-between items-center">
+        <span class="text-sm">User: ${payload.id}</span>
+        <button onclick="logout()" class="bg-red-500 text-white px-3 py-1 rounded">
+          Logout
+        </button>
+      </div>
+    `;
+  } catch (err) {
+    console.log("Token error:", err);
+
+    container.innerHTML = `
+      <div class="bg-white p-3 rounded shadow flex justify-between">
+        <span>Session expired</span>
+        <a href="login.html" class="bg-blue-500 text-white px-3 py-1 rounded">Login again</a>
+      </div>
+    `;
+  }
+    }
 
 function logout() {
   localStorage.removeItem("token");
