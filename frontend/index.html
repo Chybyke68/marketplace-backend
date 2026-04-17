@@ -22,6 +22,8 @@
 
   <h2 class="text-xl font-bold mt-6 mb-2">Add Product</h2>
 
+      <div id="sellerOnly">
+
 <form id="productForm" class="bg-white p-4 rounded shadow mb-5">
   <input type="text" id="title" placeholder="Title" class="border p-2 w-full mb-2" required>
   <input type="text" id="description" placeholder="Description" class="border p-2 w-full mb-2" required>
@@ -38,7 +40,9 @@
 
   <button class="bg-blue-500 text-white px-4 py-2 rounded">Add Product</button>
 </form>
+</div>
 
+      
 <div class="mb-4 flex gap-2">
   <button onclick="showAll()"  
     class="bg-blue-500 text-white px-3 py-1 rounded">
@@ -71,6 +75,25 @@
 if (!token) {
   window.location.href = "login.html";
 }
+
+    const token = localStorage.getItem("token");
+
+let user = null;
+let role = "buyer";
+
+if (token) {
+  user = JSON.parse(atob(token.split(".")[1]));
+  role = user.role;
+}
+
+    if (role !== "seller") {
+  const box = document.getElementById("sellerOnly");
+  if (box) {
+    box.style.display = "none";
+  }
+    }
+    
+console.log("User role:", role);
 
     let currentView = "all";
     let allProducts = [];
@@ -252,6 +275,27 @@ if (!token) {
     </div>
   `;
 }*/
+
+    function loadDashboard() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const user = JSON.parse(atob(token.split(".")[1]));
+  const role = user.role;
+
+  console.log("Role:", role);
+
+  if (role === "seller") {
+    loadMyProducts();   // 🔥 seller sees own products
+  } else {
+    loadAllProducts();  // 🔥 buyer sees all products
+  }
+    }
+    
 
     function showUser() {
   const container = document.getElementById("userInfo");
@@ -469,7 +513,7 @@ document.getElementById("minPrice").addEventListener("input", filterProducts);
 document.getElementById("maxPrice").addEventListener("input", filterProducts);
 document.getElementById("categoryFilter").addEventListener("change", filterProducts);
 
-
+ loadDashboard();
     loadAllProducts();
     showUser();
   </script>
