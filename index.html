@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Campus Marketplace</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-5">
+    <div class="max-w-6xl mx-auto">
+
+    <div id="userInfo" class="mb-4"></div>
+
+ <div class="flex justify-between items-center mb-6">
+  <h1 class="text-3xl font-bold">Campus Marketplace</h1>
+</div>
+
+  <h2 class="text-xl font-bold mb-2">Login</h2>
+
+<form id="loginForm" class="bg-white p-4 rounded shadow mb-5">
+  <input type="email" id="email" placeholder="Email" class="border p-2 w-full mb-2" required>
+  <input type="password" id="password" placeholder="Password" class="border p-2 w-full mb-2" required>
+
+  <button class="bg-green-500 text-white px-4 py-2 rounded">Login</button>
+</form>
+
+  <h2 class="text-xl font-bold mt-6 mb-2">Add Product</h2>
+
+<form id="productForm" class="bg-white p-4 rounded shadow mb-5">
+  <input type="text" id="title" placeholder="Title" class="border p-2 w-full mb-2" required>
+  <input type="text" id="description" placeholder="Description" class="border p-2 w-full mb-2" required>
+  <input type="number" id="price" placeholder="Price" class="border p-2 w-full mb-2" required>
+  <input type="file" id="image" class="mb-2" required>
+
+  <select id="category" class="border p-2 w-full mb-2">
+  <option value="">Select Category</option>
+  <option value="Phones">Phones</option>
+  <option value="Electronics">Electronics</option>
+  <option value="Fashion">Fashion</option>
+  <option value="Services">Services</option>
+</select>
+
+  <button class="bg-blue-500 text-white px-4 py-2 rounded">Add Product</button>
+</form>
+
+<div class="mb-4 flex gap-2">
+  <button onclick="showAll()"  
+    class="bg-blue-500 text-white px-3 py-1 rounded">
+    All Products
+  </button>
+
+  <button onclick="showMy()" 
+    class="bg-green-500 text-white px-3 py-1 rounded">
+    My Products
+  </button>
+</div>
+</div>
+
+<input 
+  type="text" 
+  id="searchInput" 
+  placeholder="Search products..." 
+  class="border p-2 w-full mb-4 rounded"
+/>
+
+<div class="flex gap-2 mb-4">
+  <input type="number" id="minPrice" placeholder="Min price" class="border p-2 rounded w-1/2">
+  <input type="number" id="maxPrice" placeholder="Max price" class="border p-2 rounded w-1/2">
+</div>
+
+ <div id="products" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+  <script>
+
+    let currentView = "all";
+    let allProducts = [];
+
+  
+   
+  async function loadMyProducts() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    document.getElementById("products").innerHTML = "<p>Please login</p>";
+    return;
+  }
+
+  // 🔐 Decode logged-in user ID
+  let userId = null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    userId = payload.id;
+  } catch (err) {
+    console.log("Invalid token");
+    return;
+  }
+
+  const res = await fetch("http://localhost:5000/api/products/my", {
+    headers: {
+      Authorization: token
+    }
+  });
+
+  if (!res.ok) {
+    console.log("Error:", res.status);
+    document.getElementById("products").innerHTML = "<p>Error loading products</p>";
+    return;
+  }
+
+  const data = await res.json();
+  
+
+  const container = document.getElementById("products");
+  container.innerHTML = "";
+
+  data.forEach(p => {
+   container.innerHTML += `
+  <div onclick="viewProduct('${p.id}')" 
+     class="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden cursor-pointer">
+    
+    <img src="${p.image}" class="w-full h-48 object-cover">
+
+    <div class="p-3">
+      <h2 class="font-semibold text-lg">${p.title}</h2>
+      <p class="text-blue-500 text-sm">${p.category || "General"}</p>
+      <p class="text-gray-600 text-sm">${p.description}</p>
+      <p class="text-green-600 font-bold text-lg mt-2">₦${p.price}</p>
+
+      ${
+        p.user_id === userId ? `
+          <div class="flex gap-2 mt-3">
+            <button onclick="editProduct('${p.id}', '${p.title}', '${p.description}', '${p.price}')" 
+              class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white py-1 rounded">
+              Edit
+            </button>
+
+            <button onclick="deleteProduct('${p.id}')" 
+              class="flex-1 bg-red-500 hover:bg-red-600 text-white py-1 rounded">
+              Delete
+            </button>
+          </div>
+        ` : ""
+      }
+
+    </div>
+  </div>
+`;
+  });
+}
+
+async function loadAllProducts() {
+  const res = await fetch("http://localhost:5000/api/products");
+  const data = await res.json();
+  allProducts = data; // store globally
+
+  const container = document.getElementById("products");
+  container.innerHTML = "";
+
+  const token = localStorage.getItem("token");
+  let userId = null;
+
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      userId = payload.id;
+    } catch {}
+  }
+
+  /*data.forEach(p => {
+    container.innerHTML += `
+      <div onclick="viewProduct('${p.id}')" 
+        class="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden cursor-pointer">
+        <img src="${p.image}" class="w-full h-40 object-cover">
+        <h2 class="font-bold">${p.title}</h2>
+        <p>${p.description}</p>
+        <p class="text-green-600">₦${p.price}</p>
+
+        ${
+          p.user_id === userId ? `
+          <button onclick="event.stopPropagation(); editProduct('${p.id}', '${p.title}', '${p.description}', '${p.price}')" 
+            class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white py-1 rounded">
+            Edit
+          </button>
+
+           <button onclick="event.stopPropagation(); deleteProduct('${p.id}')" 
+            class="flex-1 bg-red-500 hover:bg-red-600 text-white py-1 rounded">
+            Delete
+          </button>
+           
+          ` : ""
+        }
+      </div>
+    `;
+  });*/
+
+  displayProducts(data);
+}
+
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const res = await fetch("http://localhost:5000/api/auth/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      email: document.getElementById("email").value,
+      password: document.getElementById("password").value
+    })
+  });
+
+  const data = await res.json();
+
+  if (data.token) {
+  localStorage.setItem("token", data.token);
+  alert("Login successful!");
+} else {
+  alert("Login failed");
+  console.log(data);
+}
+
+});
+
+    document.getElementById("productForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData();
+  formData.append("title", document.getElementById("title").value);
+  formData.append("description", document.getElementById("description").value);
+  formData.append("price", document.getElementById("price").value);
+  formData.append("image", document.getElementById("image").files[0]);
+  formData.append("category", document.getElementById("category").value);
+
+ 
+  //const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
+console.log("TOKEN:", token);
+
+if (!token) {
+  alert("Please login first");
+  return;
+}
+
+  const res = await fetch("http://localhost:5000/api/products/add", {
+    method: "POST",
+    headers: {
+      Authorization: token
+    },
+    body: formData
+  });
+
+  const data = await res.json();
+  alert("Product added!");
+
+  if (currentView === "all") {
+  await loadAllProducts();
+} else {
+  await loadMyProducts();
+}
+
+ // loadProducts(); // reload products
+});
+
+function showUser() {
+  const token = localStorage.getItem("token");
+
+  if (!token) return;
+
+  const payload = JSON.parse(atob(token.split(".")[1]));
+  
+  document.getElementById("userInfo").innerHTML = `
+    <div class="bg-white p-3 rounded shadow flex justify-between">
+      <span>Logged in as user: ${payload.id}</span>
+      <button onclick="logout()" class="bg-red-500 text-white px-3 py-1 rounded">Logout</button>
+    </div>
+  `;
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  alert("Logged out!");
+  location.reload();
+}
+
+async function deleteProduct(id) {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("Login first");
+    return;
+  }
+
+  const confirmDelete = confirm("Are you sure you want to delete?");
+  if (!confirmDelete) return;
+
+  const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: token
+    }
+  });
+
+  const data = await res.json();
+
+  alert(data.message);
+
+    if (currentView === "all") {
+  await loadAllProducts();
+} else {
+  await loadMyProducts();
+}
+}
+
+async function editProduct(id, oldTitle, oldDesc, oldPrice) {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("Login first");
+    return;
+  }
+
+  // Prompt user for new values
+  const title = prompt("Edit title:", oldTitle);
+  const description = prompt("Edit description:", oldDesc);
+  const price = prompt("Edit price:", oldPrice);
+
+  if (!title || !description || !price) {
+    alert("All fields required");
+    return;
+  }
+
+  const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token
+    },
+    body: JSON.stringify({ title, description, price })
+  });
+
+  const data = await res.json();
+
+  alert(data.message);
+
+    if (currentView === "all") {
+  await loadAllProducts();
+} else {
+  await loadMyProducts();
+}
+}
+
+function showAll() {
+  currentView = "all";
+  loadAllProducts();
+}
+
+function showMy() {
+  currentView = "my";
+  loadMyProducts();
+}
+
+  function viewProduct(id) {
+     console.log("Clicked product:", id);
+  window.location.href = `product.html?id=${id}`;
+}
+
+function displayProducts(data) {
+  const container = document.getElementById("products");
+  container.innerHTML = "";
+
+  const token = localStorage.getItem("token");
+  let userId = null;
+
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      userId = payload.id;
+    } catch {}
+  }
+
+  data.forEach(p => {
+    container.innerHTML += `
+      <div onclick="viewProduct('${p.id}')" 
+        class="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden cursor-pointer">
+
+        <img src="${p.image}" class="w-full h-48 object-cover">
+
+        <div class="p-3">
+          <h2 class="font-semibold text-lg">${p.title}</h2>
+          <p class="text-blue-500 text-sm">${p.category || "General"}</p>
+          <p class="text-gray-600 text-sm">${p.description}</p>
+          <p class="text-green-600 font-bold text-lg mt-2">₦${p.price}</p>
+
+          ${
+            p.user_id === userId ? `
+              <div class="flex gap-2 mt-3">
+                <button onclick="event.stopPropagation(); editProduct('${p.id}', '${p.title}', '${p.description}', '${p.price}')" 
+                  class="flex-1 bg-yellow-500 text-white py-1 rounded">Edit</button>
+
+                <button onclick="event.stopPropagation(); deleteProduct('${p.id}')" 
+                  class="flex-1 bg-red-500 text-white py-1 rounded">Delete</button>
+              </div>
+            ` : ""
+          }
+        </div>
+      </div>
+    `;
+  });
+}
+
+/*document.getElementById("searchInput").addEventListener("input", (e) => {
+  const value = e.target.value.toLowerCase();
+
+  const filtered = allProducts.filter(p =>
+    p.title.toLowerCase().includes(value) ||
+    p.description.toLowerCase().includes(value)
+  );
+
+  displayProducts(filtered);
+});*/
+
+
+function filterProducts() {
+  const searchValue = document.getElementById("searchInput").value.toLowerCase();
+  const min = document.getElementById("minPrice").value;
+  const max = document.getElementById("maxPrice").value;
+  const category = document.getElementById("categoryFilter").value;
+
+  const filtered = allProducts.filter(p => {
+    const matchesSearch =
+      p.title.toLowerCase().includes(searchValue) ||
+      p.description.toLowerCase().includes(searchValue);
+
+    const matchesMin = min ? p.price >= Number(min) : true;
+    const matchesMax = max ? p.price <= Number(max) : true;
+    const matchesCategory = category ? p.category === category : true;
+
+    return matchesSearch && matchesMin && matchesMax && matchesCategory;
+  });
+
+  displayProducts(filtered);
+}
+
+document.getElementById("searchInput").addEventListener("input", filterProducts);
+document.getElementById("minPrice").addEventListener("input", filterProducts);
+document.getElementById("maxPrice").addEventListener("input", filterProducts);
+document.getElementById("categoryFilter").addEventListener("change", filterProducts);
+
+
+    loadAllProducts();
+    showUser();
+  </script>
+
+</body>
+</html>
