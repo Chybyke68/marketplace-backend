@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Campus Marketplace</title>
+  <title>CampusDealz</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-5">
@@ -11,7 +11,8 @@
     <div id="userInfo" class="mb-4"></div>
 
  <div class="flex justify-between items-center mb-6">
-  <h1 class="text-3xl font-bold">Campus Marketplace</h1>
+  <h1 class="text-3xl font-bold">CampusDealz</h1>
+  <p class="text-gray-600 mb-4">Buy & sell anything on campus easily</p>
 </div>
 
   <h2 class="text-xl font-bold mb-2">Login</h2>
@@ -93,7 +94,7 @@
     return;
   }
 
-  const res = await fetch("http://localhost:5000/api/products/my", {
+  const res = await fetch("https://marketplace-5nn2.onrender.com/api/products/my", {
     headers: {
       Authorization: token
     }
@@ -147,7 +148,7 @@
 }
 
 async function loadAllProducts() {
-  const res = await fetch("http://localhost:5000/api/products");
+  const res = await fetch("https://marketplace-5nn2.onrender.com/api/products");
   const data = await res.json();
   allProducts = data; // store globally
 
@@ -197,7 +198,7 @@ async function loadAllProducts() {
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const res = await fetch("http://localhost:5000/api/auth/login", {
+  const res = await fetch("https://marketplace-5nn2.onrender.com/api/auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -240,7 +241,7 @@ if (!token) {
   return;
 }
 
-  const res = await fetch("http://localhost:5000/api/products/add", {
+  const res = await fetch("https://marketplace-5nn2.onrender.com/api/products/add", {
     method: "POST",
     headers: {
       Authorization: token
@@ -292,7 +293,7 @@ async function deleteProduct(id) {
   const confirmDelete = confirm("Are you sure you want to delete?");
   if (!confirmDelete) return;
 
-  const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+  const res = await fetch(`https://marketplace-5nn2.onrender.com/api/products/${id}`, {
     method: "DELETE",
     headers: {
       Authorization: token
@@ -328,7 +329,7 @@ async function editProduct(id, oldTitle, oldDesc, oldPrice) {
     return;
   }
 
-  const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+  const res = await fetch(`https://marketplace-5nn2.onrender.com/api/products/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
