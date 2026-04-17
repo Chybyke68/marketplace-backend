@@ -179,8 +179,9 @@ if (token) {
 }
 
 async function loadAllProducts() {
-  const res = await fetch("https://marketplace-5nn2.onrender.com/api/products");
-  const data = await res.json();
+  const res = await fetch("https://marketplace-5nn2.onrender.com/api/products")
+
+  
   allProducts = data; // store globally
   const data = await res.json();
 
