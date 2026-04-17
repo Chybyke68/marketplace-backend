@@ -53,8 +53,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data.token) {
         localStorage.setItem("token", data.token);
         alert("Login successful ✅");
-        window.location.href = "index.html";
-      } else {
+        const user = JSON.parse(atob(data.token.split(".")[1]));
+
+     if (user.role === "seller") {
+        window.location.href = "seller.html";
+     } else {
+        window.location.href = "buyer.html";
+     }
+        
         alert(data.message || "Login failed");
       }
 
