@@ -1,52 +1,71 @@
 const router = require("express").Router();
 const supabase = require("../config/supabase");
 const multer = require("multer");
-const upload = multer({ storage: multer.memoryStorage() }); // Temporary storage for uploaded files
 const auth = require("../middleware/auth");
 
+const upload = multer({ storage: multer.memoryStorage() });
+
+
+// ============================
 // ADD PRODUCT
+// ============================
 router.post("/add", auth, upload.single("image"), async (req, res) => {
-  const { title, description, price, category } = req.body;
-  const user_id = req.user.id;
-  const file = req.file;
+  try {
+    const { title, description, price, category } = req.body;
+    const user_id = req.user.id;
+    const file = req.file;
 
-  // Upload to Supabase
-  const fileName = Date.now() + "-" + file.originalname;
+    if (!file) {
+      return res.status(400).json({ message: "Image is required" });
+    }
 
-  const { data, error } = await supabase.storage
-    .from("products")
-    .upload(fileName, file.buffer, {
-      contentType: file.mimetype
+    const fileName = Date.now() + "-" + file.originalname;
+
+    // Upload to Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from("products")
+      .upload(fileName, file.buffer, {
+        contentType: file.mimetype
+      });
+
+    if (uploadError) {
+      return res.status(500).json(uploadError);
+    }
+
+    // Get public URL
+    const { data: publicUrl } = supabase.storage
+      .from("products")
+      .getPublicUrl(fileName);
+
+    // Save to DB
+    const { data, error } = await supabase
+      .from("products")
+      .insert([{
+        title,
+        description,
+        price,
+        category,
+        image: publicUrl.publicUrl,
+        user_id
+      }])
+      .select();
+
+    if (error) return res.status(500).json(error);
+
+    res.json({
+      message: "Product added successfully",
+      product: data[0]
     });
 
-  if (error) return res.status(500).json(error);
-
-  // Get public URL
-  const { data: publicUrl } = supabase.storage
-    .from("products")
-    .getPublicUrl(fileName);
-
-  // Save product
-  const { data: product, error: dbError } = await supabase
-    .from("products")
-    .insert([{
-     title,
-     description,
-     price,
-     category,
-     image: publicUrl.publicUrl,
-     user_id
-   }]); 
-
-  if (dbError) return res.status(500).json(dbError);
-
-  res.json({
-    message: "Product with image uploaded",
-    product
-  });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
+
+// ============================
 // GET ALL PRODUCTS
+// ============================
 router.get("/", async (req, res) => {
   const { data, error } = await supabase
     .from("products")
@@ -59,7 +78,27 @@ router.get("/", async (req, res) => {
 });
 
 
+// ============================
+// GET MY PRODUCTS
+// ============================
+router.get("/my", auth, async (req, res) => {
+  const user_id = req.user.id;
+
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("user_id", user_id)
+    .order("created_at", { ascending: false });
+
+  if (error) return res.status(500).json(error);
+
+  res.json(data);
+});
+
+
+// ============================
 // GET SINGLE PRODUCT
+// ============================
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -76,30 +115,14 @@ router.get("/:id", async (req, res) => {
   res.json(data);
 });
 
-module.exports = router;
 
-
-// GET MY PRODUCTS
-router.get("/my", auth, async (req, res) => {
-  const user_id = req.user.id;
-
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .eq("user_id", user_id)
-    .order("created_at", { ascending: false });
-
-  if (error) return res.status(500).json(error);
-
-  res.json(data);
-});
-
+// ============================
 // DELETE PRODUCT
+// ============================
 router.delete("/:id", auth, async (req, res) => {
   const productId = req.params.id;
   const user_id = req.user.id;
 
-  // Check if product belongs to user
   const { data: product } = await supabase
     .from("products")
     .select("*")
@@ -114,7 +137,6 @@ router.delete("/:id", auth, async (req, res) => {
     return res.status(403).json({ message: "Unauthorized" });
   }
 
-  // Delete product
   const { error } = await supabase
     .from("products")
     .delete()
@@ -125,14 +147,16 @@ router.delete("/:id", auth, async (req, res) => {
   res.json({ message: "Product deleted successfully" });
 });
 
+
+// ============================
 // UPDATE PRODUCT
+// ============================
 router.put("/:id", auth, async (req, res) => {
   const productId = req.params.id;
   const user_id = req.user.id;
 
   const { title, description, price } = req.body;
 
-  // Check ownership
   const { data: product } = await supabase
     .from("products")
     .select("*")
@@ -147,16 +171,19 @@ router.put("/:id", auth, async (req, res) => {
     return res.status(403).json({ message: "Unauthorized" });
   }
 
-  // Update product
   const { data, error } = await supabase
     .from("products")
     .update({ title, description, price })
-    .eq("id", productId);
+    .eq("id", productId)
+    .select();
 
   if (error) return res.status(500).json(error);
 
   res.json({
     message: "Product updated successfully",
-    product: data
+    product: data[0]
   });
 });
+
+
+module.exports = router;
