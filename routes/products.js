@@ -58,6 +58,24 @@ router.get("/", async (req, res) => {
   res.json(data);
 });
 
+
+// GET SINGLE PRODUCT
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error || !data) {
+    return res.status(404).json({ message: "Product not found" });
+  }
+
+  res.json(data);
+});
+
 module.exports = router;
 
 
