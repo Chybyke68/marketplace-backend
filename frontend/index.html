@@ -125,6 +125,10 @@ if (!token) {
       <p class="text-blue-500 text-sm">${p.category || "General"}</p>
       <p class="text-gray-600 text-sm">${p.description}</p>
       <p class="text-green-600 font-bold text-lg mt-2">₦${p.price}</p>
+      <button onclick="event.stopPropagation(); contactSeller('${p.user_id}', '${p.title}')" 
+  class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 mt-2 rounded">
+  Contact Seller
+</button>
 
       ${
         p.user_id === userId ? `
@@ -428,6 +432,15 @@ function displayProducts(data) {
 
   displayProducts(filtered);
 });*/
+
+    function contactSeller(sellerId, productTitle) {
+  const message = `Hello, I'm interested in "${productTitle}"`;
+
+  // For now we simulate chat using WhatsApp or alert
+  alert(`Message to seller (${sellerId}):\n\n${message}`);
+
+  // Later we upgrade to real chat system
+    }
 
 
 function filterProducts() {
