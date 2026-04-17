@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+<div class="max-w-md mx-auto mt-5 bg-white p-4 rounded shadow">
+
+  <h2 class="text-lg font-bold mb-3">Chat</h2>
+
+  <!-- Messages -->
+  <div id="messages" class="h-64 overflow-y-auto border p-2 mb-3 bg-gray-50"></div>
+
+  <!-- Input -->
+  <input id="msg" placeholder="Type message..."
+    class="border p-2 w-full mb-2 rounded" />
+
+  <button onclick="sendMessage()"
+    class="bg-blue-500 text-white w-full p-2 rounded">
+    Send
+  </button>
+
+</div>
+
+<script>
+const BACKEND = "https://marketplace-5nn2.onrender.com"; // CHANGE IF DIFFERENT
+
+const token = localStorage.getItem("token");
+
+// GET URL PARAMS
+const params = new URLSearchParams(window.location.search);
+const product_id = params.get("product");
+const receiver_id = params.get("seller");
+
+// LOAD MESSAGES
+async function loadMessages() {
+  try {
+    const res = await fetch(`${BACKEND}/api/messages/${product_id}/${receiver_id}`, {
+      headers: {
+        Authorization: token
+      }
+    });
+
+    const data = await res.json();
+
+    const box = document.getElementById("messages");
+    box.innerHTML = "";
+
+    data.forEach(m => {
+      const isMe = m.sender_id !== receiver_id;
+
+      box.innerHTML += `
+        <div class="${isMe ? "text-right" : "text-left"} mb-2">
+          <span class="inline-block px-3 py-1 rounded 
+            ${isMe ? "bg-blue-500 text-white" : "bg-gray-300"}">
+            ${m.text}
+          </span>
+        </div>
+      `;
+    });
+
+    box.scrollTop = box.scrollHeight;
+
+  } catch (err) {
+    console.log("Error loading messages");
+  }
+}
+
+
+// SEND MESSAGE
+async function sendMessage() {
+  const input = document.getElementById("msg");
+  const text = input.value;
+
+  if (!text) return;
+
+  await fetch(`${BACKEND}/api/messages/send`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token
+    },
+    body: JSON.stringify({
+      receiver_id,
+      product_id,
+      text
+    })
+  });
+
+  input.value = "";
+  loadMessages();
+}
+
+
+// AUTO REFRESH EVERY 2s
+setInterval(loadMessages, 2000);
+
+// INITIAL LOAD
+loadMessages();
+
+</script>
+
+</body>
+</html>
