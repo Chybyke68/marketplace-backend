@@ -11,7 +11,7 @@ router.get("/test", (req, res) => {
 
 // REGISTER
 router.post("/register", async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body;
 
   // Check if user exists
   const { data: existingUser } = await supabase
@@ -30,7 +30,7 @@ router.post("/register", async (req, res) => {
   // Save user
   const { data, error } = await supabase
     .from("users")
-    .insert([{ name, email, password: hashedPassword }]);
+    .insert([{ name, email, password: hashedPassword, role: role || "buyer" }]);
 
   if (error) return res.status(500).json(error);
 
@@ -69,7 +69,7 @@ router.post("/login", async (req, res) => {
 
   // 🔐 CREATE TOKEN
   const token = jwt.sign(
-    { id: user.id },
+    { id: user.id, role: user.role },
     "secretkey",
     { expiresIn: "7d" }
   );
