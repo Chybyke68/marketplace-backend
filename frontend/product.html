@@ -24,6 +24,10 @@
     Contact Seller
   </button>
 
+  <button onclick="startChat()" class="bg-blue-600 text-white p-2 rounded">
+  Chat Seller
+  </button>
+
 </div>
 
 <script>
@@ -52,6 +56,14 @@ const p = await res.json();
   };
 }
 
+
+  function startChat() {
+  const productId = new URLSearchParams(window.location.search).get("id");
+  const sellerId = product.user_id;
+
+  window.location.href = `chat.html?product=${productId}&seller=${sellerId}`;
+  }
+  
 function goBack() {
   window.history.back();
 }
