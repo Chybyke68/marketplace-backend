@@ -42,23 +42,20 @@
 document.getElementById("registerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const role = document.getElementById("role").value;
+
   const res = await fetch("https://marketplace-5nn2.onrender.com/api/auth/register", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-   /* body: JSON.stringify({
-      email: document.getElementById("email").value,
-      password: document.getElementById("password").value
-    })*/
-
-    const role = document.getElementById("role").value;
-
-body: JSON.stringify({
-  email,
-  password,
-  role
-})
+    body: JSON.stringify({
+      email,
+      password,
+      role
+    })
   });
 
   const data = await res.json();
@@ -67,7 +64,7 @@ body: JSON.stringify({
     alert("Registered successfully ✅");
     window.location.href = "login.html";
   } else {
-    alert("Registration failed");
+    alert("Registration failed ❌");
   }
 });
 </script>
