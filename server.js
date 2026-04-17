@@ -30,6 +30,8 @@ app.get("/", (req, res) => {
   res.send("🚀 Campus Marketplace API is running");
 });
 
+app.use("/api/messages", require("./routes/messages"));
+
 app.listen(5000, () => {
   console.log("Server running on port 5000");
 });
