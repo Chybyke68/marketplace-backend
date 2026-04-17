@@ -32,7 +32,13 @@ const id = params.get("id");
 
 async function loadProduct() {
   const res = await fetch(`https://marketplace-5nn2.onrender.com/api/products/${id}`);
-  const p = await res.json();
+  
+  if (!res.ok) {
+  alert("Product not found ❌");
+  return;
+}
+
+const p = await res.json();
 
   document.getElementById("image").src = p.image;
   document.getElementById("title").innerText = p.title;
