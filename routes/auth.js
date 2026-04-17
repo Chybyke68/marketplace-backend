@@ -50,7 +50,7 @@ const jwt = require("jsonwebtoken");
 
 // LOGIN
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;
 
   const { data: user } = await supabase
     .from("users")
