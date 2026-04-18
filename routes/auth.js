@@ -41,7 +41,7 @@ router.get("/test", (req, res) => {
 });*/
 
 router.post("/register", async (req, res) => {
-  const { email, password, role } = req.body;
+  const { name, email, password, role } = req.body;
 
   const { data: existingUser } = await supabase
     .from("users")
@@ -58,6 +58,7 @@ router.post("/register", async (req, res) => {
   const { data, error } = await supabase
     .from("users")
     .insert([{
+      name, 
       email,
       password: hashedPassword,
       role: role || "buyer"
