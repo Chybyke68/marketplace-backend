@@ -1,20 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>CampusDealz - Buyer</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusDealz - Marketplace</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { colors: { brand: '#ea580c', navy: '#1e293b' } } }
+    }
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark')
+    } else { document.documentElement.classList.remove('dark') }
+
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+      localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    }
+  </script>
 </head>
-<body class="p-5 bg-gray-100">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-200">
 
-<h1 class="text-2xl font-bold mb-4">Marketplace</h1>
+<nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <div class="bg-white rounded-full p-1 border dark:border-none">
+        <img src="http://googleusercontent.com/generated_image_content/0" class="h-8 w-8 object-contain rounded-full">
+      </div>
+      <span class="text-xl font-extrabold text-navy dark:text-white tracking-tight">CampusDealz</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+        🌓
+      </button>
+      <button onclick="logout()" class="text-sm font-semibold text-red-500 hover:text-red-700 transition">Logout</button>
+    </div>
+  </div>
+</nav>
 
-<button onclick="logout()" class="bg-red-500 text-white px-3 py-1 mb-4 rounded">
-Logout
-</button>
+<main class="max-w-7xl mx-auto p-5">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold mb-4 text-navy dark:text-white">Discover Deals</h1>
+    <div class="relative">
+      <input id="searchInput" placeholder="Search for textbooks, electronics, clothing..." class="w-full md:w-1/2 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-full py-3 px-6 shadow-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-all"/>
+    </div>
+  </div>
 
-<input id="searchInput" placeholder="Search..." class="border p-2 w-full mb-3"/>
-
-<div id="products" class="grid grid-cols-2 gap-4"></div>
+  <div id="products" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    </div>
+</main>
 
 <script>
 const API = "https://marketplace-5nn2.onrender.com";
@@ -27,17 +62,19 @@ function logout() {
 async function loadProducts() {
   const res = await fetch(`${API}/api/products`);
   const data = await res.json();
-
   const container = document.getElementById("products");
   container.innerHTML = "";
 
   data.forEach(p => {
     container.innerHTML += `
-      <div class="bg-white p-3 rounded shadow">
-        <img src="${p.image}" class="w-full h-40 object-cover">
-        <h2>${p.title}</h2>
-        <p>₦${p.price}</p>
-        <button onclick="view('${p.id}')" class="bg-blue-500 text-white px-2 py-1 mt-2">View</button>
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer border border-gray-100 dark:border-gray-700" onclick="view('${p.id}')">
+        <div class="h-48 overflow-hidden bg-gray-200 dark:bg-gray-700">
+          <img src="${p.image}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+        </div>
+        <div class="p-4 flex flex-col flex-grow">
+          <h2 class="font-bold text-lg mb-1 truncate text-navy dark:text-white">${p.title}</h2>
+          <p class="text-brand font-extrabold text-xl mt-auto">₦${p.price.toLocaleString()}</p>
+        </div>
       </div>
     `;
   });
@@ -49,6 +86,5 @@ function view(id) {
 
 loadProducts();
 </script>
-
 </body>
 </html>
