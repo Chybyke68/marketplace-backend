@@ -127,7 +127,7 @@ router.get("/", async (req, res) => {
     if (minPrice) query = query.gte("price", minPrice);
     if (maxPrice) query = query.lte("price", maxPrice);
 
-    const { data, error } = await query;
+    //const { data, error } = await query;
 
   if (error) return res.status(500).json(error);
 
