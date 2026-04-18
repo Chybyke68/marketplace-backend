@@ -1,25 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>CampusDealz - Seller</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusDealz - Seller Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { colors: { brand: '#ea580c', navy: '#1e293b' } } }
+    }
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark')
+    } else { document.documentElement.classList.remove('dark') }
+
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+      localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    }
+  </script>
 </head>
-<body class="p-5 bg-gray-100">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-200">
 
-<h1 class="text-2xl font-bold mb-4">Seller Dashboard</h1>
+<nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <div class="bg-white rounded-full p-1 border dark:border-none">
+        <img src="http://googleusercontent.com/generated_image_content/0" class="h-8 w-8 object-contain rounded-full">
+      </div>
+      <span class="text-xl font-extrabold text-navy dark:text-white tracking-tight">Seller Hub</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition">🌓</button>
+      <button onclick="logout()" class="text-sm font-semibold text-red-500 hover:text-red-700 transition">Logout</button>
+    </div>
+  </div>
+</nav>
 
-<button onclick="logout()" class="bg-red-500 text-white px-3 py-1 mb-4 rounded">
-Logout
-</button>
+<main class="max-w-5xl mx-auto p-5 grid grid-cols-1 md:grid-cols-3 gap-6">
+  
+  <div class="md:col-span-1">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 sticky top-24">
+      <h2 class="text-xl font-bold mb-4 text-navy dark:text-white">Post New Deal</h2>
+      <form id="form" class="space-y-4">
+        <input id="title" placeholder="Product Title" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg p-3 focus:ring-2 focus:ring-brand focus:outline-none" required/>
+        <div class="relative">
+          <span class="absolute left-3 top-3 text-gray-500 font-bold">₦</span>
+          <input id="price" type="number" placeholder="Price" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg p-3 pl-8 focus:ring-2 focus:ring-brand focus:outline-none" required/>
+        </div>
+        <input id="image" type="file" class="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-brand file:text-white hover:file:bg-orange-700 cursor-pointer" required/>
+        <button type="submit" class="w-full bg-brand hover:bg-orange-700 text-white font-bold py-3 rounded-lg transition-transform active:scale-95 shadow-md">Add Product</button>
+      </form>
+    </div>
+  </div>
 
-<form id="form" class="bg-white p-4 rounded mb-4">
-  <input id="title" placeholder="Title" class="border p-2 w-full mb-2"/>
-  <input id="price" placeholder="Price" class="border p-2 w-full mb-2"/>
-  <input id="image" type="file" class="mb-2"/>
-  <button class="bg-blue-500 text-white px-3 py-1">Add</button>
-</form>
+  <div class="md:col-span-2">
+    <h2 class="text-2xl font-bold mb-4 text-navy dark:text-white">My Active Listings</h2>
+    <div id="products" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      </div>
+  </div>
 
-<div id="products"></div>
+</main>
 
 <script>
 const API = "https://marketplace-5nn2.onrender.com";
@@ -31,20 +72,21 @@ function logout() {
 
 async function loadMy() {
   const token = localStorage.getItem("token");
-
-  const res = await fetch(`${API}/api/products/my`, {
-    headers: { Authorization: token }
-  });
-
+  const res = await fetch(`${API}/api/products/my`, { headers: { Authorization: token } });
   const data = await res.json();
-
   const box = document.getElementById("products");
   box.innerHTML = "";
 
   data.forEach(p => {
     box.innerHTML += `
-      <div class="bg-white p-3 mb-2">
-        ${p.title} - ₦${p.price}
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex items-center p-3 gap-4">
+        <div class="w-20 h-20 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden shrink-0">
+          <img src="${p.image}" class="w-full h-full object-cover">
+        </div>
+        <div class="flex-grow">
+          <h3 class="font-bold text-navy dark:text-white truncate">${p.title}</h3>
+          <p class="text-brand font-bold mt-1">₦${p.price.toLocaleString()}</p>
+        </div>
       </div>
     `;
   });
@@ -52,13 +94,15 @@ async function loadMy() {
 
 document.getElementById("form").addEventListener("submit", async e => {
   e.preventDefault();
-
   const token = localStorage.getItem("token");
-
   const form = new FormData();
-  form.append("title", title.value);
-  form.append("price", price.value);
-  form.append("image", image.files[0]);
+  form.append("title", document.getElementById("title").value);
+  form.append("price", document.getElementById("price").value);
+  form.append("image", document.getElementById("image").files[0]);
+
+  const btn = e.target.querySelector('button');
+  btn.innerText = "Uploading...";
+  btn.disabled = true;
 
   await fetch(`${API}/api/products/add`, {
     method: "POST",
@@ -66,11 +110,13 @@ document.getElementById("form").addEventListener("submit", async e => {
     body: form
   });
 
+  document.getElementById("form").reset();
+  btn.innerText = "Add Product";
+  btn.disabled = false;
   loadMy();
 });
 
 loadMy();
 </script>
-
 </body>
 </html>
