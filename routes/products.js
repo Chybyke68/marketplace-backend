@@ -11,7 +11,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 // ============================
 router.post("/add", auth, upload.single("image"), async (req, res) => {
   try {
-    const { title, description, price, category } = req.body;
+    const { title, description, price, category, condition, location } = req.body;
     const user_id = req.user.id;
     const file = req.file;
 
@@ -45,8 +45,11 @@ router.post("/add", auth, upload.single("image"), async (req, res) => {
         description,
         price,
         category,
+        condition,
+        location,
         image: publicUrl.publicUrl,
-        user_id
+        user_id,
+        status: "available"
       }])
       .select();
 
@@ -63,6 +66,39 @@ router.post("/add", auth, upload.single("image"), async (req, res) => {
 });
 
 
+/*
+// Example: routes/products.js
+
+router.post('/add', authMiddleware, upload.single('image'), async (req, res) => {
+  try {
+    const { title, price, description, category, condition, location } = req.body;
+    const userId = req.user.id; // From your auth middleware
+    const imageUrl = req.file ? req.file.path : null;
+
+    const { data, error } = await supabase
+      .from('products')
+      .insert([
+        { 
+          title, 
+          price: parseFloat(price), 
+          description, 
+          category, 
+          condition, 
+          location, 
+          image: imageUrl, 
+          user_id: userId,
+          status: 'available' // Default status
+        }
+      ]);
+
+    if (error) throw error;
+    res.status(201).json({ message: "Product listed successfully!", data });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+*/
 // ============================
 // GET ALL PRODUCTS
 // ============================
@@ -70,13 +106,33 @@ router.get("/", async (req, res) => {
   const { data, error } = await supabase
     .from("products")
     .select("*")
+    .eq("status", "available")
     .order("created_at", { ascending: false });
+
+  if (search) {
+      query = query.ilike("title", `%${search}%`);
+    }
+
+    // 📂 Category filter
+    if (category && category !== "All") {
+      query = query.eq("category", category);
+    }
+
+    // 📍 Location filter
+    if (location) {
+      query = query.ilike("location", `%${location}%`);
+    }
+
+    // 💰 Price Range filters
+    if (minPrice) query = query.gte("price", minPrice);
+    if (maxPrice) query = query.lte("price", maxPrice);
+
+    const { data, error } = await query;
 
   if (error) return res.status(500).json(error);
 
   res.json(data);
 });
-
 
 // ============================
 // GET MY PRODUCTS
@@ -107,6 +163,7 @@ router.get("/:id", async (req, res) => {
     .select("*")
     .eq("id", id)
     .single();
+
 
   if (error || !data) {
     return res.status(404).json({ message: "Product not found" });
