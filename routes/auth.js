@@ -10,7 +10,7 @@ router.get("/test", (req, res) => {
 
 
 // REGISTER
-router.post("/register", async (req, res) => {
+/*router.post("/register", async (req, res) => {
   const { name, email, password, role } = req.body;
 
   // Check if user exists
@@ -36,6 +36,41 @@ router.post("/register", async (req, res) => {
 
   res.json({
     message: "User registered securely",
+    user: data
+  });
+});*/
+
+router.post("/register", async (req, res) => {
+  const { email, password, role } = req.body;
+
+  const { data: existingUser } = await supabase
+    .from("users")
+    .select("*")
+    .eq("email", email)
+    .maybeSingle(); // 🔥 FIX
+
+  if (existingUser) {
+    return res.status(400).json({ message: "User already exists" });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const { data, error } = await supabase
+    .from("users")
+    .insert([{
+      email,
+      password: hashedPassword,
+      role: role || "buyer"
+    }])
+    .select(); // 🔥 IMPORTANT
+
+  if (error) {
+    console.log("REGISTER ERROR:", error);
+    return res.status(500).json(error);
+  }
+
+  res.json({
+    message: "User registered",
     user: data
   });
 });
