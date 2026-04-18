@@ -22,48 +22,103 @@
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-200">
 
-<nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+<div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden opacity-0 transition-opacity duration-300" onclick="closeSidebar()"></div>
+
+<div id="sidebar" class="fixed inset-y-0 left-0 w-72 bg-white dark:bg-gray-800 shadow-2xl z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+  <div class="p-5 flex justify-between items-center border-b border-gray-100 dark:border-gray-700">
+    <span class="text-xl font-extrabold text-navy dark:text-white">Seller Menu</span>
+    <button onclick="closeSidebar()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+  </div>
+  <div class="flex-grow p-4 space-y-4">
+    <a href="buyer.html" class="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-medium">🛒 Switch to Buying</a>
+    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-medium">⚙️ Shop Settings</a>
+  </div>
+  <div class="p-4 border-t dark:border-gray-700">
+     <button onclick="logout()" class="w-full text-left px-3 py-2 text-red-500 font-bold flex items-center gap-3">
+        Logout
+     </button>
+  </div>
+</div>
+
+<nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-30">
   <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
     <div class="flex items-center gap-3">
-      <div class="bg-white rounded-full p-1 border dark:border-none">
-        <img src="http://googleusercontent.com/generated_image_content/0" class="h-8 w-8 object-contain rounded-full">
-      </div>
-      <span class="text-xl font-extrabold text-navy dark:text-white tracking-tight">Seller Hub</span>
+      <button onclick="openSidebar()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+        <svg class="w-6 h-6 text-navy dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+      </button>
+      <span class="text-xl font-extrabold text-navy dark:text-white">Seller Hub</span>
     </div>
-    <div class="flex items-center gap-4">
-      <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition">🌓</button>
-      <button onclick="logout()" class="text-sm font-semibold text-red-500 hover:text-red-700 transition">Logout</button>
-    </div>
+    <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">🌓</button>
   </div>
 </nav>
 
-<main class="max-w-5xl mx-auto p-5 grid grid-cols-1 md:grid-cols-3 gap-6">
+<main class="max-w-4xl mx-auto p-5">
   
-  <div class="md:col-span-1">
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 sticky top-24">
-      <h2 class="text-xl font-bold mb-4 text-navy dark:text-white">Post New Deal</h2>
-      <form id="form" class="space-y-4">
-        <input id="title" placeholder="Product Title" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg p-3 focus:ring-2 focus:ring-brand focus:outline-none" required/>
-        <div class="relative">
-          <span class="absolute left-3 top-3 text-gray-500 font-bold">₦</span>
-          <input id="price" type="number" placeholder="Price" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg p-3 pl-8 focus:ring-2 focus:ring-brand focus:outline-none" required/>
-        </div>
-        <input id="image" type="file" class="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-brand file:text-white hover:file:bg-orange-700 cursor-pointer" required/>
-        <button type="submit" class="w-full bg-brand hover:bg-orange-700 text-white font-bold py-3 rounded-lg transition-transform active:scale-95 shadow-md">Add Product</button>
-      </form>
-    </div>
-  </div>
-
-  <div class="md:col-span-2">
-    <h2 class="text-2xl font-bold mb-4 text-navy dark:text-white">My Active Listings</h2>
-    <div id="products" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  <section class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8">
+    <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+      <span class="bg-orange-100 text-orange-600 p-2 rounded-lg">✨</span> Post New Ad
+    </h2>
+    
+    <form id="form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="md:col-span-2">
+        <input id="title" placeholder="What are you selling?" class="w-full border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-3 rounded-xl focus:border-brand outline-none transition" required/>
       </div>
-  </div>
+      
+      <div class="relative">
+        <span class="absolute left-3 top-3 text-gray-400 font-bold">₦</span>
+        <input id="price" type="number" placeholder="Price" class="w-full border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-3 pl-8 rounded-xl focus:border-brand outline-none transition" required/>
+      </div>
 
+      <select id="category" class="w-full border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-3 rounded-xl focus:border-brand outline-none transition">
+        <option value="Electronics">📱 Electronics</option>
+        <option value="Textbooks">📚 Textbooks</option>
+        <option value="Fashion">👕 Fashion</option>
+        <option value="Home">🛏️ Dorm Gear</option>
+        <option value="Other">🌀 Others</option>
+      </select>
+
+      <select id="condition" class="w-full border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-3 rounded-xl focus:border-brand outline-none transition">
+        <option value="New">Brand New</option>
+        <option value="Used">Lightly Used</option>
+        <option value="Refurbished">Refurbished</option>
+      </select>
+
+      <input id="location" placeholder="Hostel/Faculty Location" class="w-full border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-3 rounded-xl focus:border-brand outline-none transition" required/>
+
+      <div class="md:col-span-2">
+        <label class="block text-sm font-bold text-gray-500 mb-2">Product Photo</label>
+        <input id="image" type="file" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100 cursor-pointer" required/>
+      </div>
+
+      <button class="md:col-span-2 bg-brand hover:bg-orange-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-orange-200 dark:shadow-none transition-all mt-2">
+        Post Advertisement
+      </button>
+    </form>
+  </section>
+
+  <h2 class="text-xl font-bold mb-4">My Active Ads</h2>
+  <div id="products" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    </div>
 </main>
 
 <script>
 const API = "https://marketplace-5nn2.onrender.com";
+
+function openSidebar() {
+  document.getElementById('sidebarOverlay').classList.remove('hidden');
+  setTimeout(() => {
+    document.getElementById('sidebarOverlay').classList.remove('opacity-0');
+    document.getElementById('sidebar').classList.remove('-translate-x-full');
+  }, 10);
+}
+
+function closeSidebar() {
+  document.getElementById('sidebarOverlay').classList.add('opacity-0');
+  document.getElementById('sidebar').classList.add('-translate-x-full');
+  setTimeout(() => document.getElementById('sidebarOverlay').classList.add('hidden'), 300);
+}
 
 function logout() {
   localStorage.removeItem("token");
@@ -72,20 +127,24 @@ function logout() {
 
 async function loadMy() {
   const token = localStorage.getItem("token");
-  const res = await fetch(`${API}/api/products/my`, { headers: { Authorization: token } });
+  const res = await fetch(`${API}/api/products/my`, {
+    headers: { Authorization: token }
+  });
   const data = await res.json();
   const box = document.getElementById("products");
   box.innerHTML = "";
 
   data.forEach(p => {
     box.innerHTML += `
-      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex items-center p-3 gap-4">
-        <div class="w-20 h-20 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden shrink-0">
-          <img src="${p.image}" class="w-full h-full object-cover">
-        </div>
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border dark:border-gray-700 flex gap-4">
+        <img src="${p.image}" class="w-20 h-20 object-cover rounded-lg">
         <div class="flex-grow">
           <h3 class="font-bold text-navy dark:text-white truncate">${p.title}</h3>
-          <p class="text-brand font-bold mt-1">₦${p.price.toLocaleString()}</p>
+          <p class="text-brand font-bold text-sm">₦${p.price.toLocaleString()}</p>
+          <div class="flex gap-2 mt-2">
+            <button onclick="markSold('${p.id}')" class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded font-bold uppercase">Mark Sold</button>
+            <button onclick="deleteAd('${p.id}')" class="text-[10px] bg-red-100 text-red-700 px-2 py-1 rounded font-bold uppercase">Delete</button>
+          </div>
         </div>
       </div>
     `;
@@ -95,26 +154,32 @@ async function loadMy() {
 document.getElementById("form").addEventListener("submit", async e => {
   e.preventDefault();
   const token = localStorage.getItem("token");
-  const form = new FormData();
-  form.append("title", document.getElementById("title").value);
-  form.append("price", document.getElementById("price").value);
-  form.append("image", document.getElementById("image").files[0]);
+  const formData = new FormData();
+  
+  formData.append("title", document.getElementById("title").value);
+  formData.append("price", document.getElementById("price").value);
+  formData.append("category", document.getElementById("category").value);
+  formData.append("condition", document.getElementById("condition").value);
+  formData.append("location", document.getElementById("location").value);
+  formData.append("image", document.getElementById("image").files[0]);
 
-  const btn = e.target.querySelector('button');
-  btn.innerText = "Uploading...";
-  btn.disabled = true;
-
-  await fetch(`${API}/api/products/add`, {
+  const res = await fetch(`${API}/api/products/add`, {
     method: "POST",
     headers: { Authorization: token },
-    body: form
+    body: formData
   });
 
-  document.getElementById("form").reset();
-  btn.innerText = "Add Product";
-  btn.disabled = false;
-  loadMy();
+  if (res.ok) {
+    alert("Ad posted successfully! 🚀");
+    location.reload();
+  } else {
+    alert("Error posting ad.");
+  }
 });
+
+// Placeholder functions for management
+async function markSold(id) { alert("Feature coming soon: Updating status to 'Sold'"); }
+async function deleteAd(id) { alert("Feature coming soon: Deleting ad"); }
 
 loadMy();
 </script>
