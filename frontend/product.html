@@ -2,91 +2,82 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Product Details</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { colors: { brand: '#ea580c', navy: '#1e293b' } } }
+    }
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark')
+    } else { document.documentElement.classList.remove('dark') }
+  </script>
 </head>
 
-<body class="bg-gray-100 p-5">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-8 transition-colors duration-200">
 
-<div class="max-w-3xl mx-auto bg-white p-5 rounded shadow">
-
-  <!-- Back -->
-  <button onclick="goBack()" class="mb-4 text-blue-500">← Back</button>
-
-  <!-- Product -->
-  <img id="image" class="w-full h-64 object-cover rounded mb-4">
-
-  <h1 id="title" class="text-2xl font-bold"></h1>
-  <p id="category" class="text-blue-500 text-sm mb-2"></p>
-  <p id="description" class="text-gray-700 mb-3"></p>
-  <p id="price" class="text-green-600 text-xl font-bold"></p>
-
-  <!-- Chat Button -->
-  <button onclick="startChat()" 
-    class="bg-green-600 text-white w-full p-2 rounded mt-4">
-    Chat Seller 💬
+<div class="max-w-4xl mx-auto">
+  <button onclick="goBack()" class="mb-6 flex items-center text-gray-500 hover:text-brand font-semibold transition">
+    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+    Back to Marketplace
   </button>
 
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row">
+    
+    <div class="md:w-1/2 h-80 md:h-[500px] bg-gray-200 dark:bg-gray-700">
+      <img id="image" class="w-full h-full object-cover">
+    </div>
+
+    <div class="md:w-1/2 p-6 md:p-10 flex flex-col">
+      <div class="mb-2">
+        <span id="category" class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide"></span>
+      </div>
+      <h1 id="title" class="text-3xl md:text-4xl font-extrabold text-navy dark:text-white leading-tight mb-4"></h1>
+      <p id="price" class="text-3xl font-black text-brand mb-6"></p>
+      
+      <div class="prose dark:prose-invert flex-grow">
+        <h3 class="text-lg font-semibold mb-2">Description</h3>
+        <p id="description" class="text-gray-600 dark:text-gray-400 leading-relaxed"></p>
+      </div>
+
+      <button onclick="startChat()" class="mt-8 bg-brand hover:bg-orange-700 text-white font-bold text-lg w-full py-4 rounded-xl shadow-lg transition-transform active:scale-95 flex justify-center items-center gap-2">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+        Message Seller
+      </button>
+    </div>
+  </div>
 </div>
 
 <script>
 const BACKEND = "https://marketplace-5nn2.onrender.com";
-
 let productData = null;
 
-
-// 🔥 LOAD PRODUCT
 async function loadProduct() {
   try {
     const id = new URLSearchParams(window.location.search).get("id");
-
     const res = await fetch(`${BACKEND}/api/products/${id}`);
-
-    if (!res.ok) {
-      alert("Product not found ❌");
-      return;
-    }
-
+    if (!res.ok) { alert("Product not found ❌"); return; }
+    
     const data = await res.json();
-
     productData = data;
 
-    // ✅ SET DATA
     document.getElementById("image").src = data.image;
     document.getElementById("title").innerText = data.title;
-    document.getElementById("description").innerText = data.description;
-    document.getElementById("price").innerText = "₦" + data.price;
+    document.getElementById("description").innerText = data.description || "No description provided by the seller.";
+    document.getElementById("price").innerText = "₦" + data.price.toLocaleString();
     document.getElementById("category").innerText = data.category || "General";
-
-  } catch (err) {
-    console.log("Error loading product");
-  }
+  } catch (err) { console.log("Error loading product"); }
 }
 
-
-// 💬 START CHAT
 function startChat() {
-  if (!productData) {
-    alert("Product not loaded yet");
-    return;
-  }
-
-  const productId = productData.id;
-  const sellerId = productData.user_id;
-
-  window.location.href = `chat.html?product=${productId}&seller=${sellerId}`;
+  if (!productData) return;
+  window.location.href = `chat.html?product=${productData.id}&seller=${productData.user_id}`;
 }
 
-
-// 🔙 BACK BUTTON
-function goBack() {
-  window.history.back();
-}
-
-
-// 🚀 INIT
+function goBack() { window.history.back(); }
 loadProduct();
 </script>
-
 </body>
 </html>
