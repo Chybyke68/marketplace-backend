@@ -103,35 +103,44 @@ router.post('/add', authMiddleware, upload.single('image'), async (req, res) => 
 // GET ALL PRODUCTS
 // ============================
 router.get("/", async (req, res) => {
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .eq("status", "available")
-    .order("created_at", { ascending: false });
+  try {
+    let query = supabase
+      .from("products")
+      .select("*")
+      .eq("status", "available")
+      .order("created_at", { ascending: false });
 
-  if (search) {
+    // OPTIONAL FILTERS (SAFE)
+    const { search, category, location, minPrice, maxPrice } = req.query;
+
+    if (search) {
       query = query.ilike("title", `%${search}%`);
     }
 
-    // 📂 Category filter
     if (category && category !== "All") {
       query = query.eq("category", category);
     }
 
-    // 📍 Location filter
     if (location) {
       query = query.ilike("location", `%${location}%`);
     }
 
-    // 💰 Price Range filters
     if (minPrice) query = query.gte("price", minPrice);
     if (maxPrice) query = query.lte("price", maxPrice);
 
-    //const { data, error } = await query;
+    const { data, error } = await query;
 
-  if (error) return res.status(500).json(error);
+    if (error) {
+      console.log("PRODUCT ERROR:", error);
+      return res.status(500).json({ message: error.message });
+    }
 
-  res.json(data);
+    res.json(data);
+
+  } catch (err) {
+    console.log("SERVER CRASH:", err);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 // ============================
