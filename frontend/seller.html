@@ -18,132 +18,114 @@
         } 
       }
     }
-    // Shared Theme Logic
-    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark')
-    } else { document.documentElement.classList.remove('dark') }
   </script>
   <style>
+    /* Hide scrollbar but allow scrolling */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans pb-20 md:pb-0">
 
-  <div id="modalOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
-    <div id="productModal" class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-3xl shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
+  <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xl md:text-2xl font-extrabold text-navy dark:text-white tracking-tight">Unizik Marketplace</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <nav class="hidden md:flex items-center gap-6 font-medium text-gray-600 dark:text-gray-300">
+            <a href="buyer.html" class="hover:text-brand transition">Home</a>
+            <a href="seller.html" class="text-brand hover:text-brand transition">Sell</a>
+            <a href="#" class="hover:text-brand transition" onclick="logout()">Logout</a>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-4 md:py-8">
+    <div class="flex justify-between items-end mb-6 border-b border-gray-200 dark:border-gray-800 pb-4">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-extrabold text-navy dark:text-white">Seller Dashboard</h1>
+      </div>
+      <button onclick="openModal()" class="bg-brand text-white px-4 py-2 rounded-lg font-bold text-sm shadow-lg">＋ Post New Ad</button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+      <section class="lg:col-span-1 space-y-4">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Active Ads</p>
+            <h3 id="activeAdsCount" class="text-3xl font-black mt-1">0</h3>
+        </div>
+      </section>
+
+      <section class="lg:col-span-2 space-y-4">
+        <h2 class="text-lg font-bold text-navy dark:text-white">Manage Your Ads</h2>
+        <div id="products-container" class="flex flex-col gap-4">
+          </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="productModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
       <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
-        <h2 id="modalTitle" class="text-xl font-black text-navy dark:text-white">Post New Item</h2>
-        <button onclick="closeModal()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
+        <h2 id="modalTitle" class="text-lg font-bold text-navy dark:text-white">Post New Item</h2>
+        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">✕</button>
       </div>
 
-      <form id="form" class="p-6 space-y-4 max-h-[70vh] overflow-y-auto no-scrollbar">
-        <div>
-          <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Item Title</label>
-          <input id="title" placeholder="e.g., iPhone 13 Pro" class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-sm focus:ring-2 focus:ring-brand outline-none" required/>
-        </div>
+      <form id="form" class="p-6 space-y-4">
+        <input id="title" placeholder="Item Title" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand" required/>
         
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Price (₦)</label>
-            <input id="price" type="number" placeholder="0.00" class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-sm focus:ring-2 focus:ring-brand outline-none" required/>
-          </div>
-          <div>
-            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Category</label>
-            <select id="category" class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-sm focus:ring-2 focus:ring-brand outline-none">
-              <option value="Books">📚 Books</option>
-              <option value="Electronics">💻 Electronics</option>
-              <option value="Fashion">👕 Fashion</option>
-              <option value="Hostel">🛏️ Hostel</option>
-            </select>
-          </div>
+        <div class="grid grid-cols-2 gap-3">
+          <input id="price" type="number" placeholder="Price (₦)" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand" required/>
+          <select id="category" class="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand">
+            <option value="Books">📚 Books</option>
+            <option value="Electronics">💻 Electronics</option>
+            <option value="Fashion">👕 Fashion</option>
+            <option value="Hostel">🛏️ Hostel</option>
+          </select>
         </div>
 
-        <div>
-          <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Description</label>
-          <textarea id="description" placeholder="Condition, reason for sale..." class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-sm focus:ring-2 focus:ring-brand outline-none resize-none" rows="3" required></textarea>
-        </div>
+        <textarea id="description" placeholder="Description..." class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand resize-none" rows="3" required></textarea>
 
-        <div class="relative border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl p-8 text-center hover:bg-orange-50 dark:hover:bg-gray-900 transition-all cursor-pointer group">
+        <div id="imageUploadArea" class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center">
             <input id="image" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="previewImage(event)"/>
-            <div id="uploadPrompt">
-               <svg class="mx-auto h-10 w-10 mb-2 text-gray-300 group-hover:text-brand transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-               <span class="text-xs font-bold text-gray-500">Tap to upload photo</span>
+            <div id="uploadPrompt" class="text-gray-400">
+               <span class="text-xs font-bold">Click to upload photo</span>
             </div>
-            <img id="imagePreview" class="hidden mx-auto h-32 w-full object-cover rounded-xl shadow-lg" alt="Preview"/>
+            <img id="imagePreview" class="hidden mx-auto h-24 w-auto object-cover rounded-lg" alt="Preview"/>
         </div>
 
-        <button type="submit" id="submitBtn" class="w-full bg-brand hover:bg-orange-600 text-white font-black py-4 rounded-2xl shadow-xl shadow-orange-200 dark:shadow-none transition-all flex justify-center items-center gap-2">
-          Publish Listing
+        <button type="submit" id="submitBtn" class="w-full bg-brand hover:bg-orange-600 text-white font-extrabold py-3.5 rounded-xl transition-all">
+          Publish Ad
         </button>
       </form>
     </div>
   </div>
 
-  <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-      <span class="text-xl md:text-2xl font-black text-navy dark:text-white tracking-tighter">Campus Dealz</span>
-      <div class="flex items-center gap-4">
-        <a href="buyer.html" class="hidden md:block text-sm font-bold text-gray-500 hover:text-brand">Back to Home</a>
-        <button onclick="openModal()" class="bg-brand text-white text-xs font-black px-5 py-2.5 rounded-full shadow-lg shadow-orange-100 dark:shadow-none">＋ Post Ad</button>
-      </div>
-    </div>
-  </header>
-
-  <main class="max-w-7xl mx-auto px-4 py-6 md:py-10">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Ads</p>
-        <h3 id="activeAdsCount" class="text-3xl font-black text-navy dark:text-white mt-2">0</h3>
-      </div>
-      </div>
-
-    <div class="space-y-6">
-      <div class="flex justify-between items-center px-2">
-        <h2 class="text-xl font-black text-navy dark:text-white">Your Marketplace Ads</h2>
-      </div>
-      <div id="products-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        </div>
-    </div>
-  </main>
-
-  <nav class="md:hidden fixed bottom-0 w-full bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 flex justify-around items-center py-3 z-50 px-4">
-    <a href="buyer.html" class="text-gray-400">🏠</a>
-    <button onclick="openModal()" class="bg-brand text-white p-4 rounded-2xl shadow-xl -mt-10 border-4 border-gray-50 dark:border-gray-900">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-    </button>
-    <button onclick="logout()" class="text-gray-400">🚪</button>
-  </nav>
-
   <script>
     const API = "https://marketplace-5nn2.onrender.com";
     let myProducts = [];
-    let editingProductId = null;
+    let editingProductId = null; // Tracks if we are editing
 
-    // MODAL CONTROL
-    function openModal() {
-      editingProductId = null;
-      document.getElementById('form').reset();
-      document.getElementById('modalTitle').innerText = "Post New Item";
-      document.getElementById('submitBtn').innerText = "Publish Listing";
-      document.getElementById('imagePreview').classList.add('hidden');
-      document.getElementById('uploadPrompt').classList.remove('hidden');
-      
-      const overlay = document.getElementById('modalOverlay');
-      overlay.classList.remove('hidden');
-      setTimeout(() => {
-        overlay.classList.remove('opacity-0');
-        document.getElementById('productModal').classList.remove('scale-95');
-      }, 10);
+    // --- Modal Controls ---
+    function openModal(isEdit = false) {
+      document.getElementById("productModal").classList.remove("hidden");
+      if (!isEdit) {
+        editingProductId = null;
+        document.getElementById("form").reset();
+        document.getElementById("modalTitle").innerText = "Post New Item";
+        document.getElementById("submitBtn").innerText = "Publish Ad";
+        document.getElementById("imagePreview").classList.add("hidden");
+        document.getElementById("uploadPrompt").classList.remove("hidden");
+        document.getElementById("imageUploadArea").classList.remove("hidden");
+      }
     }
 
     function closeModal() {
-      const overlay = document.getElementById('modalOverlay');
-      overlay.classList.add('opacity-0');
-      document.getElementById('productModal').classList.add('scale-95');
-      setTimeout(() => overlay.classList.add('hidden'), 300);
+      document.getElementById("productModal").classList.add("hidden");
     }
 
     function previewImage(event) {
@@ -160,11 +142,9 @@
       }
     }
 
-    // ADS FETCHING (Using your existing logic)
+    // --- Data Management ---
     async function loadMyAds() {
       const token = localStorage.getItem("token");
-      if (!token) { window.location.href = "login.html"; return; }
-      
       try {
         const res = await fetch(`${API}/api/products/my`, { headers: { Authorization: token } });
         const data = await res.json();
@@ -175,50 +155,48 @@
         container.innerHTML = "";
         data.forEach(p => {
           container.innerHTML += `
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 flex gap-4 items-center">
-              <img src="${p.image}" class="w-24 h-24 object-cover rounded-2xl" onerror="this.src='https://via.placeholder.com/150'">
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex gap-4 items-center">
+              <img src="${p.image}" class="w-20 h-20 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/150'">
               <div class="flex-grow min-w-0">
                 <h3 class="font-bold text-navy dark:text-white truncate">${p.title}</h3>
-                <p class="text-brand font-black text-lg">₦${p.price.toLocaleString()}</p>
-                <div class="flex gap-2 mt-2">
-                  <button onclick="editAd('${p.id}')" class="text-[10px] font-black uppercase bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-lg hover:bg-brand hover:text-white transition-colors">Edit</button>
-                  <button onclick="deleteAd('${p.id}')" class="text-[10px] font-black uppercase text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-1.5 rounded-lg transition-colors">Delete</button>
-                </div>
+                <p class="text-brand font-bold">₦${p.price.toLocaleString()}</p>
+              </div>
+              <div class="flex flex-col gap-2">
+                <button onclick="editAd('${p.id}')" class="text-xs bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-lg font-bold">Edit</button>
+                <button onclick="deleteAd('${p.id}')" class="text-xs text-red-500 font-bold">Delete</button>
               </div>
             </div>`;
         });
       } catch(err) { console.error(err); }
     }
 
-    // EDIT INITIATION
+    // Prepare Modal for Editing
     function editAd(id) {
       const product = myProducts.find(p => p.id == id);
       if (!product) return;
 
       editingProductId = id;
+      openModal(true);
+
+      document.getElementById("modalTitle").innerText = "Edit Product";
+      document.getElementById("submitBtn").innerText = "Update Product";
+      
+      // Fill form with existing data
       document.getElementById("title").value = product.title;
       document.getElementById("price").value = product.price;
-      document.getElementById("description").value = product.description || "";
       document.getElementById("category").value = product.category || "Books";
+      document.getElementById("description").value = product.description || "";
       
-      const preview = document.getElementById('imagePreview');
-      preview.src = product.image;
-      preview.classList.remove('hidden');
-      document.getElementById('uploadPrompt').classList.add('hidden');
-
-      document.getElementById('modalTitle').innerText = "Edit Item Details";
-      document.getElementById('submitBtn').innerText = "Save Changes";
+      // Show existing image
+      document.getElementById("imagePreview").src = product.image;
+      document.getElementById("imagePreview").classList.remove("hidden");
+      document.getElementById("uploadPrompt").classList.add("hidden");
       
-      const overlay = document.getElementById('modalOverlay');
-      overlay.classList.remove('hidden');
-      setTimeout(() => {
-        overlay.classList.remove('opacity-0');
-        document.getElementById('productModal').classList.remove('scale-95');
-      }, 10);
+      // Note: In edit mode, usually we don't force a re-upload unless they click the area
     }
 
-    // FORM SUBMISSION (Add & Update)
-    document.getElementById("form").addEventListener("submit", async (e) => {
+    // Unified Submit (Add or Edit)
+    document.getElementById("form").addEventListener("submit", async e => {
       e.preventDefault();
       const token = localStorage.getItem("token");
       const btn = document.getElementById("submitBtn");
@@ -226,12 +204,14 @@
       btn.innerText = "Processing...";
 
       try {
-        let res;
         if (editingProductId) {
-          // Update Logic
-          res = await fetch(`${API}/api/products/${editingProductId}`, {
+          // --- UPDATE (PUT) ---
+          const res = await fetch(`${API}/api/products/${editingProductId}`, {
             method: "PUT",
-            headers: { Authorization: token, "Content-Type": "application/json" },
+            headers: { 
+                Authorization: token,
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
               title: document.getElementById("title").value,
               price: document.getElementById("price").value,
@@ -239,42 +219,41 @@
               category: document.getElementById("category").value
             })
           });
+          if (res.ok) alert("Product updated! ✅");
         } else {
-          // Add Logic
-          const formData = new FormData(e.target); // Ensure input names match if using FormData
-          const manualData = new FormData();
-          manualData.append("title", document.getElementById("title").value);
-          manualData.append("price", document.getElementById("price").value);
-          manualData.append("description", document.getElementById("description").value);
-          manualData.append("category", document.getElementById("category").value);
-          manualData.append("image", document.getElementById("image").files[0]);
-          
-          res = await fetch(`${API}/api/products/add`, {
+          // --- ADD (POST) ---
+          const formData = new FormData();
+          formData.append("title", document.getElementById("title").value);
+          formData.append("price", document.getElementById("price").value);
+          formData.append("description", document.getElementById("description").value);
+          formData.append("category", document.getElementById("category").value);
+          formData.append("image", document.getElementById("image").files[0]);
+
+          const res = await fetch(`${API}/api/products/add`, {
             method: "POST",
             headers: { Authorization: token },
-            body: manualData
+            body: formData
           });
+          if (res.ok) alert("Product added! ✅");
         }
-
-        if (res.ok) {
-          closeModal();
-          loadMyAds();
-          alert("Success! Listing updated.");
-        } else {
-          const err = await res.json();
-          alert(err.message || "Failed to save listing");
-        }
-      } catch (err) { alert("Network error"); }
-      finally { btn.disabled = false; btn.innerText = "Publish Listing"; }
+        
+        closeModal();
+        loadMyAds();
+      } catch (err) {
+        alert("An error occurred.");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = editingProductId ? "Update Product" : "Publish Ad";
+      }
     });
 
     async function deleteAd(id) {
-      if (!confirm("Remove this ad permanently?")) return;
-      const res = await fetch(`${API}/api/products/${id}`, {
+      if (!confirm("Delete this ad?")) return;
+      await fetch(`${API}/api/products/${id}`, {
         method: "DELETE",
         headers: { Authorization: localStorage.getItem("token") }
       });
-      if (res.ok) loadMyAds();
+      loadMyAds();
     }
 
     function logout() { localStorage.removeItem("token"); window.location.href = "login.html"; }
