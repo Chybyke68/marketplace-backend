@@ -205,6 +205,7 @@
 
   <script>
     let myProducts = [];
+    let editingProductId = null;
 
     const API = "https://marketplace-5nn2.onrender.com";
 
@@ -226,28 +227,6 @@
         reader.readAsDataURL(file);
       }
     }
-
-
-  /*  async function loadMyAds() {
-  const token = localStorage.getItem("token");
-
-  if (!token) return;
-
-  const container = document.getElementById("products-container");
-
-  const res = await fetch(`${API}/api/products/my`, {
-    headers: { Authorization: token }
-  });
-
-  const data = await res.json();
-
-  container.innerHTML = "";
-
-  data.forEach(p => {
-    container.innerHTML += `
-
-  });
-}*/
 
 
     async function loadMyAds() {
@@ -322,41 +301,69 @@
   formData.append("price", document.getElementById("price").value);
   formData.append("description", document.getElementById("description").value);
   formData.append("category", document.getElementById("category").value);
-  formData.append("image", document.getElementById("image").files[0]);
+
+  const imageFile = document.getElementById("image").files[0];
+  if (imageFile) {
+    formData.append("image", imageFile);
+  }
 
   const btn = e.target.querySelector("button");
   const originalText = btn.innerText;
 
-  btn.innerText = "Publishing...";
+  btn.innerText = editingProductId ? "Updating..." : "Publishing...";
   btn.disabled = true;
 
   try {
-    const res = await fetch(`${API}/api/products/add`, {
-      method: "POST",
-      headers: {
-        Authorization: token
-      },
-      body: formData
-    });
+    let res;
+
+    // 🔥 EDIT MODE
+    if (editingProductId) {
+      res = await fetch(`${API}/api/products/${editingProductId}`, {
+        method: "PUT",
+        headers: {
+          Authorization: token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          title: document.getElementById("title").value,
+          price: document.getElementById("price").value,
+          description: document.getElementById("description").value,
+          category: document.getElementById("category").value
+        })
+      });
+    } 
+    // 🔥 ADD MODE
+    else {
+      res = await fetch(`${API}/api/products/add`, {
+        method: "POST",
+        headers: { Authorization: token },
+        body: formData
+      });
+    }
 
     const data = await res.json();
 
     if (!res.ok) {
-      alert(data.message || "Upload failed ❌");
+      alert(data.message || "Operation failed ❌");
       return;
     }
 
-    alert("Ad posted successfully ✅");
+    alert(editingProductId ? "Updated successfully ✅" : "Ad posted successfully ✅");
 
+    // 🔥 RESET FORM
     e.target.reset();
-    loadMyAds(); // reload products without refreshing page
+    editingProductId = null;
+
+    btn.innerText = "Post Item";
+
+    loadMyAds();
 
   } catch (err) {
-    console.error("Upload error:", err);
+    console.error(err);
     alert("Network error ❌");
   } finally {
-    btn.innerText = originalText;
     btn.disabled = false;
+    btn.innerText = "Post Item";
   }
 });
 
@@ -381,15 +388,7 @@
   loadMyAds();
 }
 
-async function editAd(id) {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    alert("Please login first");
-    window.location.href = "login.html";
-    return;
-  }
-
+function editAd(id) {
   const product = myProducts.find(p => p.id == id);
 
   if (!product) {
@@ -397,39 +396,26 @@ async function editAd(id) {
     return;
   }
 
-  const title = prompt("Edit title:", product.title);
-  if (!title) return;
+  // 🔥 set edit mode
+  editingProductId = id;
 
-  const price = prompt("Edit price:", product.price);
-  if (!price) return;
+  // 🔥 fill form
+  document.getElementById("title").value = product.title;
+  document.getElementById("price").value = product.price;
+  document.getElementById("description").value = product.description || "";
+  document.getElementById("category").value = product.category || "Books";
+  document.getElementById('imagePreview').src = product.image;
+  document.getElementById('imagePreview').classList.remove('hidden');
+  document.getElementById('uploadPrompt').classList.add('hidden');
 
-  const description = prompt("Edit description:", product.description || "");
+  // 🔥 scroll to form
+  window.scrollTo({ top: 0, behavior: "smooth" });
 
-  try {
-    const res = await fetch(`${API}/api/products/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token
-      },
-      body: JSON.stringify({ title, price, description })
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.message || "Update failed ❌");
-      return;
-    }
-
-    alert("Updated successfully ✅");
-    loadMyAds();
-
-  } catch (err) {
-    console.error(err);
-    alert("Network error ❌");
-  }
+  // 🔥 change button text
+  const btn = document.querySelector("#form button");
+  btn.innerText = "Update Item ✏️";
 }
+
     // Initialize
     loadMyAds();
   </script>
