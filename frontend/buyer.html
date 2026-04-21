@@ -134,15 +134,10 @@
       try {
         const res = await fetch(`${API}/api/products`);
         let data = await res.json();
-        
-        // Mock data if API fails or is empty, to demonstrate layout
-        if (!data || data.length === 0) {
-            data = [
-                { id: 1, title: "Engineering Math Textbook", price: 5500, seller: "John Doe", image: "https://via.placeholder.com/300x300?text=Book" },
-                { id: 2, title: "MacBook Pro 2019", price: 450000, seller: "Jane Smith", image: "https://via.placeholder.com/300x300?text=Laptop" },
-                { id: 3, title: "Standing Fan (Fairly Used)", price: 12000, seller: "Mike O.", image: "https://via.placeholder.com/300x300?text=Fan" },
-                { id: 4, title: "Vintage Denim Jacket", price: 4500, seller: "Sarah K.", image: "https://via.placeholder.com/300x300?text=Jacket" }
-            ];
+
+        if (!data || !Array.isArray(data)) {
+          container.innerHTML = "Failed to load products ❌";
+          return;
         }
 
         container.innerHTML = "";
