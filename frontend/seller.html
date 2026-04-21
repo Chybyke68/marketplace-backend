@@ -283,7 +283,8 @@
               </div>
 
               <div class="flex flex-col gap-2 flex-shrink-0">
-                <button class="text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-3 py-1.5 rounded-lg font-bold transition-colors w-full">Edit</button>
+                <button onclick="editAd('${p.id}', '${p.title}', '${p.price}', ${JSON.stringify(p.description || '')})"
+                    class="text-xs bg-yellow-500 text-white px-3 py-1.5 rounded-lg font-bold">Edit</button>
                 <button onclick="deleteAd('${p.id}')" class="text-xs bg-red-50 hover:bg-red-100 dark:bg-red-900/20 text-red-600 px-3 py-1.5 rounded-lg font-bold transition-colors w-full">Delete</button>
               </div>
 
@@ -369,6 +370,54 @@
 
   alert("Deleted successfully ✅");
   loadMyAds();
+}
+
+async function editAd(id, oldTitle, oldPrice, oldDescription) {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("Please login first");
+    window.location.href = "login.html";
+    return;
+  }
+
+  const title = prompt("Edit title:", oldTitle);
+  if (!title) return;
+
+  const price = prompt("Edit price:", oldPrice);
+  if (!price) return;
+
+  const description = prompt("Edit description:", oldDescription || "");
+
+  try {
+    const res = await fetch(`${API}/api/products/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token
+      },
+      body: JSON.stringify({
+        title,
+        price,
+        description
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.message || "Update failed ❌");
+      return;
+    }
+
+    alert("Updated successfully ✅");
+
+    loadMyAds(); // refresh
+
+  } catch (err) {
+    console.error(err);
+    alert("Network error ❌");
+  }
 }
     // Initialize
     loadMyAds();
