@@ -2,527 +2,366 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CampusDealz</title>
   <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 p-5">
-    <div class="max-w-6xl mx-auto">
-
-    <div id="userInfo" class="mb-4"></div>
-
-
- <div class="flex justify-between items-center mb-6">
-  <h1 class="text-3xl font-bold">CampusDealz</h1>
-  <p class="text-gray-600 mb-4">Buy & sell anything on campus easily</p>
-</div>
-
-
-  <h2 class="text-xl font-bold mt-6 mb-2">Add Product</h2>
-
-      <div id="sellerOnly">
-
-<form id="productForm" class="bg-white p-4 rounded shadow mb-5">
-  <input type="text" id="title" placeholder="Title" class="border p-2 w-full mb-2" required>
-  <input type="text" id="description" placeholder="Description" class="border p-2 w-full mb-2" required>
-  <input type="number" id="price" placeholder="Price" class="border p-2 w-full mb-2" required>
-  <input type="file" id="image" class="mb-2" required>
-
-  <select id="category" class="border p-2 w-full mb-2">
-  <option value="">Select Category</option>
-  <option value="Phones">Phones</option>
-  <option value="Electronics">Electronics</option>
-  <option value="Fashion">Fashion</option>
-  <option value="Services">Services</option>
-</select>
-
-  <button class="bg-blue-500 text-white px-4 py-2 rounded">Add Product</button>
-</form>
-</div>
-
-      
-<div class="mb-4 flex gap-2">
-  <button onclick="showAll()"  
-    class="bg-blue-500 text-white px-3 py-1 rounded">
-    All Products
-  </button>
-
-  <button onclick="showMy()" 
-    class="bg-green-500 text-white px-3 py-1 rounded">
-    My Products
-  </button>
-</div>
-</div>
-
-<input 
-  type="text" 
-  id="searchInput" 
-  placeholder="Search products..." 
-  class="border p-2 w-full mb-4 rounded"
-/>
-
-<div class="flex gap-2 mb-4">
-  <input type="number" id="minPrice" placeholder="Min price" class="border p-2 rounded w-1/2">
-  <input type="number" id="maxPrice" placeholder="Max price" class="border p-2 rounded w-1/2">
-</div>
-
- <div id="products" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
   <script>
-    const token = localStorage.getItem("token");
-
-if (!token) {
-  window.location.href = "login.html";
-}
-
-    
-
-let user = null;
-let role = "buyer";
-
-if (token) {
-  user = JSON.parse(atob(token.split(".")[1]));
-  role = user.role;
-}
-
-    console.log("User role:", role);
-
-    if (role !== "seller") {
-  const box = document.getElementById("sellerOnly");
-  if (box) box.style.display = "none";
-
-  const btn = document.querySelector('[onclick="showMy()"]');
-  if (btn) btn.style.display = "none";
-    }
-    
-
-
-    let currentView = "all";
-    let allProducts = [];
-
-  
-   
-  async function loadMyProducts() {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    document.getElementById("products").innerHTML = "<p>Please login</p>";
-    return;
-  }
-
-  // 🔐 Decode logged-in user ID
-  let userId = null;
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    userId = payload.id;
-  } catch (err) {
-    console.log("Invalid token");
-    return;
-  }
-
-  const res = await fetch("https://marketplace-5nn2.onrender.com/api/products/my", {
-    headers: {
-      Authorization: token
-    }
-  });
-
-  if (!res.ok) {
-    console.log("Error:", res.status);
-    document.getElementById("products").innerHTML = "<p>Error loading products</p>";
-    return;
-  }
-
-  const data = await res.json();
-  
-
-  const container = document.getElementById("products");
-  container.innerHTML = "";
-
-  data.forEach(p => {
-   container.innerHTML += `
-  <div onclick="viewProduct('${p.id}')" 
-     class="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden cursor-pointer">
-    
-    <img src="${p.image}" class="w-full h-48 object-cover">
-
-    <div class="p-3">
-      <h2 class="font-semibold text-lg">${p.title}</h2>
-      <p class="text-blue-500 text-sm">${p.category || "General"}</p>
-      <p class="text-gray-600 text-sm">${p.description}</p>
-      <p class="text-green-600 font-bold text-lg mt-2">₦${p.price}</p>
-      <button onclick="event.stopPropagation(); contactSeller('${p.user_id}', '${p.title}')" 
-  class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 mt-2 rounded">
-  Contact Seller
-</button>
-
-      ${
-        p.user_id === userId ? `
-          <div class="flex gap-2 mt-3">
-            <button onclick="editProduct('${p.id}', '${p.title}', '${p.description}', '${p.price}')" 
-              class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white py-1 rounded">
-              Edit
-            </button>
-
-            <button onclick="deleteProduct('${p.id}')" 
-              class="flex-1 bg-red-500 hover:bg-red-600 text-white py-1 rounded">
-              Delete
-            </button>
-          </div>
-        ` : ""
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { 
+        extend: { 
+          colors: { 
+            geminiBgLight: '#f0f4f9', 
+            geminiCardLight: '#ffffff',
+            geminiBgDark: '#131314',
+            geminiCardDark: '#1e1f20',
+            primary: '#0b57d0', // A professional blue
+            primaryDark: '#a8c7fa'
+          } 
+        } 
       }
-
-    </div>
-  </div>
-`;
-  });
-}
-
-async function loadAllProducts() {
-  const res = await fetch("https://marketplace-5nn2.onrender.com/api/products")
-
-  
-  allProducts = data; // store globally
-  const data = await res.json();
-
-  const container = document.getElementById("products");
-  container.innerHTML = "";
-
-  const token = localStorage.getItem("token");
-  let userId = null;
-
-  if (token) {
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      userId = payload.id;
-    } catch {}
-  }
-
-  /*data.forEach(p => {
-    container.innerHTML += `
-      <div onclick="viewProduct('${p.id}')" 
-        class="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden cursor-pointer">
-        <img src="${p.image}" class="w-full h-40 object-cover">
-        <h2 class="font-bold">${p.title}</h2>
-        <p>${p.description}</p>
-        <p class="text-green-600">₦${p.price}</p>
-
-        ${
-          p.user_id === userId ? `
-          <button onclick="event.stopPropagation(); editProduct('${p.id}', '${p.title}', '${p.description}', '${p.price}')" 
-            class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white py-1 rounded">
-            Edit
-          </button>
-
-           <button onclick="event.stopPropagation(); deleteProduct('${p.id}')" 
-            class="flex-1 bg-red-500 hover:bg-red-600 text-white py-1 rounded">
-            Delete
-          </button>
-           
-          ` : ""
-        }
-      </div>
-    `;
-  });*/
-
-  displayProducts(data);
-}
-
-    document.getElementById("productForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const formData = new FormData();
-  formData.append("title", document.getElementById("title").value);
-  formData.append("description", document.getElementById("description").value);
-  formData.append("price", document.getElementById("price").value);
-  formData.append("image", document.getElementById("image").files[0]);
-  formData.append("category", document.getElementById("category").value);
-
- 
-  //const token = localStorage.getItem("token");
-  const token = localStorage.getItem("token");
-console.log("TOKEN:", token);
-
-if (!token) {
-  alert("Please login first");
-  return;
-}
-
-  const res = await fetch("https://marketplace-5nn2.onrender.com/api/products/add", {
-    method: "POST",
-    headers: {
-      Authorization: token
-    },
-    body: formData
-  });
-
-  const data = await res.json();
-  alert("Product added!");
-
-  if (currentView === "all") {
-  await loadAllProducts();
-} else {
-  await loadMyProducts();
-  }
-});
-
-/*function showUser() {
-  const token = localStorage.getItem("token");
-
-  if (!token) return;
-
-  const payload = JSON.parse(atob(token.split(".")[1]));
-  
-  document.getElementById("userInfo").innerHTML = `
-    <div class="bg-white p-3 rounded shadow flex justify-between">
-      <span>Logged in as user: ${payload.id}</span>
-      <button onclick="logout()" class="bg-red-500 text-white px-3 py-1 rounded">Logout</button>
-    </div>
-  `;
-}*/
-
-    function loadDashboard() {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    window.location.href = "login.html";
-    return;
-  }
-
-  const user = JSON.parse(atob(token.split(".")[1]));
-  const role = user.role;
-
-  console.log("Role:", role);
-
-  if (role === "seller") {
-    loadMyProducts();   // 🔥 seller sees own products
-  } else {
-    loadAllProducts();  // 🔥 buyer sees all products
-  }
     }
     
-
-    function showUser() {
-  const container = document.getElementById("userInfo");
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    container.innerHTML = `
-      <div class="bg-white p-3 rounded shadow flex justify-between">
-        <span>Not logged in</span>
-        <a href="login.html" class="bg-blue-500 text-white px-3 py-1 rounded">Login</a>
-      </div>
-    `;
-    return;
-  }
-
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-
-    container.innerHTML = `
-      <div class="bg-white p-3 rounded shadow flex justify-between items-center">
-        <span class="text-sm">User: ${payload.id}</span>
-        <button onclick="logout()" class="bg-red-500 text-white px-3 py-1 rounded">
-          Logout
-        </button>
-      </div>
-    `;
-  } catch (err) {
-    console.log("Token error:", err);
-
-    container.innerHTML = `
-      <div class="bg-white p-3 rounded shadow flex justify-between">
-        <span>Session expired</span>
-        <a href="login.html" class="bg-blue-500 text-white px-3 py-1 rounded">Login again</a>
-      </div>
-    `;
-  }
+    // Theme Initialization
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark')
+    } else { 
+      document.documentElement.classList.remove('dark') 
     }
 
-function logout() {
-  localStorage.removeItem("token");
-  alert("Logged out!");
-  window.location.href = "login.html";
-}
-
-async function deleteProduct(id) {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    alert("Login first");
-    return;
-  }
-
-  const confirmDelete = confirm("Are you sure you want to delete?");
-  if (!confirmDelete) return;
-
-  const res = await fetch(`https://marketplace-5nn2.onrender.com/api/products/${id}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: token
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+      localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
     }
-  });
+  </script>
+  <style>
+    /* Smooth transitions for view swapping */
+    .view-section { display: none; opacity: 0; transition: opacity 0.3s ease; }
+    .view-section.active { display: block; opacity: 1; }
+    
+    /* Hide scrollbar for clean UI */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .dark ::-webkit-scrollbar-thumb { background: #475569; }
+  </style>
+</head>
+<body class="bg-geminiBgLight dark:bg-geminiBgDark text-gray-800 dark:text-gray-200 min-h-screen transition-colors duration-300 font-sans antialiased">
 
-  const data = await res.json();
+  <nav class="sticky top-0 z-40 bg-geminiBgLight/80 dark:bg-geminiBgDark/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+      
+      <div class="flex items-center gap-2 cursor-pointer" onclick="switchView('marketplace')">
+        <div class="w-8 h-8 bg-primary dark:bg-primaryDark text-white dark:text-gray-900 rounded-full flex items-center justify-center font-bold text-sm">
+          CD
+        </div>
+        <span class="text-xl font-medium tracking-tight hidden sm:block">CampusDealz</span>
+      </div>
 
-  alert(data.message);
-
-    if (currentView === "all") {
-  await loadAllProducts();
-} else {
-  await loadMyProducts();
-}
-}
-
-async function editProduct(id, oldTitle, oldDesc, oldPrice) {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    alert("Login first");
-    return;
-  }
-
-  // Prompt user for new values
-  const title = prompt("Edit title:", oldTitle);
-  const description = prompt("Edit description:", oldDesc);
-  const price = prompt("Edit price:", oldPrice);
-
-  if (!title || !description || !price) {
-    alert("All fields required");
-    return;
-  }
-
-  const res = await fetch(`https://marketplace-5nn2.onrender.com/api/products/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token
-    },
-    body: JSON.stringify({ title, description, price })
-  });
-
-  const data = await res.json();
-
-  alert(data.message);
-
-    if (currentView === "all") {
-  await loadAllProducts();
-} else {
-  await loadMyProducts();
-}
-}
-
-function showAll() {
-  currentView = "all";
-  loadAllProducts();
-}
-
-function showMy() {
-  currentView = "my";
-  loadMyProducts();
-}
-
-  function viewProduct(id) {
-     console.log("Clicked product:", id);
-  window.location.href = `product.html?id=${id}`;
-}
-
-function displayProducts(data) {
-  const container = document.getElementById("products");
-  container.innerHTML = "";
-
-  const token = localStorage.getItem("token");
-  let userId = null;
-
-  if (token) {
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      userId = payload.id;
-    } catch {}
-  }
-
-  data.forEach(p => {
-    container.innerHTML += `
-      <div onclick="viewProduct('${p.id}')" 
-        class="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden cursor-pointer">
-
-        <img src="${p.image}" class="w-full h-48 object-cover">
-
-        <div class="p-3">
-          <h2 class="font-semibold text-lg">${p.title}</h2>
-          <p class="text-blue-500 text-sm">${p.category || "General"}</p>
-          <p class="text-gray-600 text-sm">${p.description}</p>
-          <p class="text-green-600 font-bold text-lg mt-2">₦${p.price}</p>
-
-          ${
-            p.user_id === userId ? `
-              <div class="flex gap-2 mt-3">
-                <button onclick="event.stopPropagation(); editProduct('${p.id}', '${p.title}', '${p.description}', '${p.price}')" 
-                  class="flex-1 bg-yellow-500 text-white py-1 rounded">Edit</button>
-
-                <button onclick="event.stopPropagation(); deleteProduct('${p.id}')" 
-                  class="flex-1 bg-red-500 text-white py-1 rounded">Delete</button>
-              </div>
-            ` : ""
-          }
+      <div class="flex-grow max-w-2xl hidden md:block">
+        <div class="relative">
+          <svg class="absolute left-4 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <input type="text" placeholder="Search campus deals..." class="w-full bg-white dark:bg-geminiCardDark border-none rounded-full py-2.5 pl-12 pr-4 focus:ring-2 focus:ring-primary dark:focus:ring-primaryDark outline-none transition-shadow shadow-sm">
         </div>
       </div>
-    `;
-  });
-}
 
-/*document.getElementById("searchInput").addEventListener("input", (e) => {
-  const value = e.target.value.toLowerCase();
+      <div class="flex items-center gap-2 sm:gap-4">
+        <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+        </button>
+        
+        <button id="navActionBtn" onclick="handleNavAction()" class="bg-primary hover:bg-blue-700 dark:bg-primaryDark dark:hover:bg-blue-300 dark:text-gray-900 text-white font-medium px-5 py-2.5 rounded-full transition-colors text-sm">
+          Sell an Item
+        </button>
 
-  const filtered = allProducts.filter(p =>
-    p.title.toLowerCase().includes(value) ||
-    p.description.toLowerCase().includes(value)
-  );
+        <div class="h-9 w-9 bg-gray-300 dark:bg-gray-700 rounded-full cursor-pointer border-2 border-white dark:border-gray-800 shadow-sm flex items-center justify-center overflow-hidden" onclick="logout()">
+          <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+        </div>
+      </div>
+    </div>
+  </nav>
 
-  displayProducts(filtered);
-});*/
+  <main class="max-w-[1400px] mx-auto px-4 sm:px-6 py-8">
+    
+    <div id="view-marketplace" class="view-section active">
+      <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <h1 class="text-3xl sm:text-4xl font-normal mb-2">Discover Deals</h1>
+          <p class="text-gray-500 dark:text-gray-400">Find what you need from students on campus.</p>
+        </div>
+        <div class="flex gap-2 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
+          <button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-white dark:bg-geminiCardDark border border-gray-200 dark:border-gray-700 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition">📱 Tech</button>
+          <button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-white dark:bg-geminiCardDark border border-gray-200 dark:border-gray-700 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition">📚 Books</button>
+          <button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-white dark:bg-geminiCardDark border border-gray-200 dark:border-gray-700 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition">🛏️ Dorm</button>
+        </div>
+      </div>
 
-    function contactSeller(sellerId, productTitle) {
-  const message = `Hello, I'm interested in "${productTitle}"`;
+      <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        </div>
+    </div>
 
-  // For now we simulate chat using WhatsApp or alert
-  alert(`Message to seller (${sellerId}):\n\n${message}`);
+    <div id="view-dashboard" class="view-section">
+      <div class="flex items-center gap-4 mb-8">
+        <button onclick="switchView('marketplace')" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        </button>
+        <h1 class="text-3xl font-normal">Seller Hub</h1>
+      </div>
 
-  // Later we upgrade to real chat system
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <section class="lg:col-span-1 bg-geminiCardLight dark:bg-geminiCardDark p-6 sm:p-8 rounded-[2rem] shadow-sm">
+          <h2 class="text-xl font-medium mb-6">Create New Ad</h2>
+          <form id="postAdForm" class="space-y-5">
+            <div>
+              <input type="text" id="title" placeholder="What are you selling?" class="w-full bg-geminiBgLight dark:bg-geminiBgDark border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary outline-none transition" required/>
+            </div>
+            <div>
+               <div class="relative">
+                 <span class="absolute left-5 top-4 text-gray-500 font-medium">₦</span>
+                 <input type="number" id="price" placeholder="0.00" class="w-full bg-geminiBgLight dark:bg-geminiBgDark border-none rounded-2xl px-5 py-4 pl-10 focus:ring-2 focus:ring-primary outline-none transition" required/>
+               </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <select id="category" class="w-full bg-geminiBgLight dark:bg-geminiBgDark border-none rounded-2xl px-4 py-4 focus:ring-2 focus:ring-primary outline-none transition text-sm">
+                <option value="Electronics">Electronics</option>
+                <option value="Textbooks">Textbooks</option>
+                <option value="Home">Dorm Gear</option>
+              </select>
+              <select id="condition" class="w-full bg-geminiBgLight dark:bg-geminiBgDark border-none rounded-2xl px-4 py-4 focus:ring-2 focus:ring-primary outline-none transition text-sm">
+                <option value="New">Brand New</option>
+                <option value="Used">Used</option>
+              </select>
+            </div>
+            <div>
+               <textarea id="description" placeholder="Item description..." class="w-full bg-geminiBgLight dark:bg-geminiBgDark border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary outline-none transition resize-none" rows="3"></textarea>
+            </div>
+            <button type="submit" class="w-full bg-primary hover:bg-blue-700 dark:bg-primaryDark dark:hover:bg-blue-300 dark:text-gray-900 text-white font-medium py-4 rounded-full transition-colors">
+              Publish Advertisement
+            </button>
+          </form>
+        </section>
+
+        <section class="lg:col-span-2 space-y-8">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="bg-geminiCardLight dark:bg-geminiCardDark p-5 rounded-[1.5rem] shadow-sm">
+              <p class="text-sm text-gray-500">Revenue</p>
+              <p class="text-2xl font-medium mt-1">₦0.00</p>
+            </div>
+            <div class="bg-geminiCardLight dark:bg-geminiCardDark p-5 rounded-[1.5rem] shadow-sm">
+              <p class="text-sm text-gray-500">Active Ads</p>
+              <p class="text-2xl font-medium mt-1" id="activeAdsCount">0</p>
+            </div>
+            <div class="bg-geminiCardLight dark:bg-geminiCardDark p-5 rounded-[1.5rem] shadow-sm">
+              <p class="text-sm text-gray-500">Items Sold</p>
+              <p class="text-2xl font-medium mt-1">0</p>
+            </div>
+            <div class="bg-geminiCardLight dark:bg-geminiCardDark p-5 rounded-[1.5rem] shadow-sm">
+              <p class="text-sm text-gray-500">Views</p>
+              <p class="text-2xl font-medium mt-1">0</p>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-medium mb-4">Your Listings</h3>
+            <div id="seller-products" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+  </main>
+
+  <dialog id="verifyModal" class="bg-transparent p-0 backdrop:bg-black/50 backdrop:backdrop-blur-sm fixed inset-0 m-auto z-50">
+    <div class="bg-geminiCardLight dark:bg-geminiCardDark text-gray-900 dark:text-gray-100 w-full max-w-md p-8 rounded-[2rem] shadow-2xl mx-4 transform transition-all scale-95 opacity-0" id="verifyModalContent">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-primary dark:text-primaryDark rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <h2 class="text-2xl font-medium mb-2">Verify to Sell</h2>
+        <p class="text-gray-500 dark:text-gray-400 text-sm">To maintain a safe campus marketplace, we need a few details before you can list items.</p>
+      </div>
+      
+      <form id="verifyForm" class="space-y-4">
+        <input type="text" placeholder="Student ID Number" class="w-full bg-geminiBgLight dark:bg-geminiBgDark border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary outline-none transition" required/>
+        <input type="text" placeholder="Phone Number" class="w-full bg-geminiBgLight dark:bg-geminiBgDark border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary outline-none transition" required/>
+        
+        <div class="flex gap-3 mt-6">
+          <button type="button" onclick="closeVerifyModal()" class="flex-1 px-4 py-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition">Cancel</button>
+          <button type="submit" class="flex-1 bg-primary hover:bg-blue-700 dark:bg-primaryDark dark:hover:bg-blue-300 dark:text-gray-900 text-white font-medium px-4 py-3 rounded-full transition">Verify Me</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <script>
+    const API = "https://marketplace-5nn2.onrender.com";
+
+    // Application State Management
+    let isSeller = localStorage.getItem('isSeller') === 'true';
+    let currentView = localStorage.getItem('currentView') || 'marketplace';
+
+    // Initialize UI based on state
+    function initApp() {
+      updateNavButton();
+      
+      // Ensure unauthorized users can't force dashboard view via localstorage
+      if (!isSeller && currentView === 'dashboard') {
+        currentView = 'marketplace';
+      }
+      
+      switchView(currentView, false); // false = don't animate on first load
+      loadMarketplaceProducts();
+      
+      if (isSeller) {
+        loadSellerProducts();
+      }
     }
 
+    // View Routing
+    function switchView(viewId, animate = true) {
+      document.querySelectorAll('.view-section').forEach(el => {
+        el.classList.remove('active');
+        if(!animate) el.style.transition = 'none';
+      });
+      
+      const targetView = document.getElementById(`view-${viewId}`);
+      if (targetView) {
+        if(animate) {
+          setTimeout(() => targetView.classList.add('active'), 50);
+        } else {
+          targetView.classList.add('active');
+          setTimeout(() => targetView.style.transition = '', 50);
+        }
+      }
+      
+      currentView = viewId;
+      localStorage.setItem('currentView', currentView);
+    }
 
-function filterProducts() {
-  const searchValue = document.getElementById("searchInput").value.toLowerCase();
-  const min = document.getElementById("minPrice").value;
-  const max = document.getElementById("maxPrice").value;
-  const category = document.getElementById("categoryFilter").value;
-  
-  
-  const filtered = allProducts.filter(p => {
-    const matchesSearch =
-      p.title.toLowerCase().includes(searchValue) ||
-      p.description.toLowerCase().includes(searchValue);
+    // Navigation Action Logic
+    function handleNavAction() {
+      if (isSeller) {
+        switchView('dashboard');
+      } else {
+        openVerifyModal();
+      }
+    }
 
-    const matchesMin = min ? p.price >= Number(min) : true;
-    const matchesMax = max ? p.price <= Number(max) : true;
-    const matchesCategory = category ? p.category === category : true;
+    function updateNavButton() {
+      const btn = document.getElementById('navActionBtn');
+      if (isSeller) {
+        btn.innerText = "Dashboard";
+        btn.classList.remove('bg-primary');
+        btn.classList.add('bg-gray-800', 'dark:bg-white', 'text-white', 'dark:text-gray-900');
+      } else {
+        btn.innerText = "Sell an Item";
+      }
+    }
 
-    return matchesSearch && matchesMin && matchesMax && matchesCategory;
-  });
+    // Modal Logic
+    const modal = document.getElementById('verifyModal');
+    const modalContent = document.getElementById('verifyModalContent');
 
-  displayProducts(filtered);
-}
+    function openVerifyModal() {
+      modal.showModal();
+      setTimeout(() => {
+        modalContent.classList.remove('scale-95', 'opacity-0');
+        modalContent.classList.add('scale-100', 'opacity-100');
+      }, 10);
+    }
 
-document.getElementById("searchInput").addEventListener("input", filterProducts);
-document.getElementById("minPrice").addEventListener("input", filterProducts);
-document.getElementById("maxPrice").addEventListener("input", filterProducts);
-//document.getElementById("categoryFilter").addEventListener("change", filterProducts);
-const cat = document.getElementById("categoryFilter");
-if (cat) cat.addEventListener("change", filterProducts);
+    function closeVerifyModal() {
+      modalContent.classList.remove('scale-100', 'opacity-100');
+      modalContent.classList.add('scale-95', 'opacity-0');
+      setTimeout(() => modal.close(), 200);
+    }
 
-    
- loadDashboard();
-   // loadAllProducts();
-    showUser();
+    // Verify Form Submission
+    document.getElementById('verifyForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      // Simulate API verification
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.innerText = "Verifying...";
+      
+      setTimeout(() => {
+        isSeller = true;
+        localStorage.setItem('isSeller', 'true');
+        closeVerifyModal();
+        updateNavButton();
+        switchView('dashboard');
+        loadSellerProducts();
+        btn.innerText = "Verify Me";
+      }, 1000);
+    });
+
+    // Mock API Loading Functions
+    async function loadMarketplaceProducts() {
+      const container = document.getElementById("products-grid");
+      try {
+        const res = await fetch(`${API}/api/products`).catch(() => null);
+        let data = res ? await res.json() : [];
+        
+        // Fallback dummy data if API fails to load
+        if (!data || data.length === 0) {
+            data = [
+                { id: 1, title: "iPhone 13 Pro", price: 450000, image: "https://via.placeholder.com/400x300?text=iPhone" },
+                { id: 2, title: "Intro to Calc Textbook", price: 15000, image: "https://via.placeholder.com/400x300?text=Textbook" },
+                { id: 3, title: "Mini Fridge", price: 45000, image: "https://via.placeholder.com/400x300?text=Fridge" },
+                { id: 4, title: "Study Desk", price: 25000, image: "https://via.placeholder.com/400x300?text=Desk" }
+            ];
+        }
+
+        container.innerHTML = data.map(p => `
+          <div class="bg-geminiCardLight dark:bg-geminiCardDark rounded-[1.5rem] shadow-sm hover:shadow-md transition-shadow overflow-hidden cursor-pointer">
+            <div class="h-48 bg-gray-100 dark:bg-gray-800">
+              <img src="${p.image}" class="w-full h-full object-cover">
+            </div>
+            <div class="p-5">
+              <h2 class="font-medium text-lg mb-1 truncate">${p.title}</h2>
+              <p class="font-semibold text-primary dark:text-primaryDark mt-2">₦${p.price.toLocaleString()}</p>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function loadSellerProducts() {
+        const container = document.getElementById("seller-products");
+        // Simulated user products
+        const data = [
+            { id: 3, title: "Mini Fridge", price: 45000, image: "https://via.placeholder.com/400x300?text=Fridge" }
+        ];
+        
+        document.getElementById('activeAdsCount').innerText = data.length;
+
+        if(data.length === 0) {
+            container.innerHTML = `<p class="text-gray-500">No active ads. Post one to get started!</p>`;
+            return;
+        }
+
+        container.innerHTML = data.map(p => `
+          <div class="bg-geminiBgLight dark:bg-geminiBgDark p-4 rounded-[1.5rem] flex gap-4 items-center">
+            <img src="${p.image}" class="w-20 h-20 rounded-xl object-cover">
+            <div class="flex-grow">
+              <h3 class="font-medium truncate">${p.title}</h3>
+              <p class="text-primary dark:text-primaryDark text-sm font-semibold">₦${p.price.toLocaleString()}</p>
+            </div>
+            <button class="text-gray-400 hover:text-red-500 p-2 transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+          </div>
+        `).join('');
+    }
+
+    function logout() {
+      localStorage.clear();
+      location.reload();
+    }
+
+    // Run Initialization
+    initApp();
   </script>
-
 </body>
 </html>
