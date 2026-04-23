@@ -91,6 +91,12 @@ router.get("/", async (req, res) => {
       .eq("status", "available")
       .order("created_at", { ascending: false });
 
+  const { seller } = req.query;
+
+      if (seller) {
+      query = query.eq("user_id", seller);
+    }
+
     // OPTIONAL FILTERS (SAFE)
     const { search, category, location, minPrice, maxPrice } = req.query;
 
