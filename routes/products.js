@@ -65,7 +65,7 @@ router.post("/add", auth, upload.single("image"), async (req, res) => {
   }
 });
 
-router.get("/test-rel", async (req, res) => {
+/*router.get("/test-rel", async (req, res) => {
   const { data, error } = await supabase
     .from("products")
     .select(`
@@ -77,7 +77,7 @@ router.get("/test-rel", async (req, res) => {
   if (error) return res.status(500).json(error);
 
   res.json(data);
-});
+});*/
 
 
 // ============================
