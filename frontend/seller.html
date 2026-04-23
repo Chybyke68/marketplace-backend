@@ -175,16 +175,51 @@
       }
     }
 
+    // async function loadMyAds() {
+    //   const token = localStorage.getItem("token");
+    //   try {
+    //     const res = await fetch(`${API}/api/products/my`, { headers: { Authorization: token } });
+    //     const data = await res.json();
+    //     myProducts = data;
+    //     document.getElementById("activeAdsCount").innerText = data.length;
+    //     renderAds(data);
+    //   } catch(err) { console.error(err); }
+    // }
+
     async function loadMyAds() {
-      const token = localStorage.getItem("token");
-      try {
-        const res = await fetch(`${API}/api/products/my`, { headers: { Authorization: token } });
-        const data = await res.json();
-        myProducts = data;
-        document.getElementById("activeAdsCount").innerText = data.length;
-        renderAds(data);
-      } catch(err) { console.error(err); }
-    }
+  const token = localStorage.getItem("token");
+
+  const params = new URLSearchParams(window.location.search);
+  const userId = params.get("user");
+
+  let url;
+
+  // 🔥 VIEW OTHER SELLER
+  if (userId) {
+    url = `${API}/api/products?seller=${userId}`;
+  } 
+  // 🔥 MY DASHBOARD
+  else {
+    url = `${API}/api/products/my`;
+  }
+
+  try {
+    const res = await fetch(url, {
+      headers: token ? { Authorization: token } : {}
+    });
+
+    const data = await res.json();
+
+    myProducts = data;
+
+    document.getElementById("activeAdsCount").innerText = data.length;
+
+    renderAds(data);
+
+  } catch (err) {
+    console.error(err);
+  }
+}
 
     function renderAds(ads) {
       const container = document.getElementById("products-container");
