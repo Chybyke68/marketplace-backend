@@ -61,7 +61,8 @@ router.post("/register", async (req, res) => {
       name, 
       email,
       password: hashedPassword,
-      role: role || "buyer"
+      role: role || "buyer",
+      store_name: name + "'s Store"
     }])
     .select(); // 🔥 IMPORTANT
 

@@ -66,39 +66,7 @@ router.post("/add", auth, upload.single("image"), async (req, res) => {
 });
 
 
-/*
-// Example: routes/products.js
 
-router.post('/add', authMiddleware, upload.single('image'), async (req, res) => {
-  try {
-    const { title, price, description, category, condition, location } = req.body;
-    const userId = req.user.id; // From your auth middleware
-    const imageUrl = req.file ? req.file.path : null;
-
-    const { data, error } = await supabase
-      .from('products')
-      .insert([
-        { 
-          title, 
-          price: parseFloat(price), 
-          description, 
-          category, 
-          condition, 
-          location, 
-          image: imageUrl, 
-          user_id: userId,
-          status: 'available' // Default status
-        }
-      ]);
-
-    if (error) throw error;
-    res.status(201).json({ message: "Product listed successfully!", data });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-*/
 // ============================
 // GET ALL PRODUCTS
 // ============================
@@ -106,7 +74,7 @@ router.get("/", async (req, res) => {
   try {
     let query = supabase
       .from("products")
-      .select("*")
+      .select("*, users(name, store_name)")
       .eq("status", "available")
       .order("created_at", { ascending: false });
 
@@ -151,7 +119,7 @@ router.get("/my", auth, async (req, res) => {
 
   const { data, error } = await supabase
     .from("products")
-    .select("*")
+    .select("*, users(name, store_name)")
     .eq("user_id", user_id)
     .order("created_at", { ascending: false });
 
@@ -169,7 +137,7 @@ router.get("/:id", async (req, res) => {
 
   const { data, error } = await supabase
     .from("products")
-    .select("*")
+    .select("*, users(name, store_name)")
     .eq("id", id)
     .single();
 
@@ -225,7 +193,7 @@ router.put("/:id", auth, async (req, res) => {
 
   const { data: product } = await supabase
     .from("products")
-    .select("*")
+    .select("*, users(name, store_name)")
     .eq("id", productId)
     .single();
 
@@ -251,5 +219,18 @@ router.put("/:id", auth, async (req, res) => {
   });
 });
 
+router.get("/test-rel", async (req, res) => {
+  const { data, error } = await supabase
+    .from("products")
+    .select(`
+      *, users(name, store_name)
+    `)
+    .eq("status", "available")
+    .order("created_at", { ascending: false });
+
+  if (error) return res.status(500).json(error);
+
+  res.json(data);
+});
 
 module.exports = router;
