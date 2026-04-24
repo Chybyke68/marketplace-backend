@@ -34,10 +34,10 @@
         <div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
             <span class="text-white font-black text-xs">CD</span>
         </div>
-        <span class="text-xl font-extrabold text-navy dark:text-white tracking-tight">Seller Center</span>
+        <span id="navTitle" class="text-xl font-extrabold text-navy dark:text-white tracking-tight">Seller Center</span>
       </div>
       <div class="flex items-center gap-4">
-        <button onclick="logout()" class="hidden md:flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-red-500 transition">
+        <button id="logoutBtn" onclick="logout()" class="hidden md:flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-red-500 transition">
           Log Out
         </button>
       </div>
@@ -46,7 +46,7 @@
 
   <main class="max-w-7xl mx-auto px-4 py-6 md:py-10">
     
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div id="statsSection" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
         <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Active Ads</p>
         <div class="flex items-end justify-between">
@@ -75,12 +75,11 @@
     </div>
 
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-      <h2 class="text-xl font-black text-navy dark:text-white">My Inventory</h2>
-      <h2 id="storeHeader" class="text-2xl font-extrabold mt-2"></h2>
+      <h2 id="inventoryLabel" class="text-xl font-black text-navy dark:text-white">My Inventory</h2>
+      <h2 id="storeHeader" class="text-3xl font-black mt-2 text-navy dark:text-white"></h2>
 
-      
       <div class="relative flex-grow max-w-md">
-        <input type="text" id="inventorySearch" onkeyup="filterAds()" placeholder="Filter your items..." class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl py-2.5 px-4 text-sm focus:ring-2 focus:ring-brand outline-none transition-all"/>
+        <input type="text" id="inventorySearch" onkeyup="filterAds()" placeholder="Filter items..." class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl py-2.5 px-4 text-sm focus:ring-2 focus:ring-brand outline-none transition-all"/>
       </div>
     </div>
 
@@ -126,7 +125,7 @@
             <option value="Hostel">🛏️ Hostel</option>
           </select>
         </div>
-        <textarea id="description" placeholder="Add more details (condition, size, location)..." class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-brand outline-none resize-none" rows="3" required></textarea>
+        <textarea id="description" placeholder="Add more details..." class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-brand outline-none resize-none" rows="3" required></textarea>
 
         <div id="imageUploadArea" class="relative border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl p-6 text-center hover:bg-gray-100 dark:hover:bg-gray-700/30 transition-colors">
             <input id="image" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="previewImage(event)"/>
@@ -180,119 +179,81 @@
 
   async function loadMyAds() {
   const token = localStorage.getItem("token");
-
   const params = new URLSearchParams(window.location.search);
   const userId = params.get("user");
-
   let currentUserId = null;
 
-  // 🔥 Decode token safely
   if (token) {
     try {
       const user = JSON.parse(atob(token.split(".")[1]));
       currentUserId = user.id;
-    } catch (e) {
-      console.log("Invalid token");
-    }
+    } catch (e) { console.log("Invalid token"); }
   }
 
   let url;
-
-  // 🔥 VIEW OTHER SELLER
   if (userId) {
     url = `${API}/api/products?seller=${userId}`;
-  } 
-  // 🔥 MY DASHBOARD
-  else {
+    // 🔥 PUBLIC VIEW UI FIXES
+    document.getElementById("statsSection").style.display = "none";
+    document.getElementById("inventoryLabel").style.display = "none";
+    document.getElementById("logoutBtn").style.display = "none";
+  } else {
     url = `${API}/api/products/my`;
+    // 🔥 DASHBOARD VIEW UI FIXES
+    document.getElementById("statsSection").style.display = "grid";
+    document.getElementById("inventoryLabel").style.display = "block";
+    document.getElementById("navTitle").innerText = "Seller Center";
   }
 
   try {
     const res = await fetch(url, {
       headers: token ? { Authorization: token } : {}
     });
-
     const data = await res.json();
-
     myProducts = data;
 
-    // 🔥 STORE HEADER
     if (userId && data.length > 0) {
-      document.getElementById("storeHeader").innerText =
-        data[0].users?.store_name || "Seller Store";
+      const storeName = data[0].users?.store_name || "Seller Store";
+      document.getElementById("storeHeader").innerText = storeName;
+      document.getElementById("navTitle").innerText = storeName;
     } else {
       document.getElementById("storeHeader").innerText = "";
     }
 
-    // 🔥 HIDE FORM IF NOT OWNER
-    if (userId) {
-      document.getElementById("form").style.display = "none";
-    }
-
+    if (userId) { document.getElementById("form").style.display = "none"; }
     document.getElementById("activeAdsCount").innerText = data.length;
-
-    // 🔥 PASS currentUserId
     renderAds(data, currentUserId);
-
-  } catch (err) {
-    console.error(err);
-  }
+  } catch (err) { console.error(err); }
 }
 
 function renderAds(ads, currentUserId) {
   const container = document.getElementById("products-container");
   container.innerHTML = "";
-  
   if (ads.length === 0) {
-    container.innerHTML = `
-      <div class="col-span-full py-12 text-center text-gray-400">
-        <p>No products available.</p>
-      </div>`;
+    container.innerHTML = `<div class="col-span-full py-12 text-center text-gray-400"><p>No products available.</p></div>`;
     return;
   }
-
   ads.forEach(p => {
-
-    // 🔥 CHECK OWNERSHIP
     const isOwner = currentUserId === p.user_id;
-
     container.innerHTML += `
       <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex gap-4 items-center group">
-        
         <div class="relative h-20 w-20 overflow-hidden rounded-xl bg-gray-100">
-          <img src="${p.image}" class="w-full h-full object-cover transition-transform group-hover:scale-110"
-            onerror="this.src='https://via.placeholder.com/150'">
+          <img src="${p.image}" class="w-full h-full object-cover transition-transform group-hover:scale-110" onerror="this.src='https://via.placeholder.com/150'">
         </div>
-
         <div class="flex-grow min-w-0">
           <div class="flex items-center gap-2 mb-1">
-            <span class="text-[9px] font-black uppercase tracking-tighter bg-green-100 text-green-600 px-1.5 py-0.5 rounded">
-              Active
-            </span>
-            <span class="text-[9px] font-bold text-gray-400 uppercase">
-              ${p.category || 'Item'}
-            </span>
+            <span class="text-[9px] font-black uppercase tracking-tighter bg-green-100 text-green-600 px-1.5 py-0.5 rounded">Active</span>
+            <span class="text-[9px] font-bold text-gray-400 uppercase">${p.category || 'Item'}</span>
           </div>
-
           <h3 class="font-bold text-navy dark:text-white truncate">${p.title}</h3>
           <p class="text-brand font-black text-sm">₦${Number(p.price).toLocaleString()}</p>
         </div>
-
-        <!-- 🔥 ONLY SHOW BUTTONS IF OWNER -->
         ${isOwner ? `
         <div class="flex flex-col gap-2">
-          <button onclick="editAd('${p.id}')"
-            class="p-2 bg-gray-50 dark:bg-gray-700 hover:bg-orange-50 rounded-xl transition-colors">
-            ✏️
-          </button>
-
-          <button onclick="deleteAd('${p.id}')"
-            class="p-2 hover:bg-red-50 rounded-xl transition-colors">
-            🗑️
-          </button>
+          <button onclick="editAd('${p.id}')" class="p-2 bg-gray-50 dark:bg-gray-700 hover:bg-orange-50 rounded-xl transition-colors">✏️</button>
+          <button onclick="deleteAd('${p.id}')" class="p-2 hover:bg-red-50 rounded-xl transition-colors">🗑️</button>
         </div>
         ` : ""}
-
       </div>
     `;
   });
@@ -301,7 +262,10 @@ function renderAds(ads, currentUserId) {
     function filterAds() {
         const query = document.getElementById("inventorySearch").value.toLowerCase();
         const filtered = myProducts.filter(p => p.title.toLowerCase().includes(query));
-        renderAds(filtered);
+        // We pass currentUserId from the token if available to maintain button visibility logic
+        let cId = null;
+        try { cId = JSON.parse(atob(localStorage.getItem("token").split(".")[1])).id; } catch(e){}
+        renderAds(filtered, cId);
     }
 
     function editAd(id) {
@@ -326,7 +290,6 @@ function renderAds(ads, currentUserId) {
       const btn = document.getElementById("submitBtn");
       btn.disabled = true;
       btn.innerText = "Processing...";
-
       try {
         if (editingProductId) {
           const res = await fetch(`${API}/api/products/${editingProductId}`, {
@@ -347,7 +310,6 @@ function renderAds(ads, currentUserId) {
           formData.append("description", document.getElementById("description").value);
           formData.append("category", document.getElementById("category").value);
           formData.append("image", document.getElementById("image").files[0]);
-
           const res = await fetch(`${API}/api/products/add`, {
             method: "POST",
             headers: { Authorization: token },
