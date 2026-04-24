@@ -44,6 +44,11 @@
   </div>
 </div>
 
+  <p id="typingIndicator"
+   class="text-xs text-gray-400 px-4 hidden">
+   Seller is typing...
+  </p>
+  
   <div id="messages" class="flex-grow p-4 overflow-y-auto bg-gray-50 dark:bg-gray-900 flex flex-col space-y-3">
     </div>
 
@@ -75,6 +80,7 @@ const params = new URLSearchParams(window.location.search);
 const product_id = params.get("product");
 const receiver_id = params.get("seller");
 const initialMessage = params.get("msg");
+  let typingTimeout;
 
 async function loadMessages() {
   try {
@@ -170,6 +176,8 @@ async function sendMessage() {
     behavior: "smooth"
   });
 }, 100);
+
+  
 }
 
 async function sendInitialMessage() {
@@ -220,7 +228,53 @@ function openProductFromChat() {
   window.location.href = `product.html?id=${product_id}`;
 }
 
+
+  // 🔥 STEP 5 — DETECT TYPING
+document.getElementById("msg").addEventListener("input", () => {
+
+  clearTimeout(typingTimeout);
+
+  // 🔥 SEND TYPING SIGNAL
+  fetch(`${BACKEND}/api/messages/typing`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token
+    },
+    body: JSON.stringify({
+      product_id: product_id
+    })
+  });
+
+  // optional timeout (handled by backend)
+  typingTimeout = setTimeout(() => {}, 2000);
+
+});
+
+  async function checkTyping() {
+  try {
+    const res = await fetch(
+      `${BACKEND}/api/messages/typing-status?product=${product_id}&user=${receiver_id}`
+    );
+
+    const data = await res.json();
+
+    const el = document.getElementById("typingIndicator");
+
+    if (data.typing) {
+      el.classList.remove("hidden");
+    } else {
+      el.classList.add("hidden");
+    }
+
+  } catch (err) {
+    console.log("Typing check failed");
+  }
+  }
+  
+  
 setInterval(loadMessages, 2000);
+  setInterval(checkTyping, 1500);
 loadChatHeader();
 (async () => {
   await sendInitialMessage();
