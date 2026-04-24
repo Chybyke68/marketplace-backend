@@ -218,8 +218,9 @@ setInterval(loadMessages, 2000);
 loadChatHeader();
 (async () => {
   await sendInitialMessage();
+  await loadProductPreview();
   loadMessages();
-  loadProductPreview();
+  
 })();
 </script>
 </body>
