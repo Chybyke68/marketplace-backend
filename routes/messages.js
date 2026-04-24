@@ -25,10 +25,13 @@ router.get("/:product_id/:user_id", auth, async (req, res) => {
   const { data, error } = await supabase
     .from("messages")
     .select("*")
+    .update({ seen: true })
+    .eq("receiver_id", req.user.id)
+    .eq("product_id", req.params.product);
     .or(
       `and(sender_id.eq.${currentUser},receiver_id.eq.${user_id}),and(sender_id.eq.${user_id},receiver_id.eq.${currentUser})`
     )
-    .eq("product_id", product_id)
+ //   .eq("product_id", product_id)
     .order("created_at", { ascending: true });
 
   if (error) return res.status(500).json(error);
