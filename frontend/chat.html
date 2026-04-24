@@ -67,7 +67,8 @@
 const BACKEND = "https://marketplace-5nn2.onrender.com"; 
 const token = localStorage.getItem("token");
 let currentUserId = null;
-
+let lastMessageId = null;
+  
 if (token) {
   try {
     const user = JSON.parse(atob(token.split(".")[1]));
@@ -88,6 +89,16 @@ async function loadMessages() {
       headers: { Authorization: token }
     });
     const data = await res.json();
+    if (data.length > 0) {
+  const latestId = data[data.length - 1].id;
+
+  if (lastMessageId === latestId) {
+    return; // 🚀 no update needed
+  }
+
+  lastMessageId = latestId;
+    }
+    
     const box = document.getElementById("messages");
     if (!data || data.length === 0) {
   box.innerHTML = `
@@ -161,6 +172,17 @@ async function sendMessage() {
   if (!text) return;
 
   input.value = ""; // clear immediately for UX
+
+  const box = document.getElementById("messages");
+
+box.innerHTML += `
+  <div class="flex w-full justify-end">
+    <div class="max-w-[75%] px-4 py-2 rounded-2xl bg-brand text-white rounded-br-sm shadow-md">
+      <p class="text-[10px] opacity-70 mb-1">You</p>
+      <p class="text-sm">${text}</p>
+    </div>
+  </div>
+`;
   
   await fetch(`${BACKEND}/api/messages/send`, {
     method: "POST",
@@ -273,8 +295,11 @@ document.getElementById("msg").addEventListener("input", () => {
   }
   
   
-setInterval(loadMessages, 2000);
-  setInterval(checkTyping, 1500);
+setInterval(() => {
+  loadMessages();
+  checkTyping();
+}, 800);
+  
 loadChatHeader();
 (async () => {
   await sendInitialMessage();
