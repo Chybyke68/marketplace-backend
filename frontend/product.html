@@ -156,9 +156,16 @@ function goToSeller() {
   window.location.href = `seller.html?user=${productData.user_id}`;
 }
 
+
 function startChat() {
   if (!productData) return;
-  window.location.href = `chat.html?product=${productData.id}&seller=${productData.user_id}`;
+
+  const message = `Hi, I’m interested in your ${productData.title} (₦${Number(productData.price).toLocaleString()})`;
+
+  const encodedMessage = encodeURIComponent(message);
+
+  window.location.href =
+    `chat.html?product=${productData.id}&seller=${productData.user_id}&msg=${encodedMessage}`;
 }
 
 function goBack() { window.history.back(); }

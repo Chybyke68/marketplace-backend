@@ -61,6 +61,7 @@ if (token) {
 const params = new URLSearchParams(window.location.search);
 const product_id = params.get("product");
 const receiver_id = params.get("seller");
+const initialMessage = params.get("msg");
 
 async function loadMessages() {
   try {
@@ -152,9 +153,40 @@ async function sendMessage() {
 }, 100);
 }
 
+async function sendInitialMessage() {
+  if (!initialMessage) return;
+
+  try {
+    await fetch(`${BACKEND}/api/messages/send`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token
+      },
+      body: JSON.stringify({
+        receiver_id,
+        product_id,
+        text: decodeURIComponent(initialMessage)
+      })
+    });
+
+    // remove message from URL so it doesn't resend on refresh
+    const url = new URL(window.location);
+    url.searchParams.delete("msg");
+    window.history.replaceState({}, "", url);
+
+  } catch (err) {
+    console.log("Initial message failed");
+  }
+}
+
+
 setInterval(loadMessages, 2000);
 loadChatHeader();
-loadMessages();
+(async () => {
+  await sendInitialMessage();
+  loadMessages();
+})();
 </script>
 </body>
 </html>
