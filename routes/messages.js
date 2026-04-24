@@ -36,4 +36,16 @@ router.get("/:product_id/:user_id", auth, async (req, res) => {
   res.json(data);
 });
 
+router.get("/conversations", auth, async (req, res) => {
+  const userId = req.user.id;
+
+  const { data, error } = await supabase.rpc("get_conversations", {
+    user_id: userId
+  });
+
+  if (error) return res.status(500).json(error);
+
+  res.json(data);
+});
+
 module.exports = router;

@@ -48,6 +48,16 @@
 <script>
 const BACKEND = "https://marketplace-5nn2.onrender.com"; 
 const token = localStorage.getItem("token");
+let currentUserId = null;
+
+if (token) {
+  try {
+    const user = JSON.parse(atob(token.split(".")[1]));
+    currentUserId = user.id;
+  } catch (e) {
+    console.log("Invalid token");
+  }
+}
 const params = new URLSearchParams(window.location.search);
 const product_id = params.get("product");
 const receiver_id = params.get("seller");
@@ -59,26 +69,64 @@ async function loadMessages() {
     });
     const data = await res.json();
     const box = document.getElementById("messages");
+    if (!data || data.length === 0) {
+  box.innerHTML = `
+    <div class="flex flex-col items-center justify-center h-full text-gray-400 text-sm">
+      <p class="mb-2">No messages yet</p>
+      <p class="text-xs">Start the conversation 👇</p>
+    </div>
+  `;
+  return;
+}
     
     // Check if scroll is at bottom before updating to prevent jumpiness
     const isScrolledToBottom = box.scrollHeight - box.clientHeight <= box.scrollTop + 50;
 
     box.innerHTML = "";
     data.forEach(m => {
-      const isMe = m.sender_id !== receiver_id;
-      box.innerHTML += `
-        <div class="flex w-full ${isMe ? "justify-end" : "justify-start"}">
-          <div class="max-w-[75%] px-4 py-2 rounded-2xl ${isMe ? "bg-brand text-white rounded-br-sm shadow-md" : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-bl-sm shadow-sm"}">
-            <p class="text-sm md:text-base">${m.text}</p>
-          </div>
-        </div>
-      `;
+      const isMe = m.sender_id === currentUserId;
+     box.innerHTML += `
+  <div class="flex w-full ${isMe ? "justify-end" : "justify-start"}">
+    
+    <div class="max-w-[75%] px-4 py-2 rounded-2xl ${
+      isMe 
+        ? "bg-brand text-white rounded-br-sm shadow-md" 
+        : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-bl-sm shadow-sm"
+    }">
+
+      <!-- 🔥 ADD THIS LABEL -->
+      <p class="text-[10px] opacity-70 mb-1">
+        ${isMe ? "You" : "Seller"}
+      </p>
+
+      <p class="text-sm md:text-base">${m.text}</p>
+
+    </div>
+
+  </div>
+`;
     });
 
-    if (isScrolledToBottom) {
-      box.scrollTop = box.scrollHeight;
-    }
+   if (isScrolledToBottom) {
+  box.scrollTo({
+    top: box.scrollHeight,
+    behavior: "smooth"
+  });
+}
   } catch (err) { console.log("Error loading messages"); }
+}
+
+async function loadChatHeader() {
+  try {
+    const res = await fetch(`${BACKEND}/api/products/${product_id}`);
+    const data = await res.json();
+
+    const storeName = data.users?.store_name || "Seller";
+
+    document.querySelector("h2").innerText = storeName;
+  } catch (err) {
+    console.log("Header load failed");
+  }
 }
 
 async function sendMessage() {
@@ -96,12 +144,16 @@ async function sendMessage() {
   
   loadMessages();
   setTimeout(() => {
-     const box = document.getElementById("messages");
-     box.scrollTop = box.scrollHeight;
-  }, 100);
+  const box = document.getElementById("messages");
+  box.scrollTo({
+    top: box.scrollHeight,
+    behavior: "smooth"
+  });
+}, 100);
 }
 
 setInterval(loadMessages, 2000);
+loadChatHeader();
 loadMessages();
 </script>
 </body>
