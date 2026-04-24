@@ -115,6 +115,12 @@ async function loadMessages() {
 
       <p class="text-sm md:text-base">${m.text}</p>
 
+<p class="text-[10px] opacity-70 mt-1 text-right">
+  ${new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+</p>
+
+${isMe ? `<span class="text-[10px] ml-1">✓✓</span>` : ""}
+
     </div>
 
   </div>
