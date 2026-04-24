@@ -22,22 +22,32 @@ router.get("/:product_id/:user_id", auth, async (req, res) => {
   const { product_id, user_id } = req.params;
   const currentUser = req.user.id;
 
+  // ✅ FIRST: mark messages as seen
+  await supabase
+    .from("messages")
+    .update({ seen: true })
+    .eq("receiver_id", currentUser)
+    .eq("product_id", product_id);
+
+  // ✅ SECOND: fetch messages
   const { data, error } = await supabase
     .from("messages")
     .select("*")
-    .update({ seen: true })
-    .eq("receiver_id", req.user.id)
-    .eq("product_id", req.params.product);
     .or(
       `and(sender_id.eq.${currentUser},receiver_id.eq.${user_id}),and(sender_id.eq.${user_id},receiver_id.eq.${currentUser})`
     )
- //   .eq("product_id", product_id)
+    .eq("product_id", product_id)
     .order("created_at", { ascending: true });
 
-  if (error) return res.status(500).json(error);
+  if (error) {
+    console.log("FETCH ERROR:", error);
+    return res.status(500).json(error);
+  }
 
   res.json(data);
 });
+
+
 
 router.get("/conversations", auth, async (req, res) => {
   const userId = req.user.id;
