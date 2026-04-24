@@ -66,5 +66,36 @@ router.get("/unread-count", auth, async (req, res) => {
   res.json({ count });
 });
 
+router.post("/typing", auth, async (req, res) => {
+  const userId = req.user.id;
+  const { product_id } = req.body;
+
+  await supabase
+    .from("typing_status")
+    .upsert({
+      user_id: userId,
+      product_id,
+      is_typing: true,
+      updated_at: new Date()
+    });
+
+  res.json({ success: true });
+});
+
+router.get("/typing-status", async (req, res) => {
+  const { product, user } = req.query;
+
+  const { data } = await supabase
+    .from("typing_status")
+    .select("*")
+    .eq("product_id", product)
+    .eq("user_id", user)
+    .single();
+
+  const isTyping =
+    data && new Date() - new Date(data.updated_at) < 3000;
+
+  res.json({ typing: isTyping });
+});
 
 module.exports = router;
