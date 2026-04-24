@@ -18,11 +18,24 @@
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen pb-20 md:pb-0">
 
+  <div id="app-loader" class="fixed inset-0 bg-white dark:bg-gray-900 z-[100] flex items-center justify-center transition-opacity duration-500">
+    <img src="logo.png" alt="Loading..." class="w-24 h-24 object-contain animate-pulse mix-blend-multiply dark:bg-white dark:p-2 dark:rounded-xl">
+  </div>
+  <script>
+    window.addEventListener('load', () => {
+      const loader = document.getElementById('app-loader');
+      if (loader) {
+        loader.classList.add('opacity-0');
+        setTimeout(() => loader.style.display = 'none', 500);
+      }
+    });
+  </script>
+
   <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <button onclick="window.location.href='buyer.html'" class="text-brand font-bold text-sm tracking-widest hidden md:block mr-2">← BACK</button>
-        <div class="w-8 h-8 bg-brand rounded flex items-center justify-center text-white font-black text-xs">CD</div>
+        <img src="logo.png" alt="Logo" class="w-8 h-8 object-contain mix-blend-multiply dark:bg-white dark:rounded dark:p-0.5">
         <span class="text-xl font-black text-navy dark:text-white tracking-tight">Messages</span>
       </div>
       <div class="flex items-center gap-4">
@@ -84,7 +97,6 @@ async function loadChats() {
     }
 
     data.forEach(chat => {
-      // Formatted date to look cleaner (e.g., 2:30 PM)
       const timeString = new Date(chat.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
       const initial = (chat.store_name || "S").charAt(0).toUpperCase();
 
@@ -121,6 +133,5 @@ function openChat(productId, userId) {
 
 loadChats();
 </script>
-
 </body>
 </html>

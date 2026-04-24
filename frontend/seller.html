@@ -26,12 +26,23 @@
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans pb-24">
 
+  <div id="app-loader" class="fixed inset-0 bg-white dark:bg-gray-900 z-[100] flex items-center justify-center transition-opacity duration-500">
+    <img src="logo.png" alt="Loading..." class="w-24 h-24 object-contain animate-pulse mix-blend-multiply dark:bg-white dark:p-2 dark:rounded-xl">
+  </div>
+  <script>
+    window.addEventListener('load', () => {
+      const loader = document.getElementById('app-loader');
+      if (loader) {
+        loader.classList.add('opacity-0');
+        setTimeout(() => loader.style.display = 'none', 500);
+      }
+    });
+  </script>
+
   <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-2" onclick="window.location.href='buyer.html'">
-        <div class="w-8 h-8 bg-brand rounded flex items-center justify-center cursor-pointer">
-            <span class="text-white font-black text-xs">CD</span>
-        </div>
+      <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='buyer.html'">
+        <img src="logo.png" alt="Logo" class="w-8 h-8 object-contain mix-blend-multiply dark:bg-white dark:rounded dark:p-0.5">
         <span id="navTitle" class="text-xl font-black text-navy dark:text-white tracking-tight">Seller Center</span>
       </div>
       <div class="flex items-center gap-4">
@@ -87,13 +98,13 @@
       <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
       <span class="text-[10px] font-bold">Sell</span>
     </a>
+    <a href="messages.html" class="flex flex-col items-center text-gray-400 hover:text-brand transition">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+        <span class="text-[10px] font-bold">Messages</span>
+    </a>
     <a href="seller.html" class="flex flex-col items-center text-brand">
       <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
       <span class="text-[10px] font-bold">Manager</span>
-    </a>
-    <a href="#" class="flex flex-col items-center text-gray-400 hover:text-brand transition">
-      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-      <span class="text-[10px] font-bold">Profile</span>
     </a>
   </nav>
 
@@ -221,7 +232,6 @@ function renderAds(ads, currentUserId) {
   }
   ads.forEach(p => {
     const isOwner = currentUserId === p.user_id;
-    // Changed into Jiji List Style (horizontal bar layout)
     container.innerHTML += `
      <div onclick="openProduct('${p.id}')" 
           class="bg-white dark:bg-gray-800 p-3 rounded shadow-sm border border-gray-200 dark:border-gray-700 flex gap-4 items-center group cursor-pointer hover:shadow-md transition">
