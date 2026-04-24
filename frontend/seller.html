@@ -22,120 +22,108 @@
   <style>
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .glass-nav { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.8); }
-    .dark .glass-nav { background: rgba(30, 41, 59, 0.8); }
   </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans pb-24">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans pb-24">
 
   <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
+      <div class="flex items-center gap-2" onclick="window.location.href='buyer.html'">
+        <div class="w-8 h-8 bg-brand rounded flex items-center justify-center cursor-pointer">
             <span class="text-white font-black text-xs">CD</span>
         </div>
-        <span id="navTitle" class="text-xl font-extrabold text-navy dark:text-white tracking-tight">Seller Center</span>
+        <span id="navTitle" class="text-xl font-black text-navy dark:text-white tracking-tight">Seller Center</span>
       </div>
       <div class="flex items-center gap-4">
-        <button id="logoutBtn" onclick="logout()" class="hidden md:flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-red-500 transition">
+        <button id="logoutBtn" onclick="logout()" class="hidden md:flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-brand transition tracking-widest uppercase">
           Log Out
         </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-6 md:py-10">
+  <main class="max-w-5xl mx-auto px-4 py-6 md:py-8">
     
-    <div id="statsSection" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+    <div id="statsSection" class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+      <div class="bg-white dark:bg-gray-800 p-4 rounded shadow-sm border-l-4 border-green-500 border-y border-r border-gray-200 dark:border-gray-700">
         <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Active Ads</p>
-        <div class="flex items-end justify-between">
-            <h3 id="activeAdsCount" class="text-2xl font-black">0</h3>
-            <span class="text-green-500 text-xs font-bold mb-1">Live</span>
-        </div>
+        <h3 id="activeAdsCount" class="text-2xl font-black">0</h3>
       </div>
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+      <div class="bg-white dark:bg-gray-800 p-4 rounded shadow-sm border-l-4 border-brand border-y border-r border-gray-200 dark:border-gray-700">
         <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Views</p>
-        <div class="flex items-end justify-between">
-            <h3 class="text-2xl font-black">1.2k</h3>
-            <span class="text-brand text-xs font-bold mb-1">+12%</span>
-        </div>
+        <h3 class="text-2xl font-black">1.2k</h3>
       </div>
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
-        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Leads</p>
-        <div class="flex items-end justify-between">
-            <h3 class="text-2xl font-black">8</h3>
-            <span class="text-blue-500 text-xs font-bold mb-1">Messages</span>
-        </div>
+      <div class="bg-white dark:bg-gray-800 p-4 rounded shadow-sm border-l-4 border-blue-500 border-y border-r border-gray-200 dark:border-gray-700">
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Messages</p>
+        <h3 class="text-2xl font-black">8</h3>
       </div>
-      <button onclick="openForm()" class="bg-brand hover:bg-orange-600 text-white p-5 rounded-2xl shadow-lg shadow-orange-100 dark:shadow-none flex flex-col items-center justify-center transition-all group">
-        <span class="text-2xl group-hover:scale-125 transition-transform">＋</span>
-        <span class="text-xs font-black uppercase tracking-tighter">Post New Ad</span>
+      <button onclick="openForm()" class="bg-brand hover:bg-orange-600 text-white p-4 rounded shadow-sm flex items-center justify-center gap-2 transition-all group font-bold text-sm">
+        <span class="text-lg">＋</span> POST AD
       </button>
     </div>
 
-    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-      <h2 id="inventoryLabel" class="text-xl font-black text-navy dark:text-white">My Inventory</h2>
-      <h2 id="storeHeader" class="text-3xl font-black mt-2 text-navy dark:text-white"></h2>
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
+      <div>
+        <h2 id="storeHeader" class="text-2xl font-black text-navy dark:text-white"></h2>
+        <h2 id="inventoryLabel" class="text-sm font-bold text-gray-500 uppercase tracking-widest">My Listings</h2>
+      </div>
 
       <div class="relative flex-grow max-w-md">
-        <input type="text" id="inventorySearch" onkeyup="filterAds()" placeholder="Filter items..." class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl py-2.5 px-4 text-sm focus:ring-2 focus:ring-brand outline-none transition-all"/>
+        <input type="text" id="inventorySearch" onkeyup="filterAds()" placeholder="Search items..." class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded py-2 px-4 text-sm focus:outline-none focus:border-brand"/>
       </div>
     </div>
 
-    <div id="products-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div id="products-container" class="space-y-3">
       </div>
 
   </main>
 
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 glass-nav border-t border-gray-200 dark:border-gray-700 px-6 py-3 flex justify-between items-center z-50">
-    <a href="buyer.html" class="flex flex-col items-center gap-1 text-gray-400">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+  <nav class="md:hidden fixed bottom-0 w-full bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex justify-around items-center pb-safe pt-2 pb-2 z-50">
+    <a href="buyer.html" class="flex flex-col items-center text-gray-400 hover:text-brand transition">
+      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
       <span class="text-[10px] font-bold">Home</span>
     </a>
-    <a href="seller.html" class="flex flex-col items-center gap-1 text-brand">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+    <a href="seller.html" class="flex flex-col items-center text-brand">
+      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
       <span class="text-[10px] font-bold">Sell</span>
     </a>
-    <a href="messages.html" class="flex flex-col items-center gap-1 text-gray-400">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-        <span class="text-[10px] font-bold">Messages</span>
+    <a href="seller.html" class="flex flex-col items-center text-brand">
+      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+      <span class="text-[10px] font-bold">Manager</span>
     </a>
-    <a href="profile.html" class="flex flex-col items-center gap-1 text-gray-400">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+    <a href="#" class="flex flex-col items-center text-gray-400 hover:text-brand transition">
+      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
       <span class="text-[10px] font-bold">Profile</span>
     </a>
   </nav>
 
-  <div id="formModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-700">
+  <div id="formModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded shadow-2xl overflow-hidden">
       <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
-        <h2 id="formTitle" class="text-lg font-bold text-navy dark:text-white">New Ad</h2>
-        <button onclick="closeForm()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500">✕</button>
+        <h2 id="formTitle" class="text-lg font-black text-navy dark:text-white">New Ad</h2>
+        <button onclick="closeForm()" class="text-gray-400">✕</button>
       </div>
 
       <form id="form" class="p-6 space-y-4">
-        <input id="title" placeholder="What are you selling?" class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-brand outline-none" required/>
+        <input id="title" placeholder="Title" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand" required/>
         <div class="grid grid-cols-2 gap-3">
-          <input id="price" type="number" placeholder="Price (₦)" class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-brand outline-none" required/>
-          <select id="category" class="w-full px-3 py-3 border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-brand outline-none">
+          <input id="price" type="number" placeholder="Price (₦)" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand" required/>
+          <select id="category" class="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand">
             <option value="Books">📚 Books</option>
             <option value="Electronics">💻 Electronics</option>
             <option value="Fashion">👕 Fashion</option>
             <option value="Hostel">🛏️ Hostel</option>
           </select>
         </div>
-        <textarea id="description" placeholder="Add more details..." class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-brand outline-none resize-none" rows="3" required></textarea>
+        <textarea id="description" placeholder="Description..." class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand resize-none" rows="3" required></textarea>
 
-        <div id="imageUploadArea" class="relative border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl p-6 text-center hover:bg-gray-100 dark:hover:bg-gray-700/30 transition-colors">
+        <div id="imageUploadArea" class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded p-6 text-center hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
             <input id="image" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="previewImage(event)"/>
-            <div id="uploadPrompt" class="text-gray-400">
-               <span class="text-xs font-bold">Click to upload photo</span>
-            </div>
-            <img id="imagePreview" class="hidden mx-auto h-32 w-auto object-cover rounded-xl shadow-md" alt="Preview"/>
+            <div id="uploadPrompt" class="text-gray-400"><span class="text-xs font-bold">Add Photo</span></div>
+            <img id="imagePreview" class="hidden mx-auto h-24 w-auto object-cover rounded shadow-sm" alt="Preview"/>
         </div>
 
-        <button type="submit" id="submitBtn" class="w-full bg-brand hover:bg-orange-600 text-white font-extrabold py-4 rounded-2xl transition-all shadow-lg shadow-orange-100 dark:shadow-none">
+        <button type="submit" id="submitBtn" class="w-full bg-brand text-white font-bold py-4 rounded transition-all text-sm">
           Publish Ad
         </button>
       </form>
@@ -193,13 +181,11 @@
   let url;
   if (userId) {
     url = `${API}/api/products?seller=${userId}`;
-    // 🔥 PUBLIC VIEW UI FIXES
     document.getElementById("statsSection").style.display = "none";
     document.getElementById("inventoryLabel").style.display = "none";
     document.getElementById("logoutBtn").style.display = "none";
   } else {
     url = `${API}/api/products/my`;
-    // 🔥 DASHBOARD VIEW UI FIXES
     document.getElementById("statsSection").style.display = "grid";
     document.getElementById("inventoryLabel").style.display = "block";
     document.getElementById("navTitle").innerText = "Seller Center";
@@ -230,52 +216,44 @@ function renderAds(ads, currentUserId) {
   const container = document.getElementById("products-container");
   container.innerHTML = "";
   if (ads.length === 0) {
-    container.innerHTML = `<div class="col-span-full py-12 text-center text-gray-400"><p>No products available.</p></div>`;
+    container.innerHTML = `<div class="p-8 text-center text-gray-400 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700"><p>No products available.</p></div>`;
     return;
   }
   ads.forEach(p => {
     const isOwner = currentUserId === p.user_id;
+    // Changed into Jiji List Style (horizontal bar layout)
     container.innerHTML += `
      <div onclick="openProduct('${p.id}')" 
-          class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex gap-4 items-center group cursor-pointer hover:shadow-md transition">
-        <div class="relative h-20 w-20 overflow-hidden rounded-xl bg-gray-100">
-          <img src="${p.image}" class="w-full h-full object-cover transition-transform group-hover:scale-110" onerror="this.src='https://via.placeholder.com/150'">
+          class="bg-white dark:bg-gray-800 p-3 rounded shadow-sm border border-gray-200 dark:border-gray-700 flex gap-4 items-center group cursor-pointer hover:shadow-md transition">
+        <div class="h-16 w-16 md:h-20 md:w-20 overflow-hidden rounded bg-gray-100 flex-shrink-0">
+          <img src="${p.image}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/150'">
         </div>
         <div class="flex-grow min-w-0">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-[9px] font-black uppercase tracking-tighter bg-green-100 text-green-600 px-1.5 py-0.5 rounded">Active</span>
-            <span class="text-[9px] font-bold text-gray-400 uppercase">${p.category || 'Item'}</span>
-          </div>
-          <h3 class="font-bold text-navy dark:text-white truncate">${p.title}</h3>
-          <p class="text-brand font-black text-sm">₦${Number(p.price).toLocaleString()}</p>
+          <h3 class="font-bold text-sm text-navy dark:text-white truncate mb-1">${p.title}</h3>
+          <p class="text-brand font-black text-sm md:text-base">₦${Number(p.price).toLocaleString()}</p>
         </div>
        ${isOwner ? `
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-row md:flex-col gap-2">
           <button onclick="event.stopPropagation(); editAd('${p.id}')"
-            class="p-2 bg-gray-50 dark:bg-gray-700 hover:bg-orange-50 rounded-xl">
+            class="p-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-200 rounded text-gray-600">
           ✏️
            </button>
-
           <button onclick="event.stopPropagation(); deleteAd('${p.id}')"
-             class="p-2 hover:bg-red-50 rounded-xl">
+             class="p-2 hover:bg-red-50 rounded text-red-500">
             🗑️
            </button>
           </div>
           ` : ""}
-    
       </div>
     `;
   });
 }
 
-function openProduct(id) {
-  window.location.href = `product.html?id=${id}`;
-}
+function openProduct(id) { window.location.href = `product.html?id=${id}`; }
 
     function filterAds() {
         const query = document.getElementById("inventorySearch").value.toLowerCase();
         const filtered = myProducts.filter(p => p.title.toLowerCase().includes(query));
-        // We pass currentUserId from the token if available to maintain button visibility logic
         let cId = null;
         try { cId = JSON.parse(atob(localStorage.getItem("token").split(".")[1])).id; } catch(e){}
         renderAds(filtered, cId);
