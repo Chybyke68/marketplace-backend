@@ -236,7 +236,8 @@ function renderAds(ads, currentUserId) {
   ads.forEach(p => {
     const isOwner = currentUserId === p.user_id;
     container.innerHTML += `
-      <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex gap-4 items-center group">
+     <div onclick="openProduct('${p.id}')" 
+          class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex gap-4 items-center group cursor-pointer hover:shadow-md transition">
         <div class="relative h-20 w-20 overflow-hidden rounded-xl bg-gray-100">
           <img src="${p.image}" class="w-full h-full object-cover transition-transform group-hover:scale-110" onerror="this.src='https://via.placeholder.com/150'">
         </div>
@@ -248,15 +249,27 @@ function renderAds(ads, currentUserId) {
           <h3 class="font-bold text-navy dark:text-white truncate">${p.title}</h3>
           <p class="text-brand font-black text-sm">₦${Number(p.price).toLocaleString()}</p>
         </div>
-        ${isOwner ? `
+       ${isOwner ? `
         <div class="flex flex-col gap-2">
-          <button onclick="editAd('${p.id}')" class="p-2 bg-gray-50 dark:bg-gray-700 hover:bg-orange-50 rounded-xl transition-colors">✏️</button>
-          <button onclick="deleteAd('${p.id}')" class="p-2 hover:bg-red-50 rounded-xl transition-colors">🗑️</button>
-        </div>
-        ` : ""}
+          <button onclick="event.stopPropagation(); editAd('${p.id}')"
+            class="p-2 bg-gray-50 dark:bg-gray-700 hover:bg-orange-50 rounded-xl">
+          ✏️
+           </button>
+
+          <button onclick="event.stopPropagation(); deleteAd('${p.id}')"
+             class="p-2 hover:bg-red-50 rounded-xl">
+            🗑️
+           </button>
+          </div>
+          ` : ""}
+    
       </div>
     `;
   });
+}
+
+function openProduct(id) {
+  window.location.href = `product.html?id=${id}`;
 }
 
     function filterAds() {
