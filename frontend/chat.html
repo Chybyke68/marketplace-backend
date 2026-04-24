@@ -79,6 +79,10 @@ if (token) {
 }
 const params = new URLSearchParams(window.location.search);
 const product_id = params.get("product");
+  if (!product_id || !receiver_id) {
+  alert("Invalid chat link");
+  window.location.href = "index.html";
+  }
 const receiver_id = params.get("seller");
 const initialMessage = params.get("msg");
   let typingTimeout;
@@ -134,9 +138,8 @@ async function loadMessages() {
 
 <p class="text-[10px] opacity-70 mt-1 text-right">
   ${new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+  ${isMe ? " ✓✓" : ""}
 </p>
-
-${isMe ? `<span class="text-[10px] ml-1">✓✓</span>` : ""}
 
     </div>
 
@@ -252,27 +255,31 @@ function openProductFromChat() {
 
 
   // 🔥 STEP 5 — DETECT TYPING
+let typingTimeout;
+let lastTypingSent = 0;
+
 document.getElementById("msg").addEventListener("input", () => {
+  const now = Date.now();
+
+  // only send every 1.5 seconds
+  if (now - lastTypingSent > 1500) {
+    fetch(`${BACKEND}/api/messages/typing`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token
+      },
+      body: JSON.stringify({ product_id })
+    });
+
+    lastTypingSent = now;
+  }
 
   clearTimeout(typingTimeout);
-
-  // 🔥 SEND TYPING SIGNAL
-  fetch(`${BACKEND}/api/messages/typing`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token
-    },
-    body: JSON.stringify({
-      product_id: product_id
-    })
-  });
-
-  // optional timeout (handled by backend)
   typingTimeout = setTimeout(() => {}, 2000);
-
 });
 
+  
   async function checkTyping() {
   try {
     const res = await fetch(
