@@ -100,6 +100,10 @@
     <a href="messages.html" class="flex flex-col items-center text-gray-400 hover:text-brand transition">
         <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
         <span class="text-[10px] font-bold">Messages</span>
+      <span id="msgBadge"
+       class="bg-red-500 text-white text-xs px-2 py-1 rounded-full hidden">
+       0
+      </span>
     </a>
     <a href="seller.html" class="flex flex-col items-center text-gray-400 hover:text-brand transition">
       <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
@@ -144,6 +148,26 @@
     function view(id) {
       window.location.href = "product.html?id=" + id;
     }
+
+    async function loadUnreadCount() {
+  const res = await fetch(`${API}/api/messages/unread-count`, {
+    headers: { Authorization: localStorage.getItem("token") }
+  });
+
+  const data = await res.json();
+
+  const badge = document.getElementById("msgBadge");
+
+  if (data.count > 0) {
+    badge.innerText = data.count;
+    badge.classList.remove("hidden");
+  } else {
+    badge.classList.add("hidden");
+  }
+    }
+
+    loadUnreadCount();
+setInterval(loadUnreadCount, 5000);
 
     loadProducts();
   </script>
