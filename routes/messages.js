@@ -48,4 +48,20 @@ router.get("/conversations", auth, async (req, res) => {
   res.json(data);
 });
 
+
+router.get("/unread-count", auth, async (req, res) => {
+  const userId = req.user.id;
+
+  const { count, error } = await supabase
+    .from("messages")
+    .select("*", { count: "exact", head: true })
+    .eq("receiver_id", userId)
+    .eq("seen", false);
+
+  if (error) return res.status(500).json(error);
+
+  res.json({ count });
+});
+
+
 module.exports = router;
