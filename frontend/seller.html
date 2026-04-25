@@ -337,50 +337,43 @@ const subMap = {
   others: ["others"]
 };
 
+
 // function loadSubcategories() {
 //   const category = document.getElementById("category").value;
-//   const sub = subMap[category];
 //   const subSelect = document.getElementById("subcategory");
 
-//   subSelect.innerHTML = "";
+//   subSelect.innerHTML = '<option value="" disabled selected>Select Subcategory</option>';
 
-//   sub.forEach(s => {
+//   if (!category || !subMap[category]) return;
+
+//   subMap[category].forEach(s => {
 //     subSelect.innerHTML += `<option value="${s}">${s.replaceAll("_", " ")}</option>`;
 //   });
 // }
 
-// function loadSubcategories() {
-//   const category = document.getElementById("category").value;
-//   const subSelect = document.getElementById("subcategory");
-
-//   subSelect.innerHTML = "";
-
-//   // Handle the default empty state
-//   if (!category) {
-//     subSelect.innerHTML = '<option value="" disabled selected>Select Subcategory</option>';
-//     return;
-//   }
-
-//   const sub = subMap[category];
-  
-//   if (sub) {
-//     // Add the default select placeholder for the subcategory dropdown too
-//     subSelect.innerHTML = '<option value="" disabled selected>Select Subcategory</option>';
-//     sub.forEach(s => {
-//       subSelect.innerHTML += `<option value="${s}">${s.replaceAll("_", " ")}</option>`;
-//     });
-//   }
-// }
-function loadSubcategories() {
+function loadSubcategories(selectedSub = null) {
   const category = document.getElementById("category").value;
   const subSelect = document.getElementById("subcategory");
 
-  subSelect.innerHTML = '<option value="" disabled selected>Select Subcategory</option>';
+  subSelect.innerHTML = '<option value="">Select Subcategory</option>';
 
   if (!category || !subMap[category]) return;
 
   subMap[category].forEach(s => {
-    subSelect.innerHTML += `<option value="${s}">${s.replaceAll("_", " ")}</option>`;
+    const option = document.createElement("option");
+
+    option.value = s.toLowerCase().trim();
+    option.textContent = s.replaceAll("_", " ");
+
+    // ✅ SELECT MATCH
+    if (
+      selectedSub &&
+      option.value === selectedSub.toLowerCase().trim()
+    ) {
+      option.selected = true;
+    }
+
+    subSelect.appendChild(option);
   });
 }
 
@@ -411,13 +404,13 @@ function openProduct(id) { window.location.href = `product.html?id=${id}`; }
   // ✅ SET CATEGORY
   document.getElementById("category").value = product.category;
 
-  // ✅ LOAD SUBCATEGORIES FIRST
-  loadSubcategories();
 
-  // ✅ THEN SET SUBCATEGORY
-  setTimeout(() => {
-    document.getElementById("subcategory").value = product.subcategory || "";
-  }, 50);
+ // normalize DB value
+const normalizedSub = product.subcategory
+  ? product.subcategory.toLowerCase().trim()
+  : null;
+
+loadSubcategories(normalizedSub);
 
   // IMAGE
   document.getElementById("imagePreview").src = product.image;
@@ -446,7 +439,8 @@ function openProduct(id) { window.location.href = `product.html?id=${id}`; }
               price: document.getElementById("price").value,
               description: document.getElementById("description").value,
               category: document.getElementById("category").value,
-              subcategory: document.getElementById("subcategory").value
+              // subcategory: document.getElementById("subcategory").value
+              subcategory: document.getElementById("subcategory").value.toLowerCase().trim()
             })
           });
           if (res.ok) alert("Listing updated! ✅");
