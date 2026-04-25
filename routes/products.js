@@ -45,6 +45,7 @@ router.post("/add", auth, upload.single("image"), async (req, res) => {
         description,
         price,
         category,
+        subcategory,
         condition,
         location,
         image: publicUrl.publicUrl,
@@ -98,14 +99,17 @@ router.get("/", async (req, res) => {
     }
 
     // OPTIONAL FILTERS (SAFE)
-    const { search, category, location, minPrice, maxPrice } = req.query;
-
+    const { search, category, subcategory, location, minPrice, maxPrice } = req.query;
     if (search) {
       query = query.ilike("title", `%${search}%`);
     }
 
     if (category && category !== "All") {
       query = query.eq("category", category);
+    }
+
+    if (subcategory && subcategory !== "All") {
+      query = query.eq("subcategory", subcategory);
     }
 
     if (location) {

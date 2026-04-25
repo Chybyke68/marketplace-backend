@@ -62,7 +62,7 @@
 
   <main class="max-w-7xl mx-auto px-4 py-4 md:py-6">
     
-    <div class="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar mb-6 pb-2">
+    <!-- <div class="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar mb-6 pb-2">
       <button class="flex flex-col items-center min-w-[70px] group">
         <div class="w-12 h-12 md:w-14 md:h-14 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center text-xl shadow-sm border border-gray-200 dark:border-gray-700 group-hover:border-brand transition">📚</div>
         <span class="text-[11px] md:text-xs font-bold mt-2 text-gray-600 dark:text-gray-300">Books</span>
@@ -79,7 +79,51 @@
         <div class="w-12 h-12 md:w-14 md:h-14 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center text-xl shadow-sm border border-gray-200 dark:border-gray-700 group-hover:border-brand transition">🛏️</div>
         <span class="text-[11px] md:text-xs font-bold mt-2 text-gray-600 dark:text-gray-300">Hostel</span>
       </button>
-    </div>
+    </div> -->
+
+    <div class="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar mb-6 pb-2">
+
+  <button onclick="filterCategory('books')" class="flex flex-col items-center min-w-[70px] group">
+    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow border group-hover:border-brand">📚</div>
+    <span class="text-xs font-bold mt-2">Books</span>
+  </button>
+
+  <button onclick="filterCategory('computing')" class="flex flex-col items-center min-w-[70px] group">
+    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow border group-hover:border-brand">💻</div>
+    <span class="text-xs font-bold mt-2">Computing</span>
+  </button>
+
+  <button onclick="filterCategory('phones')" class="flex flex-col items-center min-w-[70px] group">
+    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow border group-hover:border-brand">📱</div>
+    <span class="text-xs font-bold mt-2">Phones</span>
+  </button>
+
+  <button onclick="filterCategory('fashion')" class="flex flex-col items-center min-w-[70px] group">
+    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow border group-hover:border-brand">👕</div>
+    <span class="text-xs font-bold mt-2">Fashion</span>
+  </button>
+
+  <button onclick="filterCategory('hostel')" class="flex flex-col items-center min-w-[70px] group">
+    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow border group-hover:border-brand">🛏️</div>
+    <span class="text-xs font-bold mt-2">Hostel</span>
+  </button>
+
+  <button onclick="filterCategory('electronics')" class="flex flex-col items-center min-w-[70px] group">
+    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow border group-hover:border-brand">🎮</div>
+    <span class="text-xs font-bold mt-2">Electronics</span>
+  </button>
+
+  <button onclick="filterCategory('beauty')" class="flex flex-col items-center min-w-[70px] group">
+    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow border group-hover:border-brand">💄</div>
+    <span class="text-xs font-bold mt-2">Beauty</span>
+  </button>
+
+  <button onclick="filterCategory('services')" class="flex flex-col items-center min-w-[70px] group">
+    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow border group-hover:border-brand">🎯</div>
+    <span class="text-xs font-bold mt-2">Services</span>
+  </button>
+
+</div>
 
     <h2 class="font-black text-lg mb-4 text-navy dark:text-white flex items-center gap-2">Trending Ads <span class="w-2 h-2 bg-brand rounded-full animate-pulse"></span></h2>
 
