@@ -121,7 +121,7 @@
           <input id="price" type="number" placeholder="Price (₦)" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand" required/>
           <select id="category" onchange="loadSubcategories()" class="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand">
               <option value="phones">📱 Phones</option>
-              <option value="phones_accesories">📱 Phones Accessories</option>
+              <option value="phones_accessories">📱 Phones Accessories</option>
               <option value="computing">💻 Laptops & Computing</option>
               <option value="books">📚 Books</option>
               <option value="hostel">🛏️ Hostel</option>
@@ -166,7 +166,7 @@
             <select id="category" onchange="loadSubcategories()" class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all cursor-pointer" required>
                 <option value="" disabled selected>Select Category</option>
                 <option value="phones">📱 Phones</option>
-                <option value="phones_accesories">📱 Accessories</option>
+                <option value="phones_accessories">📱 Accessories</option>
                 <option value="computing">💻 Computing</option>
                 <option value="books">📚 Books</option>
                 <option value="hostel">🛏️ Hostel</option>
@@ -326,7 +326,7 @@ function renderAds(ads, currentUserId) {
 
 const subMap = {
   phones: ["Androids", "iPhones"],
-  phones_accesories: ["Chargers", "Powerbanks", "Earbuds", "Headphones", "Cases", "ScreenProtectors"],
+  phones_accessories: ["Chargers", "Powerbanks", "Earbuds", "Headphones", "Cases", "ScreenProtectors"],
   computing: ["Laptops", "Keyboards", "Mouses", "Storage_Devices"],
   books: ["Textbooks"],
   hostel: ["Beds_Foam", "Tables_Chairs", "Buckets_Mirrors", "Others"],
@@ -433,7 +433,16 @@ function openProduct(id) { window.location.href = `product.html?id=${id}`; }
             headers: { Authorization: token },
             body: formData
           });
-          if (res.ok) alert("Listing is now live! ✅");
+          // if (res.ok) alert("Listing is now live! ✅");
+          const data = await res.json();
+
+if (!res.ok) {
+  console.log("ERROR:", data);
+  alert(data.message || "Upload failed ❌");
+  return;
+}
+
+alert("Listing is now live! ✅");
         }
         closeForm();
         loadMyAds();

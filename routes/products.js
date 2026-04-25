@@ -11,7 +11,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 // ============================
 router.post("/add", auth, upload.single("image"), async (req, res) => {
   try {
-    const { title, description, price, category, condition, location } = req.body;
+    const { title, description, price, category, subcategory, condition, location } = req.body;
     const user_id = req.user.id;
     const file = req.file;
 
