@@ -34,12 +34,12 @@
   <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <button onclick="window.location.href='buyer.html'" class="text-brand font-bold text-sm tracking-widest hidden md:block mr-2">← BACK</button>
+        <button onclick="window.location.href='index.html'" class="text-brand font-bold text-sm tracking-widest hidden md:block mr-2">← BACK</button>
         <img src="logo.png" alt="Logo" class="w-8 h-8 object-contain mix-blend-multiply dark:bg-white dark:rounded dark:p-0.5">
         <span class="text-xl font-black text-navy dark:text-white tracking-tight">Messages</span>
       </div>
       <div class="flex items-center gap-4">
-        <a href="buyer.html" class="hidden md:block text-sm font-bold text-gray-500 hover:text-brand transition">Home</a>
+        <a href="index.html" class="hidden md:block text-sm font-bold text-gray-500 hover:text-brand transition">Home</a>
       </div>
     </div>
   </header>
@@ -80,12 +80,17 @@ async function loadChats() {
       headers: { Authorization: token }
     });
 
-    const data = await res.json();
+    if (!res.ok) {
+  console.log("Failed to fetch conversations");
+  return;
+}
+
+const data = await res.json();
     const container = document.getElementById("chatList");
 
     container.innerHTML = "";
 
-    if (!data.length) {
+   if (!data || data.length === 0) {
       container.innerHTML = `
         <div class="p-10 text-center flex flex-col items-center justify-center">
             <span class="text-4xl mb-3 opacity-50">📭</span>

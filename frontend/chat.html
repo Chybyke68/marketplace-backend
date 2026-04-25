@@ -27,7 +27,7 @@
       <div class="bg-white rounded-full p-1 border dark:border-none">
         <img src="logo.svg" class="h-8 w-8 object-contain rounded-full">
       </div>
-      <h2 class="text-lg font-bold text-navy dark:text-white">Seller Chat</h2>
+      <h2 id="chatTitle" class="text-lg font-bold text-navy dark:text-white">Seller Chat</h2>
     </div>
   </div>
 <!-- 🔥 PRODUCT PREVIEW -->
@@ -79,11 +79,13 @@ if (token) {
 }
 const params = new URLSearchParams(window.location.search);
 const product_id = params.get("product");
-  if (!product_id || !receiver_id) {
+const receiver_id = params.get("seller");
+
+if (!product_id || !receiver_id) {
   alert("Invalid chat link");
   window.location.href = "index.html";
-  }
-const receiver_id = params.get("seller");
+}
+
 const initialMessage = params.get("msg");
   let typingTimeout;
 
@@ -147,12 +149,15 @@ async function loadMessages() {
 `;
     });
 
-   if (isScrolledToBottom) {
-  box.scrollTo({
-    top: box.scrollHeight,
-    behavior: "smooth"
-  });
+  //  if (isScrolledToBottom) {
+  // box.scrollTo({
+  //   top: box.scrollHeight,
+  //   behavior: "smooth"
+  // });
+  if (isScrolledToBottom || !lastMessageId) {
+  box.scrollTop = box.scrollHeight;
 }
+
   } catch (err) { console.log("Error loading messages"); }
 }
 
@@ -163,7 +168,8 @@ async function loadChatHeader() {
 
     const storeName = data.users?.store_name || "Seller";
 
-    document.querySelector("h2").innerText = storeName;
+    // document.querySelector("h2").innerText = storeName;
+    document.getElementById("chatTitle").innerText = storeName;
   } catch (err) {
     console.log("Header load failed");
   }
@@ -192,8 +198,12 @@ box.innerHTML += `
     headers: { "Content-Type": "application/json", Authorization: token },
     body: JSON.stringify({ receiver_id, product_id, text })
   });
+
+  if (!res.ok) {
+  alert("Message failed ❌");
+}
   
-  loadMessages();
+  setTimeout(loadMessages, 300);
   setTimeout(() => {
   const box = document.getElementById("messages");
   box.scrollTo({
@@ -206,7 +216,8 @@ box.innerHTML += `
 }
 
 async function sendInitialMessage() {
-  if (!initialMessage) return;
+  if (!initialMessage || sessionStorage.getItem("sentInitial")) return;
+  sessionStorage.setItem("sentInitial", "true");
 
   try {
     await fetch(`${BACKEND}/api/messages/send`, {
