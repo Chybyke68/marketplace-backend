@@ -62,7 +62,7 @@
 
   <main class="max-w-7xl mx-auto px-4 py-4 md:py-6">
 
-    <div class="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar mb-6 pb-2">
+    <!-- <div class="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar mb-6 pb-2">
 
   <button onclick="filterCategory('books')" class="flex flex-col items-center min-w-[70px] group">
     <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow border group-hover:border-brand">📚</div>
@@ -104,9 +104,57 @@
     <span class="text-xs font-bold mt-2">Services</span>
   </button>
 
-</div>
+</div> -->
 <!-- SUBCATEGORY BAR -->
-<div id="subcategoryBar" class="flex gap-3 overflow-x-auto no-scrollbar mb-6 px-1"></div>
+<!-- <div id="subcategoryBar" class="flex gap-3 overflow-x-auto no-scrollbar mb-6 px-1"></div> -->
+
+
+<div class="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar mb-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+  
+  <button onclick="filterCategory('books')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">📚</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Books</span>
+  </button>
+
+  <button onclick="filterCategory('computing')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">💻</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Computing</span>
+  </button>
+
+  <button onclick="filterCategory('phones')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">📱</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Phones</span>
+  </button>
+
+  <button onclick="filterCategory('fashion')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">👕</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Fashion</span>
+  </button>
+
+  <button onclick="filterCategory('hostel')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">🛏️</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Hostel</span>
+  </button>
+
+  <button onclick="filterCategory('electronics')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">🎮</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Electronics</span>
+  </button>
+
+  <button onclick="filterCategory('beauty')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">💄</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Beauty</span>
+  </button>
+
+  <button onclick="filterCategory('services')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">🎯</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Services</span>
+  </button>
+
+</div>
+
+<div id="subcategoryBar" class="flex gap-2 overflow-x-auto no-scrollbar mb-8 px-1 items-center"></div>
+
 
     <h2 class="font-black text-lg mb-4 text-navy dark:text-white flex items-center gap-2">Trending Ads <span class="w-2 h-2 bg-brand rounded-full animate-pulse"></span></h2>
 
@@ -207,8 +255,32 @@ const subMap = {
   services: ["assignment_help", "graphic_design", "hair_barbing", "laundry", "phone_repair"]
 };
 
+// function loadSubcategories(category) {
+//   const bar = document.getElementById("subcategoryBar");
+
+//   if (!subMap[category]) {
+//     bar.innerHTML = "";
+//     return;
+//   }
+
+//   const subs = subMap[category];
+
+//   bar.innerHTML = "";
+
+//   subs.forEach(s => {
+//     bar.innerHTML += `
+//       <button onclick="filterSub('${category}', '${s}')"
+//         class="px-4 py-2 bg-white border rounded-full text-xs font-bold hover:bg-brand hover:text-white transition">
+//         ${s.replaceAll("_", " ")}
+//       </button>
+//     `;
+//   });
+// }
+
 function loadSubcategories(category) {
   const bar = document.getElementById("subcategoryBar");
+  const params = new URLSearchParams(window.location.search);
+  const activeSub = params.get("subcategory");
 
   if (!subMap[category]) {
     bar.innerHTML = "";
@@ -216,13 +288,27 @@ function loadSubcategories(category) {
   }
 
   const subs = subMap[category];
-
   bar.innerHTML = "";
 
+  // Add an "All" option for a premium UX
+  const allBtnActive = !activeSub ? 'bg-brand text-white border-brand shadow-orange-200' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-brand hover:text-brand';
+  
+  bar.innerHTML += `
+    <button onclick="filterCategory('${category}')" 
+      class="px-5 py-2.5 ${allBtnActive} border rounded-xl text-xs font-bold whitespace-nowrap shadow-sm transition-all active:scale-95">
+      All
+    </button>
+  `;
+
   subs.forEach(s => {
+    const isActive = activeSub === s;
+    const styleClass = isActive 
+      ? 'bg-brand text-white border-brand shadow-orange-200' 
+      : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-brand hover:text-brand';
+    
     bar.innerHTML += `
       <button onclick="filterSub('${category}', '${s}')"
-        class="px-4 py-2 bg-white border rounded-full text-xs font-bold hover:bg-brand hover:text-white transition">
+        class="px-5 py-2.5 ${styleClass} border rounded-xl text-xs font-bold whitespace-nowrap shadow-sm transition-all active:scale-95">
         ${s.replaceAll("_", " ")}
       </button>
     `;
