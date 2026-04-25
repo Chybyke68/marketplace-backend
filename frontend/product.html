@@ -197,6 +197,31 @@ function startChat() {
 }
 
 function goBack() { window.history.back(); }
+
+
+  async function loadUnreadCount() {
+  const res = await fetch(`${API}/api/messages/unread-count`, {
+    headers: { Authorization: localStorage.getItem("token") }
+  });
+
+  const data = await res.json();
+
+  const badge = document.getElementById("msgBadge");
+
+  if (data.count > 0) {
+    badge.innerText = data.count;
+    badge.classList.remove("hidden");
+  } else {
+    badge.classList.add("hidden");
+  }
+    }
+
+    function filterCategory(category) {
+  window.location.href = `index.html?category=${category}`;
+}
+
+    loadUnreadCount();
+setInterval(loadUnreadCount, 5000);
 loadProduct();
 </script>
 </body>
