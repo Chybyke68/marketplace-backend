@@ -104,6 +104,25 @@ router.post("/login", async (req, res) => {
     return res.status(400).json({ message: "Wrong password" });
   }
 
+  const auth = require("../middleware/auth"); // make sure this exists
+
+router.get("/me", auth, async (req, res) => {
+  const userId = req.user.id;
+
+  const { data, error } = await supabase
+    .from("users")
+    .select("id, name, email")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    console.log("ME ERROR:", error);
+    return res.status(500).json({ message: "Failed to fetch user" });
+  }
+
+  res.json(data);
+});
+
   // 🔐 CREATE TOKEN
   const token = jwt.sign(
     { id: user.id, role: user.role },
