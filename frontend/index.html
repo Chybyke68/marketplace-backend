@@ -3,400 +3,358 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CampusDealz - Free Classifieds</title>
+  <title>Campus Dealz</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: { 
         extend: { 
           colors: { 
-            jijiGreen: '#00B53F',
-            jijiGreenHover: '#009a35',
-            jijiBg: '#F4F5F7',
-            jijiDark: '#1a1a1a'
+            brand: '#ea580c', 
+            navy: '#1e293b',
+            surface: '#f8fafc'
           } 
         } 
       }
     }
   </script>
   <style>
-    .view-section { display: none; }
-    .view-section.active { display: block; animation: fadeIn 0.3s ease-in-out; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    
-    /* Jiji-style scrollbar */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #f1f1f1; }
-    ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-jijiBg text-gray-800 font-sans antialiased min-h-screen flex flex-col">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans pb-20 md:pb-0">
 
-  <header class="bg-white shadow-sm sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-      <div class="flex items-center justify-between gap-4 sm:gap-8">
+  <div id="app-loader" class="fixed inset-0 bg-white dark:bg-gray-900 z-[100] flex items-center justify-center transition-opacity duration-500">
+    <img src="logo.png" alt="Loading..." class="w-24 h-24 object-contain animate-pulse mix-blend-multiply dark:bg-white dark:p-2 dark:rounded-xl">
+  </div>
+  <script>
+    window.addEventListener('load', () => {
+      const loader = document.getElementById('app-loader');
+      if (loader) {
+        loader.classList.add('opacity-0');
+        setTimeout(() => loader.style.display = 'none', 500);
+      }
+    });
+  </script>
+
+  <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="flex items-center justify-between gap-4">
         
-        <div class="flex items-center cursor-pointer" onclick="switchView('marketplace')">
-          <span class="text-3xl font-bold text-jijiGreen tracking-tight">CampusDealz</span>
+        <div class="flex items-center gap-2">
+          <img src="logo.png" alt="Logo" class="w-8 h-8 object-contain mix-blend-multiply dark:bg-white dark:rounded dark:p-0.5">
+          <span class="text-xl md:text-2xl font-black text-navy dark:text-white tracking-tight hidden sm:block">CampusDealz</span>
         </div>
 
-        <div class="flex-grow hidden md:flex items-center">
-          <div class="flex w-full max-w-3xl border-2 border-jijiGreen rounded-md overflow-hidden bg-white">
-            <input type="text" placeholder="I am looking for..." class="flex-grow px-4 py-2 outline-none text-gray-700">
-            <button class="bg-jijiGreen text-white px-8 py-2 font-medium hover:bg-jijiGreenHover transition-colors">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </button>
-          </div>
+        <div class="flex-grow max-w-2xl relative">
+          <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <input type="text" placeholder="I am looking for..." class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand">
         </div>
 
         <div class="flex items-center gap-4">
-          <button class="text-gray-600 font-medium hidden sm:block" onclick="logout()">Sign out</button>
-          
-          <button id="navActionBtn" onclick="handleNavAction()" class="bg-[#FFAE00] hover:bg-[#e69d00] text-gray-900 font-bold px-6 py-2.5 rounded shadow-sm transition-colors uppercase text-sm tracking-wide flex items-center gap-1">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            <span id="navActionText">Sell</span>
-          </button>
+          <a href="seller.html" class="hidden md:flex bg-brand hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-bold text-sm shadow-sm transition">SELL</a>
         </div>
-      </div>
-      
-      <div class="mt-3 flex md:hidden w-full border-2 border-jijiGreen rounded-md overflow-hidden bg-white">
-        <input type="text" placeholder="I am looking for..." class="flex-grow px-3 py-2 outline-none text-gray-700 text-sm">
-        <button class="bg-jijiGreen text-white px-4 py-2 font-medium">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        </button>
       </div>
     </div>
   </header>
 
-  <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
-    
-    <div id="view-marketplace" class="view-section active">
-      <h1 class="text-xl font-bold text-gray-800 mb-4">Trending ads</h1>
-      
-      <div id="products-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
-        </div>
-    </div>
+  <main class="max-w-7xl mx-auto px-4 py-4 md:py-6">
 
-    <div id="view-dashboard" class="view-section">
-      <div class="flex items-center gap-3 mb-6 border-b pb-4">
-        <button onclick="switchView('marketplace')" class="text-jijiGreen hover:underline text-sm font-medium flex items-center gap-1">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-          Back to ads
-        </button>
-        <span class="text-gray-300">|</span>
-        <h1 class="text-2xl font-bold text-gray-800">My Adverts</h1>
+    <!-- <div class="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar mb-6 pb-2">
+
+  <button onclick="filterCategory('books')" class="flex flex-col items-center min-w-[70px] group">
+    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow border group-hover:border-brand">📚</div>
+    <span class="text-xs font-bold mt-2">Books</span>
+  </button>
+
+  <button onclick="filterCategory('computing')" class="flex flex-col items-center min-w-[70px] group">
+    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow border group-hover:border-brand">💻</div>
+    <span class="text-xs font-bold mt-2">Computing</span>
+  </button>
+
+  <button onclick="filterCategory('phones')" class="flex flex-col items-center min-w-[70px] group">
+    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow border group-hover:border-brand">📱</div>
+    <span class="text-xs font-bold mt-2">Phones</span>
+  </button>
+
+  <button onclick="filterCategory('fashion')" class="flex flex-col items-center min-w-[70px] group">
+    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow border group-hover:border-brand">👕</div>
+    <span class="text-xs font-bold mt-2">Fashion</span>
+  </button>
+
+  <button onclick="filterCategory('hostel')" class="flex flex-col items-center min-w-[70px] group">
+    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow border group-hover:border-brand">🛏️</div>
+    <span class="text-xs font-bold mt-2">Hostel</span>
+  </button>
+
+  <button onclick="filterCategory('electronics')" class="flex flex-col items-center min-w-[70px] group">
+    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow border group-hover:border-brand">🎮</div>
+    <span class="text-xs font-bold mt-2">Electronics</span>
+  </button>
+
+  <button onclick="filterCategory('beauty')" class="flex flex-col items-center min-w-[70px] group">
+    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow border group-hover:border-brand">💄</div>
+    <span class="text-xs font-bold mt-2">Beauty</span>
+  </button>
+
+  <button onclick="filterCategory('services')" class="flex flex-col items-center min-w-[70px] group">
+    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow border group-hover:border-brand">🎯</div>
+    <span class="text-xs font-bold mt-2">Services</span>
+  </button>
+
+</div> -->
+<!-- SUBCATEGORY BAR -->
+<!-- <div id="subcategoryBar" class="flex gap-3 overflow-x-auto no-scrollbar mb-6 px-1"></div> -->
+
+
+<div class="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar mb-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+  
+  <button onclick="filterCategory('books')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">📚</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Books</span>
+  </button>
+
+  <button onclick="filterCategory('computing')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">💻</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Computing</span>
+  </button>
+
+  <button onclick="filterCategory('phones')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">📱</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Phones</span>
+  </button>
+
+  <button onclick="filterCategory('phones_accesories')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">📱</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Phones Accessories</span>
+  </button>
+
+
+  <button onclick="filterCategory('fashion')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">👕</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Fashion</span>
+  </button>
+
+  <button onclick="filterCategory('hostel')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">🛏️</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Hostel</span>
+  </button>
+
+  <button onclick="filterCategory('electronics')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">🎮</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Electronics</span>
+  </button>
+
+  <button onclick="filterCategory('beauty')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">💄</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Beauty</span>
+  </button>
+
+  <button onclick="filterCategory('services')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">🎯</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Services</span>
+  </button>
+
+</div>
+
+<div id="subcategoryBar" class="flex gap-2 overflow-x-auto no-scrollbar mb-8 px-1 items-center"></div>
+
+
+    <h2 class="font-black text-lg mb-4 text-navy dark:text-white flex items-center gap-2">Trending Ads <span class="w-2 h-2 bg-brand rounded-full animate-pulse"></span></h2>
+
+    <div id="products-container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
       </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        
-        <aside class="lg:col-span-1 space-y-4">
-          <div class="bg-white p-5 rounded-md shadow-sm border border-gray-100">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-500 text-lg">
-                U
-              </div>
-              <div>
-                <p class="font-bold text-gray-900">Campus Seller</p>
-                <p class="text-xs text-green-600 font-medium">✓ Verified Student</p>
-              </div>
-            </div>
-            <div class="border-t pt-4 space-y-2">
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-500">Active Ads</span>
-                <span class="font-bold text-gray-800" id="activeAdsCount">0</span>
-              </div>
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-500">Views</span>
-                <span class="font-bold text-gray-800">0</span>
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        <section class="lg:col-span-3 space-y-6">
-          
-          <div class="bg-white p-6 rounded-md shadow-sm border border-gray-100">
-            <h2 class="text-lg font-bold mb-4 border-b pb-2">Post a New Ad</h2>
-            <form id="postAdForm" class="space-y-4 max-w-2xl">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Title *</label>
-                <input type="text" id="title" class="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-jijiGreen focus:ring-1 focus:ring-jijiGreen" required/>
-              </div>
-              
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-                  <select id="category" class="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-jijiGreen bg-white" required>
-                    <option value="">Select category...</option>
-                    <option value="Phones & Tablets">Phones & Tablets</option>
-                    <option value="Electronics">Electronics</option>
-                    <option value="Books">Textbooks & Notes</option>
-                    <option value="Hostel & Furniture">Hostel & Furniture</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Price (₦) *</label>
-                  <input type="number" id="price" class="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-jijiGreen" required/>
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Description *</label>
-                <textarea id="description" rows="4" class="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-jijiGreen resize-none" required></textarea>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Photo *</label>
-                <input type="file" id="image" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-jijiGreen hover:file:bg-green-100" accept="image/*" required/>
-              </div>
-
-              <div class="pt-2">
-                <button type="submit" class="bg-jijiGreen hover:bg-jijiGreenHover text-white font-bold py-3 px-8 rounded shadow-md transition-colors w-full sm:w-auto">
-                  Post Ad
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <div class="bg-white p-6 rounded-md shadow-sm border border-gray-100">
-            <h3 class="text-lg font-bold mb-4 border-b pb-2">Active Ads</h3>
-            <div id="seller-products" class="space-y-4">
-              </div>
-          </div>
-        </section>
-      </div>
-    </div>
 
   </main>
 
-  <dialog id="verifyModal" class="bg-transparent p-0 backdrop:bg-black/60 fixed inset-0 m-auto z-50 w-full">
-    <div class="bg-white text-gray-900 w-full max-w-md p-6 rounded-md shadow-2xl mx-auto transform transition-all scale-95 opacity-0 mt-20" id="verifyModalContent">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">Seller Verification</h2>
-        <button onclick="closeVerifyModal()" class="text-gray-400 hover:text-gray-700">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-      </div>
-      
-      <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-5">
-        <p class="text-sm text-yellow-700">For security reasons, all sellers must be verified students before posting classified ads.</p>
-      </div>
-      
-      <form id="verifyForm" class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Student ID / Matric Number</label>
-          <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-jijiGreen" required/>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-          <input type="tel" class="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-jijiGreen" required/>
-        </div>
-        
-        <div class="pt-4">
-          <button type="submit" class="w-full bg-jijiGreen hover:bg-jijiGreenHover text-white font-bold py-3 rounded transition">Verify Account</button>
-        </div>
-      </form>
-    </div>
-  </dialog>
+  <nav class="md:hidden fixed bottom-0 w-full bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex justify-around items-center pb-safe pt-2 pb-2 z-50">
+    <a href="index.html" class="flex flex-col items-center text-brand">
+      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+      <span class="text-[10px] font-bold">Home</span>
+    </a>
+    <a href="seller.html" class="flex flex-col items-center text-gray-400 hover:text-brand transition">
+      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+      <span class="text-[10px] font-bold">Sell</span>
+    </a>
+    <a href="messages.html" class="flex flex-col items-center text-gray-400 hover:text-brand transition">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+        <span class="text-[10px] font-bold">Messages</span>
+      <span id="msgBadge"
+       class="bg-red-500 text-white text-xs px-2 py-1 rounded-full hidden">
+       0
+      </span>
+    </a>
+    <a href="seller.html" class="flex flex-col items-center text-gray-400 hover:text-brand transition">
+      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+      <span class="text-[10px] font-bold">Manager</span>
+    </a>
+  </nav>
 
   <script>
     const API = "https://marketplace-5nn2.onrender.com";
 
-    // State Management
-    let isSeller = localStorage.getItem('isSeller') === 'true';
-    let currentView = localStorage.getItem('currentView') || 'marketplace';
+    async function loadProducts() {
+  const container = document.getElementById("products-container");
 
-    function initApp() {
-      updateNavButton();
-      if (!isSeller && currentView === 'dashboard') currentView = 'marketplace';
-      switchView(currentView);
-      loadMarketplaceProducts();
-      if (isSeller) loadSellerProducts();
+  const params = new URLSearchParams(window.location.search);
+  const category = params.get("category");
+
+  const subcategory = params.get("subcategory");
+
+// 🔥 load subcategories UI
+if (category) {
+  loadSubcategories(category);
+}
+
+  let url = `${API}/api/products`;
+
+ if (category) {
+  url += `?category=${category}`;
+}
+
+if (subcategory) {
+  url += `${category ? "&" : "?"}subcategory=${subcategory}`;
+}
+
+  try {
+    const res = await fetch(url);
+    let data = await res.json();
+
+    if (!data || !Array.isArray(data)) {
+      container.innerHTML = "Failed to load products ❌";
+      return;
     }
 
-    function switchView(viewId) {
-      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-      const targetView = document.getElementById(`view-${viewId}`);
-      if (targetView) targetView.classList.add('active');
-      
-      currentView = viewId;
-      localStorage.setItem('currentView', currentView);
-    }
+    container.innerHTML = "";
 
-    // Navbar Logic
-    function handleNavAction() {
-      if (isSeller) {
-        switchView('dashboard');
-      } else {
-        openVerifyModal();
-      }
-    }
-
-    function updateNavButton() {
-      const textSpan = document.getElementById('navActionText');
-      if (isSeller) {
-        textSpan.innerText = "Dashboard";
-      } else {
-        textSpan.innerText = "Sell";
-      }
-    }
-
-    // Modal Logic
-    const modal = document.getElementById('verifyModal');
-    const modalContent = document.getElementById('verifyModalContent');
-
-    function openVerifyModal() {
-      modal.showModal();
-      setTimeout(() => {
-        modalContent.classList.remove('scale-95', 'opacity-0');
-        modalContent.classList.add('scale-100', 'opacity-100');
-      }, 10);
-    }
-
-    function closeVerifyModal() {
-      modalContent.classList.remove('scale-100', 'opacity-100');
-      modalContent.classList.add('scale-95', 'opacity-0');
-      setTimeout(() => modal.close(), 200);
-    }
-
-    document.getElementById('verifyForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const btn = e.target.querySelector('button[type="submit"]');
-      btn.innerText = "Verifying...";
-      
-      setTimeout(() => {
-        isSeller = true;
-        localStorage.setItem('isSeller', 'true');
-        closeVerifyModal();
-        updateNavButton();
-        switchView('dashboard');
-        loadSellerProducts();
-        btn.innerText = "Verify Account";
-      }, 1000);
+    data.forEach(p => {
+      container.innerHTML += `
+        <div class="bg-white rounded-lg shadow hover:shadow-md overflow-hidden cursor-pointer border"
+             onclick="view('${p.id}')">
+          <div class="aspect-square bg-gray-100">
+            <img src="${p.image}" class="w-full h-full object-cover"
+              onerror="this.src='https://via.placeholder.com/300'">
+          </div>
+          <div class="p-2 flex flex-col">
+            <h2 class="text-sm line-clamp-2 mb-1">${p.title}</h2>
+            <p class="text-brand font-bold">₦${Number(p.price).toLocaleString()}</p>
+          </div>
+        </div>
+      `;
     });
 
-    // Form Submission (Using your original fetch logic)
-    document.getElementById('postAdForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const token = localStorage.getItem("token") || "mock-token";
-      
-      const formData = new FormData();
-      formData.append("title", document.getElementById("title").value);
-      formData.append("price", document.getElementById("price").value);
-      formData.append("description", document.getElementById("description").value);
-      formData.append("category", document.getElementById("category").value);
-      
-      const imageFile = document.getElementById("image").files[0];
-      if (imageFile) formData.append("image", imageFile);
+  } catch (error) {
+    console.error("Failed:", error);
+  }
+}
 
-      const btn = e.target.querySelector('button[type="submit"]');
-      const originalText = btn.innerText;
-      btn.innerText = "Publishing...";
-      btn.disabled = true;
+const subMap = {
+  phones: ["Androids", "iPhones"],
+  phones_accesories: ["Chargers", "Powerbanks", "Earbuds", "Headphones", "Cases", "ScreenProtectors"],
+  computing: ["Laptops", "Keyboards", "Mouses", "Storage_Devices"],
+  books: ["Textbooks"],
+  hostel: ["Beds_Foam", "Tables_Chairs", "Buckets_Mirrors", "Others"],
+  fashion: ["Clothes", "Shoes", "Bags", "Watches", "Jewelry", "Others"],
+  electronics: ["Speakers", "Smartwatches", "Gadgets", "Others"],
+  beauty: ["Skincare", "Hair_Products", "Perfumes", "Makeup", "Others"],
+  services: ["Graphic_Design", "Hair_Barbing", "Laundry", "Phone_Repair", "Others"]
+};
 
-      try {
-        const res = await fetch(`${API}/api/products/add`, {
-          method: "POST",
-          headers: { Authorization: token },
-          body: formData
-        });
+// function loadSubcategories(category) {
+//   const bar = document.getElementById("subcategoryBar");
 
-        if (!res.ok) {
-          const data = await res.json();
-          alert(data.message || "Error posting ad");
-        } else {
-          alert("Ad posted successfully!");
-          loadSellerProducts(); // Refresh seller list dynamically
-          e.target.reset(); // Clear form
-        }
-      }
-      catch (err) {
-        console.log("Mocking successful upload for demo purposes...");
-        // Fallback for visual demo if API fails
-        alert("Ad posted successfully (Offline Mode)!");
-        e.target.reset();
-      } finally {
-        btn.innerText = originalText;
-        btn.disabled = false;
-      }
-    });
+//   if (!subMap[category]) {
+//     bar.innerHTML = "";
+//     return;
+//   }
 
-    // Load Data
-    async function loadMarketplaceProducts() {
-      const container = document.getElementById("products-grid");
-      try {
-        const res = await fetch(`${API}/api/products`).catch(() => null);
-        let data = res ? await res.json() : [];
-        
-        if (!data || data.length === 0) {
-            data = [
-                { id: 1, title: "iPhone 13 Pro 256GB", price: 450000, category: "Phones", image: "https://via.placeholder.com/400x300?text=iPhone" },
-                { id: 2, title: "MTH101 Textbook", price: 5000, category: "Books", image: "https://via.placeholder.com/400x300?text=Textbook" },
-                { id: 3, title: "Hisense Mini Fridge", price: 45000, category: "Electronics", image: "https://via.placeholder.com/400x300?text=Fridge" },
-                { id: 4, title: "Study Desk & Chair", price: 25000, category: "Furniture", image: "https://via.placeholder.com/400x300?text=Desk" },
-                { id: 5, title: "MacBook Air M1", price: 650000, category: "Laptops", image: "https://via.placeholder.com/400x300?text=MacBook" }
-            ];
-        }
+//   const subs = subMap[category];
 
-        container.innerHTML = data.map(p => `
-          <div class="bg-white rounded shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition cursor-pointer flex flex-col h-full">
-            <div class="relative h-40 bg-gray-100">
-              <img src="${p.image}" class="w-full h-full object-cover">
-              <span class="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded">
-                ${p.category || 'Ad'}
-              </span>
-            </div>
-            <div class="p-3 flex flex-col flex-grow">
-              <p class="text-sm text-gray-700 leading-tight mb-2 line-clamp-2">${p.title}</p>
-              <div class="mt-auto">
-                <p class="font-bold text-jijiGreen text-lg">₦${Number(p.price).toLocaleString()}</p>
-              </div>
-            </div>
-          </div>
-        `).join('');
-      } catch (err) {
-        console.error(err);
-      }
+//   bar.innerHTML = "";
+
+//   subs.forEach(s => {
+//     bar.innerHTML += `
+//       <button onclick="filterSub('${category}', '${s}')"
+//         class="px-4 py-2 bg-white border rounded-full text-xs font-bold hover:bg-brand hover:text-white transition">
+//         ${s.replaceAll("_", " ")}
+//       </button>
+//     `;
+//   });
+// }
+
+function loadSubcategories(category) {
+  const bar = document.getElementById("subcategoryBar");
+  const params = new URLSearchParams(window.location.search);
+  const activeSub = params.get("subcategory");
+
+  if (!subMap[category]) {
+    bar.innerHTML = "";
+    return;
+  }
+
+  const subs = subMap[category];
+  bar.innerHTML = "";
+
+  // Add an "All" option for a premium UX
+  const allBtnActive = !activeSub ? 'bg-brand text-white border-brand shadow-orange-200' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-brand hover:text-brand';
+  
+  bar.innerHTML += `
+    <button onclick="filterCategory('${category}')" 
+      class="px-5 py-2.5 ${allBtnActive} border rounded-xl text-xs font-bold whitespace-nowrap shadow-sm transition-all active:scale-95">
+      All
+    </button>
+  `;
+
+  subs.forEach(s => {
+    const isActive = activeSub === s;
+    const styleClass = isActive 
+      ? 'bg-brand text-white border-brand shadow-orange-200' 
+      : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-brand hover:text-brand';
+    
+    bar.innerHTML += `
+      <button onclick="filterSub('${category}', '${s}')"
+        class="px-5 py-2.5 ${styleClass} border rounded-xl text-xs font-bold whitespace-nowrap shadow-sm transition-all active:scale-95">
+        ${s.replaceAll("_", " ")}
+      </button>
+    `;
+  });
+}
+
+function filterSub(category, sub) {
+  window.location.href = `index.html?category=${category}&subcategory=${sub}`;
+}
+
+    function view(id) {
+      window.location.href = "product.html?id=" + id;
     }
 
-    async function loadSellerProducts() {
-        const container = document.getElementById("seller-products");
-        // Simulated user products
-        const data = [
-            { id: 3, title: "Hisense Mini Fridge", price: 45000, status: 'Active', image: "https://via.placeholder.com/400x300?text=Fridge" }
-        ];
-        
-        document.getElementById('activeAdsCount').innerText = data.length;
+    async function loadUnreadCount() {
+  const res = await fetch(`${API}/api/messages/unread-count`, {
+    headers: { Authorization: localStorage.getItem("token") }
+  });
 
-        if(data.length === 0) {
-            container.innerHTML = `<div class="text-center py-8 text-gray-500">You don't have any ads yet.</div>`;
-            return;
-        }
+  const data = await res.json();
 
-        container.innerHTML = data.map(p => `
-          <div class="border border-gray-200 rounded p-3 flex flex-col sm:flex-row gap-4 items-center">
-            <img src="${p.image}" class="w-24 h-24 rounded object-cover flex-shrink-0">
-            <div class="flex-grow text-center sm:text-left">
-              <h3 class="font-bold text-gray-800">${p.title}</h3>
-              <p class="text-jijiGreen font-bold mt-1">₦${Number(p.price).toLocaleString()}</p>
-              <span class="inline-block mt-2 text-xs font-bold px-2 py-1 bg-green-100 text-green-800 rounded uppercase tracking-wider">${p.status}</span>
-            </div>
-            <div class="flex sm:flex-col gap-2 w-full sm:w-auto">
-               <button class="flex-1 sm:flex-none border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded text-sm font-medium transition">Edit</button>
-               <button class="flex-1 sm:flex-none border border-red-200 text-red-600 hover:bg-red-50 px-4 py-2 rounded text-sm font-medium transition">Delete</button>
-            </div>
-          </div>
-        `).join('');
+  const badge = document.getElementById("msgBadge");
+
+  if (data.count > 0) {
+    badge.innerText = data.count;
+    badge.classList.remove("hidden");
+  } else {
+    badge.classList.add("hidden");
+  }
     }
 
-    function logout() {
-      localStorage.clear();
-      location.reload();
-    }
+    function filterCategory(category) {
+  window.location.href = `index.html?category=${category}`;
+}
 
-    // Run Initialization
-    initApp();
+    loadUnreadCount();
+setInterval(loadUnreadCount, 5000);
+
+    loadProducts();
   </script>
 </body>
 </html>

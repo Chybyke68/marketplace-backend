@@ -61,7 +61,7 @@
           if (data.token) {
             localStorage.setItem("token", data.token);
             const user = JSON.parse(atob(data.token.split(".")[1]));
-            window.location.href = user.role === "seller" ? "seller.html" : "buyer.html";
+            window.location.href = user.role === "seller" ? "seller.html" : "index.html";
           } else {
             alert(data.message || "Login failed");
           }
