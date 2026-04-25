@@ -61,25 +61,6 @@
   </header>
 
   <main class="max-w-7xl mx-auto px-4 py-4 md:py-6">
-    
-    <!-- <div class="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar mb-6 pb-2">
-      <button class="flex flex-col items-center min-w-[70px] group">
-        <div class="w-12 h-12 md:w-14 md:h-14 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center text-xl shadow-sm border border-gray-200 dark:border-gray-700 group-hover:border-brand transition">📚</div>
-        <span class="text-[11px] md:text-xs font-bold mt-2 text-gray-600 dark:text-gray-300">Books</span>
-      </button>
-      <button class="flex flex-col items-center min-w-[70px] group">
-        <div class="w-12 h-12 md:w-14 md:h-14 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center text-xl shadow-sm border border-gray-200 dark:border-gray-700 group-hover:border-brand transition">💻</div>
-        <span class="text-[11px] md:text-xs font-bold mt-2 text-gray-600 dark:text-gray-300">Tech</span>
-      </button>
-      <button class="flex flex-col items-center min-w-[70px] group">
-        <div class="w-12 h-12 md:w-14 md:h-14 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center text-xl shadow-sm border border-gray-200 dark:border-gray-700 group-hover:border-brand transition">👕</div>
-        <span class="text-[11px] md:text-xs font-bold mt-2 text-gray-600 dark:text-gray-300">Fashion</span>
-      </button>
-      <button class="flex flex-col items-center min-w-[70px] group">
-        <div class="w-12 h-12 md:w-14 md:h-14 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center text-xl shadow-sm border border-gray-200 dark:border-gray-700 group-hover:border-brand transition">🛏️</div>
-        <span class="text-[11px] md:text-xs font-bold mt-2 text-gray-600 dark:text-gray-300">Hostel</span>
-      </button>
-    </div> -->
 
     <div class="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar mb-6 pb-2">
 
@@ -124,6 +105,8 @@
   </button>
 
 </div>
+<!-- SUBCATEGORY BAR -->
+<div id="subcategoryBar" class="flex gap-3 overflow-x-auto no-scrollbar mb-6 px-1"></div>
 
     <h2 class="font-black text-lg mb-4 text-navy dark:text-white flex items-center gap-2">Trending Ads <span class="w-2 h-2 bg-brand rounded-full animate-pulse"></span></h2>
 
@@ -164,11 +147,22 @@
   const params = new URLSearchParams(window.location.search);
   const category = params.get("category");
 
+  const subcategory = params.get("subcategory");
+
+// 🔥 load subcategories UI
+if (category) {
+  loadSubcategories(category);
+}
+
   let url = `${API}/api/products`;
 
-  if (category) {
-    url += `?category=${category}`;
-  }
+ if (category) {
+  url += `?category=${category}`;
+}
+
+if (subcategory) {
+  url += `${category ? "&" : "?"}subcategory=${subcategory}`;
+}
 
   try {
     const res = await fetch(url);
@@ -202,36 +196,42 @@
   }
 }
 
-    /*async function loadProducts() {
-      const container = document.getElementById("products-container");
-      try {
-        const res = await fetch(`${API}/api/products`);
-        let data = await res.json();
+const subMap = {
+  phones: ["phones", "chargers_powerbanks", "earbuds_headphones"],
+  computing: ["laptops", "keyboards_mouse", "storage_devices"],
+  books: ["textbooks"],
+  hostel: ["beds_foam", "tables_chairs", "buckets_mirrors"],
+  fashion: ["clothes", "shoes", "bags"],
+  electronics: ["speakers", "smartwatches", "gadgets"],
+  beauty: ["skincare", "hair_products", "perfumes"],
+  services: ["assignment_help", "graphic_design", "hair_barbing", "laundry", "phone_repair"]
+};
 
-        if (!data || !Array.isArray(data)) {
-          container.innerHTML = "Failed to load products ❌";
-          return;
-        }
+function loadSubcategories(category) {
+  const bar = document.getElementById("subcategoryBar");
 
-        container.innerHTML = "";
+  if (!subMap[category]) {
+    bar.innerHTML = "";
+    return;
+  }
 
-        data.forEach(p => {
-          container.innerHTML += `
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col cursor-pointer border border-gray-200 dark:border-gray-700" onclick="view('${p.id}')">
-              <div class="aspect-square w-full bg-gray-100 dark:bg-gray-700 relative">
-                <img src="${p.image}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'">
-              </div>
-              <div class="p-2 md:p-3 flex flex-col flex-grow">
-                <h2 class="text-xs md:text-sm text-gray-700 dark:text-gray-200 line-clamp-2 mb-1">${p.title}</h2>
-                <p class="text-brand font-black text-sm md:text-lg mt-auto">₦${p.price.toLocaleString()}</p>
-              </div>
-            </div>
-          `;
-        });
-      } catch (error) {
-        console.error("Failed to load products:", error);
-      }
-    }*/
+  const subs = subMap[category];
+
+  bar.innerHTML = "";
+
+  subs.forEach(s => {
+    bar.innerHTML += `
+      <button onclick="filterSub('${category}', '${s}')"
+        class="px-4 py-2 bg-white border rounded-full text-xs font-bold hover:bg-brand hover:text-white transition">
+        ${s.replaceAll("_", " ")}
+      </button>
+    `;
+  });
+}
+
+function filterSub(category, sub) {
+  window.location.href = `buyer.html?category=${category}&subcategory=${sub}`;
+}
 
     function view(id) {
       window.location.href = "product.html?id=" + id;
