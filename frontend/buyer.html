@@ -126,6 +126,12 @@
     <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Phones</span>
   </button>
 
+  <button onclick="filterCategory('phones_accesories')" class="flex flex-col items-center min-w-[72px] group transition-all">
+    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">📱</div>
+    <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Phones Accessories</span>
+  </button>
+
+
   <button onclick="filterCategory('fashion')" class="flex flex-col items-center min-w-[72px] group transition-all">
     <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-brand group-hover:shadow-md group-active:scale-95 transition-all">👕</div>
     <span class="text-[11px] font-bold mt-3 text-gray-500 dark:text-gray-400 group-hover:text-brand tracking-tight">Fashion</span>
@@ -245,14 +251,15 @@ if (subcategory) {
 }
 
 const subMap = {
-  phones: ["phones", "chargers_powerbanks", "earbuds_headphones"],
-  computing: ["laptops", "keyboards_mouse", "storage_devices"],
-  books: ["textbooks"],
-  hostel: ["beds_foam", "tables_chairs", "buckets_mirrors"],
-  fashion: ["clothes", "shoes", "bags"],
-  electronics: ["speakers", "smartwatches", "gadgets"],
-  beauty: ["skincare", "hair_products", "perfumes"],
-  services: ["assignment_help", "graphic_design", "hair_barbing", "laundry", "phone_repair"]
+  phones: ["Androids", "iPhones"],
+  phones_accesories: ["Chargers", "Powerbanks", "Earbuds", "Headphones", "Cases", "ScreenProtectors"],
+  computing: ["Laptops", "Keyboards", "Mouses", "Storage_Devices"],
+  books: ["Textbooks"],
+  hostel: ["Beds_Foam", "Tables_Chairs", "Buckets_Mirrors", "Others"],
+  fashion: ["Clothes", "Shoes", "Bags", "Watches", "Jewelry", "Others"],
+  electronics: ["Speakers", "Smartwatches", "Gadgets", "Others"],
+  beauty: ["Skincare", "Hair_Products", "Perfumes", "Makeup", "Others"],
+  services: ["Graphic_Design", "Hair_Barbing", "Laundry", "Phone_Repair", "Others"]
 };
 
 // function loadSubcategories(category) {

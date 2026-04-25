@@ -120,7 +120,8 @@
         <div class="grid grid-cols-2 gap-3">
           <input id="price" type="number" placeholder="Price (₦)" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand" required/>
           <select id="category" onchange="loadSubcategories()" class="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand">
-              <option value="phones">📱 Phones & Accessories</option>
+              <option value="phones">📱 Phones</option>
+              <option value="phones_accesories">📱 Phones Accessories</option>
               <option value="computing">💻 Laptops & Computing</option>
               <option value="books">📚 Books</option>
               <option value="hostel">🛏️ Hostel</option>
@@ -268,14 +269,15 @@ function renderAds(ads, currentUserId) {
 }
 
 const subMap = {
-  phones: ["phones", "chargers_powerbanks", "earbuds_headphones"],
-  computing: ["laptops", "keyboards_mouse", "storage_devices"],
-  books: ["textbooks"],
-  hostel: ["beds_foam", "tables_chairs", "buckets_mirrors"],
-  fashion: ["clothes", "shoes", "bags"],
-  electronics: ["speakers", "smartwatches", "gadgets"],
-  beauty: ["skincare", "hair_products", "perfumes"],
-  services: ["assignment_help", "graphic_design", "hair_barbing", "laundry", "phone_repair"],
+  phones: ["Androids", "iPhones"],
+  phones_accesories: ["Chargers", "Powerbanks", "Earbuds", "Headphones", "Cases", "ScreenProtectors"],
+  computing: ["Laptops", "Keyboards", "Mouses", "Storage_Devices"],
+  books: ["Textbooks"],
+  hostel: ["Beds_Foam", "Tables_Chairs", "Buckets_Mirrors", "Others"],
+  fashion: ["Clothes", "Shoes", "Bags", "Watches", "Jewelry", "Others"],
+  electronics: ["Speakers", "Smartwatches", "Gadgets", "Others"],
+  beauty: ["Skincare", "Hair_Products", "Perfumes", "Makeup", "Others"],
+  services: ["Graphic_Design", "Hair_Barbing", "Laundry", "Phone_Repair", "Others"],
   others: ["others"]
 };
 
