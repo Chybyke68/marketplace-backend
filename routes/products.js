@@ -209,40 +209,86 @@ router.delete("/:id", auth, async (req, res) => {
 // ============================
 // UPDATE PRODUCT
 // ============================
+// router.put("/:id", auth, async (req, res) => {
+//   const productId = req.params.id;
+//   const user_id = req.user.id;
+
+//   const { title, description, price } = req.body;
+
+//   const { data: product } = await supabase
+//     .from("products")
+//     .select("*, users(name, store_name)")
+//     .eq("id", productId)
+//     .single();
+
+//   if (!product) {
+//     return res.status(404).json({ message: "Product not found" });
+//   }
+
+//   if (product.user_id !== user_id) {
+//     return res.status(403).json({ message: "Unauthorized" });
+//   }
+
+//   const { data, error } = await supabase
+//     .from("products")
+//     .update({ title, description, price })
+//     .eq("id", productId)
+//     .select();
+
+//   if (error) return res.status(500).json(error);
+
+//   res.json({
+//     message: "Product updated successfully",
+//     product: data[0]
+//   });
+// });
+
 router.put("/:id", auth, async (req, res) => {
   const productId = req.params.id;
   const user_id = req.user.id;
 
-  const { title, description, price } = req.body;
+  // ✅ INCLUDE category + subcategory
+  const { title, description, price, category, subcategory } = req.body;
 
-  const { data: product } = await supabase
+  // 🔍 Check product exists
+  const { data: product, error: fetchError } = await supabase
     .from("products")
-    .select("*, users(name, store_name)")
+    .select("*")
     .eq("id", productId)
     .single();
 
-  if (!product) {
+  if (fetchError || !product) {
     return res.status(404).json({ message: "Product not found" });
   }
 
+  // 🔒 Ensure owner
   if (product.user_id !== user_id) {
     return res.status(403).json({ message: "Unauthorized" });
   }
 
+  // ✅ UPDATE EVERYTHING
   const { data, error } = await supabase
     .from("products")
-    .update({ title, description, price })
+    .update({
+      title,
+      description,
+      price,
+      category,      // 🔥 ADD THIS
+      subcategory    // 🔥 ADD THIS
+    })
     .eq("id", productId)
     .select();
 
-  if (error) return res.status(500).json(error);
+  if (error) {
+    console.log("UPDATE ERROR:", error);
+    return res.status(500).json(error);
+  }
 
   res.json({
     message: "Product updated successfully",
     product: data[0]
   });
 });
-
 
 
 module.exports = router;
