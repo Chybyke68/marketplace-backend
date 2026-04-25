@@ -158,6 +158,47 @@
   <script>
     const API = "https://marketplace-5nn2.onrender.com";
 
+    async function loadProfile() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/api/auth/me`, {
+      headers: { Authorization: token }
+    });
+
+    const user = await res.json();
+
+    document.getElementById("userName").innerText = user.name || "User";
+    document.getElementById("userEmail").innerText = user.email || "";
+
+  } catch (err) {
+    console.error("Profile error:", err);
+  }
+    }
+
+    async function loadStats() {
+  const token = localStorage.getItem("token");
+
+  try {
+    const res = await fetch(`${API}/api/products/my`, {
+      headers: { Authorization: token }
+    });
+
+    const data = await res.json();
+
+    document.getElementById("statAds").innerText = data.length || 0;
+
+  } catch (err) {
+    console.error("Stats error:", err);
+  }
+    }
+    
+
     // Reusing your unread message count logic
     async function loadUnreadCount() {
       try {
@@ -190,6 +231,9 @@
     // Initialize
     loadUnreadCount();
     setInterval(loadUnreadCount, 5000);
+
+    loadProfile();
+loadStats();
   </script>
 </body>
 </html>
