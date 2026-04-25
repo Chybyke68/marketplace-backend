@@ -349,27 +349,39 @@ const subMap = {
 //   });
 // }
 
+// function loadSubcategories() {
+//   const category = document.getElementById("category").value;
+//   const subSelect = document.getElementById("subcategory");
+
+//   subSelect.innerHTML = "";
+
+//   // Handle the default empty state
+//   if (!category) {
+//     subSelect.innerHTML = '<option value="" disabled selected>Select Subcategory</option>';
+//     return;
+//   }
+
+//   const sub = subMap[category];
+  
+//   if (sub) {
+//     // Add the default select placeholder for the subcategory dropdown too
+//     subSelect.innerHTML = '<option value="" disabled selected>Select Subcategory</option>';
+//     sub.forEach(s => {
+//       subSelect.innerHTML += `<option value="${s}">${s.replaceAll("_", " ")}</option>`;
+//     });
+//   }
+// }
 function loadSubcategories() {
   const category = document.getElementById("category").value;
   const subSelect = document.getElementById("subcategory");
 
-  subSelect.innerHTML = "";
+  subSelect.innerHTML = '<option value="" disabled selected>Select Subcategory</option>';
 
-  // Handle the default empty state
-  if (!category) {
-    subSelect.innerHTML = '<option value="" disabled selected>Select Subcategory</option>';
-    return;
-  }
+  if (!category || !subMap[category]) return;
 
-  const sub = subMap[category];
-  
-  if (sub) {
-    // Add the default select placeholder for the subcategory dropdown too
-    subSelect.innerHTML = '<option value="" disabled selected>Select Subcategory</option>';
-    sub.forEach(s => {
-      subSelect.innerHTML += `<option value="${s}">${s.replaceAll("_", " ")}</option>`;
-    });
-  }
+  subMap[category].forEach(s => {
+    subSelect.innerHTML += `<option value="${s}">${s.replaceAll("_", " ")}</option>`;
+  });
 }
 
 // 🔥 load default
@@ -385,21 +397,38 @@ function openProduct(id) { window.location.href = `product.html?id=${id}`; }
         renderAds(filtered, cId);
     }
 
+
     function editAd(id) {
-      const product = myProducts.find(p => p.id == id);
-      if (!product) return;
-      editingProductId = id;
-      document.getElementById("title").value = product.title;
-      document.getElementById("price").value = product.price;
-      document.getElementById("category").value = product.category || "Books";
-      document.getElementById("description").value = product.description || "";
-      document.getElementById("imagePreview").src = product.image;
-      document.getElementById("imagePreview").classList.remove("hidden");
-      document.getElementById("uploadPrompt").classList.add("hidden");
-      document.getElementById("formTitle").innerText = "Edit Ad Details";
-      document.getElementById("submitBtn").innerText = "Update Listing";
-      openForm();
-    }
+  const product = myProducts.find(p => p.id == id);
+  if (!product) return;
+
+  editingProductId = id;
+
+  document.getElementById("title").value = product.title;
+  document.getElementById("price").value = product.price;
+  document.getElementById("description").value = product.description || "";
+
+  // ✅ SET CATEGORY
+  document.getElementById("category").value = product.category;
+
+  // ✅ LOAD SUBCATEGORIES FIRST
+  loadSubcategories();
+
+  // ✅ THEN SET SUBCATEGORY
+  setTimeout(() => {
+    document.getElementById("subcategory").value = product.subcategory || "";
+  }, 50);
+
+  // IMAGE
+  document.getElementById("imagePreview").src = product.image;
+  document.getElementById("imagePreview").classList.remove("hidden");
+  document.getElementById("uploadPrompt").classList.add("hidden");
+
+  document.getElementById("formTitle").innerText = "Edit Ad Details";
+  document.getElementById("submitBtn").innerText = "Update Listing";
+
+  openForm();
+}
 
     document.getElementById("form").addEventListener("submit", async e => {
       e.preventDefault();
@@ -416,7 +445,8 @@ function openProduct(id) { window.location.href = `product.html?id=${id}`; }
               title: document.getElementById("title").value,
               price: document.getElementById("price").value,
               description: document.getElementById("description").value,
-              category: document.getElementById("category").value
+              category: document.getElementById("category").value,
+              subcategory: document.getElementById("subcategory").value
             })
           });
           if (res.ok) alert("Listing updated! ✅");
