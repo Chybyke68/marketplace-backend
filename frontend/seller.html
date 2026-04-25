@@ -115,7 +115,7 @@
         <button onclick="closeForm()" class="text-gray-400">✕</button>
       </div>
 
-      <form id="form" class="p-6 space-y-4">
+      <!-- <form id="form" class="p-6 space-y-4">
         <input id="title" placeholder="Title" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand" required/>
         <div class="grid grid-cols-2 gap-3">
           <input id="price" type="number" placeholder="Price (₦)" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand" required/>
@@ -144,6 +144,62 @@
         </div>
 
         <button type="submit" id="submitBtn" class="w-full bg-brand text-white font-bold py-4 rounded transition-all text-sm">
+          Publish Ad
+        </button>
+      </form> -->
+
+      <form id="form" class="p-6 space-y-5">
+        
+        <div>
+          <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Product Title</label>
+          <input id="title" placeholder="e.g. iPhone 12 Pro Max" class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all" required/>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Price (₦)</label>
+          <input id="price" type="number" placeholder="0.00" class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all" required/>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Category</label>
+            <select id="category" onchange="loadSubcategories()" class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all cursor-pointer" required>
+                <option value="" disabled selected>Select Category</option>
+                <option value="phones">📱 Phones</option>
+                <option value="phones_accesories">📱 Accessories</option>
+                <option value="computing">💻 Computing</option>
+                <option value="books">📚 Books</option>
+                <option value="hostel">🛏️ Hostel</option>
+                <option value="fashion">👕 Fashion</option>
+                <option value="electronics">🎮 Electronics</option>
+                <option value="beauty">💄 Beauty</option>
+                <option value="services">🎯 Services</option>
+                <option value="others">🔄 Others</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Subcategory</label>
+            <select id="subcategory" class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all cursor-pointer" required>
+                <option value="" disabled selected>Select Subcategory</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Description</label>
+          <textarea id="description" placeholder="Provide details about condition, features, etc..." class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 resize-none transition-all" rows="3" required></textarea>
+        </div>
+
+        <div id="imageUploadArea" class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group cursor-pointer">
+            <input id="image" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="previewImage(event)"/>
+            <div id="uploadPrompt" class="text-gray-400 group-hover:text-brand transition-colors">
+                <div class="text-4xl mb-2">📸</div>
+                <span class="text-xs font-bold tracking-wide uppercase">Tap to add a photo</span>
+            </div>
+            <img id="imagePreview" class="hidden mx-auto h-32 w-auto object-cover rounded-xl shadow-md" alt="Preview"/>
+        </div>
+
+        <button type="submit" id="submitBtn" class="w-full bg-brand hover:bg-orange-600 text-white font-black py-4 rounded-xl shadow-md active:scale-95 transition-all text-sm tracking-widest uppercase">
           Publish Ad
         </button>
       </form>
@@ -281,16 +337,39 @@ const subMap = {
   others: ["others"]
 };
 
+// function loadSubcategories() {
+//   const category = document.getElementById("category").value;
+//   const sub = subMap[category];
+//   const subSelect = document.getElementById("subcategory");
+
+//   subSelect.innerHTML = "";
+
+//   sub.forEach(s => {
+//     subSelect.innerHTML += `<option value="${s}">${s.replaceAll("_", " ")}</option>`;
+//   });
+// }
+
 function loadSubcategories() {
   const category = document.getElementById("category").value;
-  const sub = subMap[category];
   const subSelect = document.getElementById("subcategory");
 
   subSelect.innerHTML = "";
 
-  sub.forEach(s => {
-    subSelect.innerHTML += `<option value="${s}">${s.replaceAll("_", " ")}</option>`;
-  });
+  // Handle the default empty state
+  if (!category) {
+    subSelect.innerHTML = '<option value="" disabled selected>Select Subcategory</option>';
+    return;
+  }
+
+  const sub = subMap[category];
+  
+  if (sub) {
+    // Add the default select placeholder for the subcategory dropdown too
+    subSelect.innerHTML = '<option value="" disabled selected>Select Subcategory</option>';
+    sub.forEach(s => {
+      subSelect.innerHTML += `<option value="${s}">${s.replaceAll("_", " ")}</option>`;
+    });
+  }
 }
 
 // 🔥 load default
