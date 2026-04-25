@@ -159,6 +159,50 @@
     const API = "https://marketplace-5nn2.onrender.com";
 
     async function loadProducts() {
+  const container = document.getElementById("products-container");
+
+  const params = new URLSearchParams(window.location.search);
+  const category = params.get("category");
+
+  let url = `${API}/api/products`;
+
+  if (category) {
+    url += `?category=${category}`;
+  }
+
+  try {
+    const res = await fetch(url);
+    let data = await res.json();
+
+    if (!data || !Array.isArray(data)) {
+      container.innerHTML = "Failed to load products ❌";
+      return;
+    }
+
+    container.innerHTML = "";
+
+    data.forEach(p => {
+      container.innerHTML += `
+        <div class="bg-white rounded-lg shadow hover:shadow-md overflow-hidden cursor-pointer border"
+             onclick="view('${p.id}')">
+          <div class="aspect-square bg-gray-100">
+            <img src="${p.image}" class="w-full h-full object-cover"
+              onerror="this.src='https://via.placeholder.com/300'">
+          </div>
+          <div class="p-2 flex flex-col">
+            <h2 class="text-sm line-clamp-2 mb-1">${p.title}</h2>
+            <p class="text-brand font-bold">₦${Number(p.price).toLocaleString()}</p>
+          </div>
+        </div>
+      `;
+    });
+
+  } catch (error) {
+    console.error("Failed:", error);
+  }
+}
+
+    /*async function loadProducts() {
       const container = document.getElementById("products-container");
       try {
         const res = await fetch(`${API}/api/products`);
@@ -187,7 +231,7 @@
       } catch (error) {
         console.error("Failed to load products:", error);
       }
-    }
+    }*/
 
     function view(id) {
       window.location.href = "product.html?id=" + id;
@@ -209,6 +253,10 @@
     badge.classList.add("hidden");
   }
     }
+
+    function filterCategory(category) {
+  window.location.href = `buyer.html?category=${category}`;
+}
 
     loadUnreadCount();
 setInterval(loadUnreadCount, 5000);
