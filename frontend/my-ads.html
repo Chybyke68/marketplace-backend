@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Ads</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-6">
+
+<h1 class="text-2xl font-bold mb-4">My Ads</h1>
+
+<div id="products"></div>
+
+<script>
+const API = "https://marketplace-5nn2.onrender.com";
+
+let myProducts = [];
+
+async function loadAds() {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API}/api/products/my`, {
+    headers: { Authorization: token }
+  });
+
+  const data = await res.json();
+  myProducts = data;
+
+  const box = document.getElementById("products");
+  box.innerHTML = "";
+
+  data.forEach(p => {
+    box.innerHTML += `
+      <div class="bg-white p-4 mb-3 rounded shadow flex justify-between items-center">
+        <div>
+          <h2 class="font-bold">${p.title}</h2>
+          <p>₦${p.price}</p>
+        </div>
+
+        <div class="flex gap-2">
+          <button onclick="editAd('${p.id}')" class="bg-gray-200 px-2">Edit</button>
+          <button onclick="deleteAd('${p.id}')" class="bg-red-500 text-white px-2">Delete</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function editAd(id) {
+  const p = myProducts.find(x => x.id == id);
+
+  const newTitle = prompt("Edit title", p.title);
+  const newPrice = prompt("Edit price", p.price);
+
+  updateAd(id, newTitle, newPrice);
+}
+
+async function updateAd(id, title, price) {
+  const token = localStorage.getItem("token");
+
+  await fetch(`${API}/api/products/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token
+    },
+    body: JSON.stringify({ title, price })
+  });
+
+  loadAds();
+}
+
+async function deleteAd(id) {
+  const token = localStorage.getItem("token");
+
+  await fetch(`${API}/api/products/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: token }
+  });
+
+  loadAds();
+}
+
+loadAds();
+</script>
+
+</body>
+</html>
