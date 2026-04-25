@@ -115,38 +115,6 @@
         <button onclick="closeForm()" class="text-gray-400">✕</button>
       </div>
 
-      <!-- <form id="form" class="p-6 space-y-4">
-        <input id="title" placeholder="Title" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand" required/>
-        <div class="grid grid-cols-2 gap-3">
-          <input id="price" type="number" placeholder="Price (₦)" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand" required/>
-          <select id="category" onchange="loadSubcategories()" class="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand">
-              <option value="phones">📱 Phones</option>
-              <option value="phones_accessories">📱 Phones Accessories</option>
-              <option value="computing">💻 Laptops & Computing</option>
-              <option value="books">📚 Books</option>
-              <option value="hostel">🛏️ Hostel</option>
-              <option value="fashion">👕 Fashion</option>
-              <option value="electronics">🎮 Electronics</option>
-              <option value="beauty">💄 Health & Beauty</option>
-              <option value="services">🎯 Services</option>
-              <option value="others">🔄 Others</option>
-          </select>
-          <select id="subcategory" class="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand">
-              <option value="">Select Subcategory</option>
-          </select>
-        </div>
-        <textarea id="description" placeholder="Description..." class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-sm focus:outline-none focus:border-brand resize-none" rows="3" required></textarea>
-
-        <div id="imageUploadArea" class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded p-6 text-center hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-            <input id="image" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="previewImage(event)"/>
-            <div id="uploadPrompt" class="text-gray-400"><span class="text-xs font-bold">Add Photo</span></div>
-            <img id="imagePreview" class="hidden mx-auto h-24 w-auto object-cover rounded shadow-sm" alt="Preview"/>
-        </div>
-
-        <button type="submit" id="submitBtn" class="w-full bg-brand text-white font-bold py-4 rounded transition-all text-sm">
-          Publish Ad
-        </button>
-      </form> -->
 
       <form id="form" class="p-6 space-y-5">
         
@@ -351,6 +319,8 @@ const subMap = {
 //   });
 // }
 
+// 
+
 function loadSubcategories(selectedSub = null) {
   const category = document.getElementById("category").value;
   const subSelect = document.getElementById("subcategory");
@@ -362,20 +332,18 @@ function loadSubcategories(selectedSub = null) {
   subMap[category].forEach(s => {
     const option = document.createElement("option");
 
-    option.value = s.toLowerCase().trim();
+    option.value = s; // ✅ KEEP ORIGINAL TEXT
     option.textContent = s.replaceAll("_", " ");
 
-    // ✅ SELECT MATCH
-    if (
-      selectedSub &&
-      option.value === selectedSub.toLowerCase().trim()
-    ) {
+    // ✅ MATCH EXACT VALUE
+    if (selectedSub && selectedSub === s) {
       option.selected = true;
     }
 
     subSelect.appendChild(option);
   });
 }
+
 
 // 🔥 load default
 loadSubcategories();
@@ -400,17 +368,11 @@ function openProduct(id) { window.location.href = `product.html?id=${id}`; }
   document.getElementById("title").value = product.title;
   document.getElementById("price").value = product.price;
   document.getElementById("description").value = product.description || "";
-
-  // ✅ SET CATEGORY
   document.getElementById("category").value = product.category;
 
 
- // normalize DB value
-const normalizedSub = product.subcategory
-  ? product.subcategory.toLowerCase().trim()
-  : null;
-
-loadSubcategories(normalizedSub);
+ 
+loadSubcategories(product.subcategory);
 
   // IMAGE
   document.getElementById("imagePreview").src = product.image;
@@ -439,8 +401,7 @@ loadSubcategories(normalizedSub);
               price: document.getElementById("price").value,
               description: document.getElementById("description").value,
               category: document.getElementById("category").value,
-              // subcategory: document.getElementById("subcategory").value
-              subcategory: document.getElementById("subcategory").value.toLowerCase().trim()
+              subcategory: document.getElementById("subcategory").value
             })
           });
           if (res.ok) alert("Listing updated! ✅");
