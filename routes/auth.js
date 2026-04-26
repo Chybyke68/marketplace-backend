@@ -137,3 +137,30 @@ router.get("/me", auth, async (req, res) => {
     user
   });
 });
+
+
+
+router.put("/update", auth, async (req, res) => {
+  const userId = req.user.id;
+
+  const { name, store_name, phone, email } = req.body;
+
+  const { data, error } = await supabase
+    .from("users")
+    .update({
+      name,
+      store_name,
+      phone,
+      email
+    })
+    .eq("id", userId)
+    .select()
+    .single();
+
+  if (error) {
+    console.log("UPDATE ERROR:", error);
+    return res.status(500).json({ message: "Update failed" });
+  }
+
+  res.json(data);
+});
