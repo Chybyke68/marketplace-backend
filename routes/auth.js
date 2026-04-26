@@ -111,7 +111,8 @@ router.get("/me", auth, async (req, res) => {
 
   const { data, error } = await supabase
     .from("users")
-    .select("id, name, email")
+    .select("id, name, email, phone, store_name")
+   // .select("id, name, email")
     .eq("id", userId)
     .single();
 
