@@ -125,7 +125,7 @@ router.get("/me", auth, async (req, res) => {
 
   const { data, error } = await supabase
     .from("users")
-    .select("id, name, email, phone, store_name")
+    .select("id, name, email, phone, store_name, avatar")
     .eq("id", userId)
     .single();
 
@@ -175,4 +175,91 @@ router.put("/update", auth, async (req, res) => {
   }
 
   res.json(data);
+});
+
+//const bcrypt = require("bcrypt");
+
+router.put("/password", auth, async (req, res) => {
+  const userId = req.user.id;
+  const { currentPassword, newPassword } = req.body;
+
+  // get current user
+  const { data: user, error } = await supabase
+    .from("users")
+    .select("password")
+    .eq("id", userId)
+    .single();
+
+  if (error || !user) {
+    return res.status(400).json({ message: "User not found" });
+  }
+
+  // check current password
+  const valid = await bcrypt.compare(currentPassword, user.password);
+  if (!valid) {
+    return res.status(401).json({ message: "Wrong current password" });
+  }
+
+  // hash new password
+  const hashed = await bcrypt.hash(newPassword, 10);
+
+  // update password
+  const { error: updateError } = await supabase
+    .from("users")
+    .update({ password: hashed })
+    .eq("id", userId);
+
+  if (updateError) {
+    return res.status(500).json({ message: "Password update failed" });
+  }
+
+  res.json({ message: "Password updated" });
+});
+
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() });
+
+router.post("/upload-avatar", auth, upload.single("image"), async (req, res) => {
+  const userId = req.user.id;
+  const file = req.file;
+
+  if (!file) {
+    return res.status(400).json({ message: "No file uploaded" });
+  }
+
+  const fileName = `avatar_${userId}_${Date.now()}`;
+
+  // 🔥 Upload to Supabase Storage
+  const { error: uploadError } = await supabase.storage
+    .from("avatars") // bucket name
+    .upload(fileName, file.buffer, {
+      contentType: file.mimetype
+    });
+
+  if (uploadError) {
+    console.log(uploadError);
+    return res.status(500).json({ message: "Upload failed" });
+  }
+
+  // 🔥 Get public URL
+  const { data } = supabase.storage
+    .from("avatars")
+    .getPublicUrl(fileName);
+
+  const imageUrl = data.publicUrl;
+
+  // 🔥 Save to DB
+  const { error: dbError } = await supabase
+    .from("users")
+    .update({ avatar: imageUrl })
+    .eq("id", userId);
+
+  if (dbError) {
+    return res.status(500).json({ message: "DB update failed" });
+  }
+
+  res.json({
+    message: "Avatar updated",
+    avatar: imageUrl
+  });
 });
