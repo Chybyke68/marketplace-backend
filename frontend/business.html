@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Business Info</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-6">
+
+<div class="max-w-md mx-auto bg-white p-6 rounded shadow">
+
+  <h1 class="text-xl font-bold mb-4">Store Name</h1>
+
+  <input id="store" class="w-full border p-2 mb-4 rounded">
+
+  <button onclick="update()" class="w-full bg-orange-600 text-white py-2 rounded">
+    Save
+  </button>
+
+</div>
+
+<script>
+const API = "https://marketplace-5nn2.onrender.com";
+
+async function load() {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API}/api/auth/me`, {
+    headers: { Authorization: token }
+  });
+
+  const user = await res.json();
+
+  document.getElementById("store").value = user.store_name || "";
+}
+
+async function update() {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API}/api/auth/update`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token
+    },
+    body: JSON.stringify({
+      store_name: document.getElementById("store").value
+    })
+  });
+
+  alert(res.ok ? "Saved ✅" : "Failed ❌");
+}
+
+load();
+</script>
+
+</body>
+</html>
