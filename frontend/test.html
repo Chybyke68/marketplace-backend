@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Settings | Marketplace</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .tab-active { border-left: 4px solid #ea580c; background-color: #fff7ed; color: #ea580c; }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900">
+
+<div class="min-h-screen flex">
+  <aside class="w-64 bg-white border-r hidden md:block">
+    <div class="p-6">
+      <div class="text-2xl font-bold text-orange-600 flex items-center gap-2">
+        <span class="p-2 bg-orange-600 text-white rounded-lg">M</span>
+        Marketplace
+      </div>
+    </div>
+    <nav class="mt-4">
+      <a href="#" class="flex items-center px-6 py-3 tab-active font-medium">
+        Profile Settings
+      </a>
+      <a href="#" class="flex items-center px-6 py-3 text-gray-500 hover:bg-gray-50 transition">
+        Orders
+      </a>
+      <a href="#" class="flex items-center px-6 py-3 text-gray-500 hover:bg-gray-50 transition">
+        Security
+      </a>
+      <a href="#" class="flex items-center px-6 py-3 text-gray-500 hover:bg-gray-50 transition">
+        Notifications
+      </a>
+    </nav>
+  </aside>
+
+  <main class="flex-1 p-4 md:p-10">
+    <div class="max-w-4xl mx-auto">
+      
+      <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+        <div>
+          <h1 class="text-2xl font-bold">Account Settings</h1>
+          <p class="text-gray-500">Manage your personal and business profile information.</p>
+        </div>
+        <button onclick="saveAll()" class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg font-semibold transition shadow-sm flex items-center justify-center gap-2">
+          <span>Save Changes</span>
+        </button>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+        <div class="flex items-center gap-6">
+          <div class="relative">
+            <div class="w-24 h-24 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-3xl font-bold border-4 border-white shadow-sm" id="avatarInitials">
+              U
+            </div>
+            <button class="absolute bottom-0 right-0 bg-white p-1.5 rounded-full border shadow-sm hover:bg-gray-50">
+              📸
+            </button>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold" id="headerName">User Name</h2>
+            <p class="text-gray-500" id="headerStore">Store Name</p>
+            <div class="mt-2 flex items-center gap-2">
+              <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-medium">Verified Seller</span>
+              <span class="text-xs text-gray-400">Member since 2024</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="p-4 border-b bg-gray-50/50 flex justify-between items-center">
+            <h3 class="font-semibold text-gray-700">Personal Information</h3>
+            <span class="text-gray-400">👤</span>
+          </div>
+          <div class="p-6 space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+              <input id="name" type="text" class="w-full border-gray-200 border p-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition" placeholder="Your Name">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+              <input id="email" type="email" class="w-full border-gray-200 border p-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition" placeholder="email@example.com">
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="p-4 border-b bg-gray-50/50 flex justify-between items-center">
+            <h3 class="font-semibold text-gray-700">Business Details</h3>
+            <span class="text-gray-400">🏢</span>
+          </div>
+          <div class="p-6 space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Store Name</label>
+              <input id="store_name" type="text" class="w-full border-gray-200 border p-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition" placeholder="Company Name">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+              <input id="phone" type="text" class="w-full border-gray-200 border p-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition" placeholder="+1 (555) 000-0000">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mt-6 bg-orange-50 border border-orange-100 rounded-xl p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-orange-200 p-2 rounded-lg text-xl">🛡️</div>
+          <div>
+            <h4 class="font-semibold text-orange-900">Account Security</h4>
+            <p class="text-sm text-orange-700">Two-factor authentication is currently disabled.</p>
+          </div>
+        </div>
+        <button class="text-orange-700 font-semibold text-sm hover:underline">Enable Now</button>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+const API = "https://marketplace-5nn2.onrender.com";
+
+/**
+ * Load user data on startup
+ */
+async function load() {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("Please login first");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/api/auth/me`, {
+      headers: { Authorization: token }
+    });
+    const user = await res.json();
+
+    // Fill Input Fields
+    document.getElementById("name").value = user.name || "";
+    document.getElementById("email").value = user.email || "";
+    document.getElementById("store_name").value = user.store_name || "";
+    document.getElementById("phone").value = user.phone || "";
+
+    // Fill UI Display Elements
+    document.getElementById("headerName").innerText = user.name || "User Name";
+    document.getElementById("headerStore").innerText = user.store_name || "No store added";
+    
+    // Set initials for avatar
+    if (user.name) {
+      document.getElementById("avatarInitials").innerText = user.name.charAt(0).toUpperCase();
+    }
+  } catch (error) {
+    console.error("Error loading user:", error);
+  }
+}
+
+/**
+ * Update all profile info at once
+ */
+async function saveAll() {
+  const token = localStorage.getItem("token");
+  const payload = {
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    store_name: document.getElementById("store_name").value,
+    phone: document.getElementById("phone").value
+  };
+
+  try {
+    const res = await fetch(`${API}/api/auth/update`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      alert("Profile updated successfully ✅");
+      load(); // Refresh display labels
+    } else {
+      const err = await res.json();
+      alert(`Update failed: ${err.message || "Unknown error"} ❌`);
+    }
+  } catch (error) {
+    alert("An error occurred while saving.");
+  }
+}
+
+// Initial Load
+load();
+</script>
+
+</body>
+</html>
+
