@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Email</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-6">
+
+<div class="max-w-md mx-auto bg-white p-6 rounded shadow">
+
+  <h1 class="text-xl font-bold mb-4">Email</h1>
+
+  <p id="currentEmail" class="mb-4 text-gray-600">Loading...</p>
+
+  <input id="emailInput" class="w-full border p-2 rounded mb-4" placeholder="Enter new email">
+
+  <button onclick="updateEmail()" class="w-full bg-orange-600 text-white py-2 rounded">
+    Update Email
+  </button>
+
+</div>
+
+<script>
+const API = "https://marketplace-5nn2.onrender.com";
+
+async function load() {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API}/api/auth/me`, {
+    headers: { Authorization: token }
+  });
+
+  const user = await res.json();
+
+  document.getElementById("currentEmail").innerText = user.email;
+}
+
+async function updateEmail() {
+  const email = document.getElementById("emailInput").value;
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API}/api/auth/update`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token
+    },
+    body: JSON.stringify({ email })
+  });
+
+  if (res.ok) {
+    alert("Updated ✅");
+    load();
+  } else {
+    alert("Failed ❌");
+  }
+}
+
+load();
+</script>
+
+</body>
+</html>
