@@ -140,7 +140,17 @@ router.get("/me", auth, async (req, res) => {
 router.put("/update", auth, async (req, res) => {
   const userId = req.user.id;
 
-  const { name, store_name, phone, email } = req.body;
+  const {
+    name,
+    store_name,
+    phone,
+    whatsapp,
+    email,
+    location,
+    sex,
+    business_location,
+    delivery
+  } = req.body;
 
   const { data, error } = await supabase
     .from("users")
@@ -148,7 +158,12 @@ router.put("/update", auth, async (req, res) => {
       name,
       store_name,
       phone,
-      email
+      whatsapp,
+      email,
+      location,
+      sex,
+      business_location,
+      delivery
     })
     .eq("id", userId)
     .select()
