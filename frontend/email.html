@@ -47,16 +47,46 @@
       const user = await res.json();
       document.getElementById("currentEmail").innerText = user.email;
     }
+
     async function updateEmail() {
-      const email = document.getElementById("emailInput").value;
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${API}/api/auth/update`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: token },
-        body: JSON.stringify({ email })
-      });
-      if (res.ok) { alert("Updated ✅"); load(); } else { alert("Failed ❌"); }
+  const email = document.getElementById("emailInput").value;
+  const token = localStorage.getItem("token");
+
+  // ✅ VALIDATION
+  if (!email || !email.includes("@")) {
+    alert("Enter a valid email ❌");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/api/auth/update`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token
+      },
+      body: JSON.stringify({ email })
+    });
+
+    if (!res.ok) {
+      alert("Update failed ❌");
+      return;
     }
+
+    alert("Email Updated ✅");
+
+    // 🔥 refresh UI
+    document.getElementById("emailInput").value = "";
+    load();
+
+  } catch (err) {
+    console.log(err);
+    alert("Network error ❌");
+  }
+    }
+
+
+    
     load();
     if (localStorage.theme === 'dark') document.documentElement.classList.add('dark');
   </script>
