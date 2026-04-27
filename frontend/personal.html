@@ -25,10 +25,9 @@
       
       <div class="flex justify-center mb-6">
         <div class="relative">
-          <img id="profileImage" src="https://ui-avatars.com/api/?name=User&background=ea580c&color=fff" alt="Profile" class="w-24 h-24 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-sm">
-          <button class="absolute bottom-0 right-0 bg-brand text-white p-2 rounded-full shadow hover:bg-orange-600 transition transform active:scale-95">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-          </button>
+          <input type="file" id="avatarInput" class="hidden" onchange="uploadAvatar()">
+
+<button onclick="document.getElementById('avatarInput').click()" class="absolute bottom-0 right-0 bg-brand text-white p-2 rounded-full">
         </div>
       </div>
 
@@ -66,8 +65,21 @@
     const API = "https://marketplace-5nn2.onrender.com";
     async function load() {
       const token = localStorage.getItem("token");
+
+if (!token) {
+  window.location.href = "login.html";
+  return;
+}
       const res = await fetch(`${API}/api/auth/me`, { headers: { Authorization: token } });
-      const user = await res.json();
+      if (!res.ok) {
+  alert("Failed to load user ❌");
+  return;
+}
+
+const user = await res.json();
+      if (user.avatar) {
+  document.getElementById("profileImage").src = user.avatar;
+      }
       if(user.name) {
         const parts = user.name.split(' ');
         document.getElementById("firstName").value = parts[0] || "";
@@ -123,6 +135,41 @@
         console.log(err);
         alert("Network error ❌");
       }
+    }
+
+
+    async function uploadAvatar() {
+  const file = document.getElementById("avatarInput").files[0];
+  const token = localStorage.getItem("token");
+
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("image", file);
+
+  try {
+    const res = await fetch(`${API}/api/auth/upload-avatar`, {
+      method: "POST",
+      headers: { Authorization: token },
+      body: formData
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert("Upload failed ❌");
+      return;
+    }
+
+    // 🔥 Update UI instantly
+    document.getElementById("profileImage").src = data.avatar;
+
+    alert("Profile image updated ✅");
+
+  } catch (err) {
+    console.log(err);
+    alert("Error ❌");
+  }
     }
 
     load();
