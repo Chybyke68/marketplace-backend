@@ -138,9 +138,15 @@
       const token = localStorage.getItem("token");
 
       if (!currentPassword || !newPassword) {
-        alert("Please fill in both password fields ❌");
-        return;
-      }
+  alert("Please fill in both password fields ❌");
+  return;
+}
+
+if (newPassword.length < 6) {
+  alert("Password too short ❌");
+  return;
+}
+     
 
       try {
         const res = await fetch(`${API}/api/auth/password`, {
@@ -153,8 +159,9 @@
         });
 
         if (!res.ok) {
-          alert("Password reset failed ❌");
-          return;
+  const err = await res.json();
+  alert(err.message || "Password failed ❌");
+  return;
         }
 
         alert("Password Reset Successfully ✅");
