@@ -60,18 +60,35 @@
       document.getElementById("phoneCall").value = user.phone || "";
       document.getElementById("phoneWhatsApp").value = user.whatsapp || "";
     }
+
     async function updatePhone() {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${API}/api/auth/update`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: token },
-        body: JSON.stringify({ 
-          phone: document.getElementById("phoneCall").value,
-          whatsapp: document.getElementById("phoneWhatsApp").value 
-        })
-      });
-      alert(res.ok ? "Numbers Updated ✅" : "Failed ❌");
+  const token = localStorage.getItem("token");
+
+  const phone = document.getElementById("phoneCall").value;
+  const whatsapp = document.getElementById("phoneWhatsApp").value;
+
+  if (!phone) {
+    alert("Phone number required ❌");
+    return;
+  }
+
+  const res = await fetch(`${API}/api/auth/update`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token
+    },
+    body: JSON.stringify({ phone, whatsapp })
+  });
+
+  if (res.ok) {
+    alert("Numbers Updated ✅");
+    load();
+  } else {
+    alert("Failed ❌");
+  }
     }
+    
     load();
     if (localStorage.theme === 'dark') document.documentElement.classList.add('dark');
   </script>
