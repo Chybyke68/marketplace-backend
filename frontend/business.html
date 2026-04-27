@@ -1,58 +1,83 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Business Info</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Business Info - CampusDealz</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class', theme: { extend: { colors: { brand: '#ea580c', navy: '#1e293b' } } } }
+  </script>
 </head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans pb-20">
 
-<body class="bg-gray-100 p-6">
+  <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
+      <div class="cursor-pointer p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition" onclick="window.location.href='settings.html'">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+      </div>
+      <span class="text-xl font-black text-navy dark:text-white">Business Info</span>
+    </div>
+  </header>
 
-<div class="max-w-md mx-auto bg-white p-6 rounded shadow">
+  <main class="max-w-3xl mx-auto px-4 py-8">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-6">
+      
+      <div class="flex items-center gap-4 p-4 bg-orange-50 dark:bg-brand/10 rounded-xl border border-brand/20">
+        <span class="text-2xl">🏬</span>
+        <p class="text-sm font-medium text-orange-800 dark:text-orange-200">This info will be visible on your product listings.</p>
+      </div>
 
-  <h1 class="text-xl font-bold mb-4">Store Name</h1>
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Business Name</label>
+        <input id="store" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-3 rounded-xl focus:ring-2 focus:ring-brand outline-none transition">
+      </div>
 
-  <input id="store" class="w-full border p-2 mb-4 rounded">
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Business Location</label>
+        <input id="bizLocation" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-3 rounded-xl focus:ring-2 focus:ring-brand outline-none transition">
+      </div>
 
-  <button onclick="update()" class="w-full bg-orange-600 text-white py-2 rounded">
-    Save
-  </button>
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Delivery Service</label>
+        <select id="delivery" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-3 rounded-xl focus:ring-2 focus:ring-brand outline-none transition">
+          <option value="pickup">Pick-up Only</option>
+          <option value="on-campus">On-Campus Delivery</option>
+          <option value="everywhere">Nationwide Delivery</option>
+        </select>
+      </div>
 
-</div>
+      <button onclick="update()" class="w-full bg-brand hover:bg-orange-600 text-white font-bold py-4 rounded-2xl shadow-lg transition transform active:scale-95">
+        Save Business Details
+      </button>
+    </div>
+  </main>
 
-<script>
-const API = "https://marketplace-5nn2.onrender.com";
-
-async function load() {
-  const token = localStorage.getItem("token");
-
-  const res = await fetch(`${API}/api/auth/me`, {
-    headers: { Authorization: token }
-  });
-
-  const user = await res.json();
-
-  document.getElementById("store").value = user.store_name || "";
-}
-
-async function update() {
-  const token = localStorage.getItem("token");
-
-  const res = await fetch(`${API}/api/auth/update`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token
-    },
-    body: JSON.stringify({
-      store_name: document.getElementById("store").value
-    })
-  });
-
-  alert(res.ok ? "Saved ✅" : "Failed ❌");
-}
-
-load();
-</script>
-
+  <script>
+    const API = "https://marketplace-5nn2.onrender.com";
+    async function load() {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API}/api/auth/me`, { headers: { Authorization: token } });
+      const user = await res.json();
+      document.getElementById("store").value = user.store_name || "";
+      document.getElementById("bizLocation").value = user.business_location || "";
+      document.getElementById("delivery").value = user.delivery || "pickup";
+    }
+    async function update() {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API}/api/auth/update`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: token },
+        body: JSON.stringify({ 
+          store_name: document.getElementById("store").value,
+          business_location: document.getElementById("bizLocation").value,
+          delivery: document.getElementById("delivery").value
+        })
+      });
+      alert(res.ok ? "Business Updated ✅" : "Failed ❌");
+    }
+    load();
+    if (localStorage.theme === 'dark') document.documentElement.classList.add('dark');
+  </script>
 </body>
 </html>
