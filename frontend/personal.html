@@ -68,20 +68,55 @@
       document.getElementById("sex").value = user.sex || "male";
     }
 
+
+
     async function update() {
-      const token = localStorage.getItem("token");
-      const name = document.getElementById("firstName").value + " " + document.getElementById("lastName").value;
-      const res = await fetch(`${API}/api/auth/update`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: token },
-        body: JSON.stringify({ 
-          name, 
-          location: document.getElementById("location").value,
-          sex: document.getElementById("sex").value 
-        })
-      });
-      alert(res.ok ? "Profile Updated ✅" : "Failed ❌");
+  const token = localStorage.getItem("token");
+
+  const first = document.getElementById("firstName").value.trim();
+  const last = document.getElementById("lastName").value.trim();
+  const location = document.getElementById("location").value;
+  const sex = document.getElementById("sex").value;
+
+  const name = `${first} ${last}`.trim();
+
+  // ✅ VALIDATION
+  if (!first) {
+    alert("First name required ❌");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/api/auth/update`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token
+      },
+      body: JSON.stringify({
+        name,
+        location,
+        sex
+      })
+    });
+
+    if (!res.ok) {
+      alert("Update failed ❌");
+      return;
     }
+
+    alert("Profile Updated ✅");
+
+    // 🔥 refresh UI
+    load();
+
+  } catch (err) {
+    console.log(err);
+    alert("Network error ❌");
+  }
+    }
+
+    
     load();
     if (localStorage.theme === 'dark') document.documentElement.classList.add('dark');
   </script>
