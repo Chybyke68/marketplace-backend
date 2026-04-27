@@ -63,19 +63,51 @@
       document.getElementById("bizLocation").value = user.business_location || "";
       document.getElementById("delivery").value = user.delivery || "pickup";
     }
+
     async function update() {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${API}/api/auth/update`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: token },
-        body: JSON.stringify({ 
-          store_name: document.getElementById("store").value,
-          business_location: document.getElementById("bizLocation").value,
-          delivery: document.getElementById("delivery").value
-        })
-      });
-      alert(res.ok ? "Business Updated ✅" : "Failed ❌");
+  const token = localStorage.getItem("token");
+
+  const store = document.getElementById("store").value;
+  const location = document.getElementById("bizLocation").value;
+  const delivery = document.getElementById("delivery").value;
+
+  // ✅ VALIDATION
+  if (!store) {
+    alert("Store name required ❌");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/api/auth/update`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token
+      },
+      body: JSON.stringify({
+        store_name: store,
+        business_location: location,
+        delivery
+      })
+    });
+
+    if (!res.ok) {
+      alert("Update failed ❌");
+      return;
     }
+
+    alert("Business Updated ✅");
+
+    // 🔥 reload values
+    load();
+
+  } catch (err) {
+    console.log(err);
+    alert("Network error ❌");
+  }
+    }
+    
+    
     load();
     if (localStorage.theme === 'dark') document.documentElement.classList.add('dark');
   </script>
