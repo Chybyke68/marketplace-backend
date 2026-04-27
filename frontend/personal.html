@@ -9,108 +9,79 @@
     tailwind.config = { darkMode: 'class', theme: { extend: { colors: { brand: '#ea580c', navy: '#1e293b' } } } }
   </script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans pb-20 md:pb-0">
 
-  <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 border-b dark:border-gray-700">
+  <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
-      <div class="cursor-pointer p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition" onclick="window.history.back()">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+      <div class="cursor-pointer p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition" onclick="window.location.href='settings.html'">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
       </div>
       <span class="text-xl font-black text-navy dark:text-white">Personal Info</span>
     </div>
   </header>
 
-  <main class="max-w-3xl mx-auto px-4 py-8 space-y-4">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 border dark:border-gray-700 shadow-sm">
-      <div id="field-name" class="flex flex-col gap-1">
-        <div class="flex justify-between items-center">
-          <label class="text-xs font-bold text-gray-400 uppercase tracking-widest">Full Name</label>
-          <button onclick="toggleEdit('name')" id="btn-name" class="text-brand">
-            <svg class="w-5 h-5" id="icon-name" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-          </button>
-        </div>
-        <div id="display-name" class="text-lg font-semibold py-1">Loading...</div>
-        <input id="input-name" class="hidden w-full bg-gray-50 dark:bg-gray-900 border border-brand p-2 rounded-lg outline-none">
+  <main class="max-w-3xl mx-auto px-4 py-8 space-y-6">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-5">
+      
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">First Name</label>
+        <input id="firstName" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-3 rounded-xl focus:ring-2 focus:ring-brand outline-none transition">
       </div>
-    </div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 border dark:border-gray-700 shadow-sm">
-      <div id="field-location" class="flex flex-col gap-1">
-        <div class="flex justify-between items-center">
-          <label class="text-xs font-bold text-gray-400 uppercase tracking-widest">Location</label>
-          <button onclick="toggleEdit('location')" id="btn-location" class="text-brand">
-            <svg class="w-5 h-5" id="icon-location" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-          </button>
-        </div>
-        <div id="display-location" class="text-lg font-semibold py-1">Not set</div>
-        <input id="input-location" class="hidden w-full bg-gray-50 dark:bg-gray-900 border border-brand p-2 rounded-lg outline-none">
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Last Name</label>
+        <input id="lastName" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-3 rounded-xl focus:ring-2 focus:ring-brand outline-none transition">
       </div>
-    </div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 border dark:border-gray-700 shadow-sm">
-      <div id="field-sex" class="flex flex-col gap-1">
-        <div class="flex justify-between items-center">
-          <label class="text-xs font-bold text-gray-400 uppercase tracking-widest">Sex</label>
-          <button onclick="toggleEdit('sex')" id="btn-sex" class="text-brand">
-            <svg class="w-5 h-5" id="icon-sex" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-          </button>
-        </div>
-        <div id="display-sex" class="text-lg font-semibold py-1 capitalize">Male</div>
-        <select id="input-sex" class="hidden w-full bg-gray-50 dark:bg-gray-900 border border-brand p-2 rounded-lg outline-none">
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Location (Hostel/Area)</label>
+        <input id="location" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-3 rounded-xl focus:ring-2 focus:ring-brand outline-none transition" placeholder="e.g. Hall 4, Main Campus">
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Sex</label>
+        <select id="sex" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-3 rounded-xl focus:ring-2 focus:ring-brand outline-none transition">
           <option value="male">Male</option>
           <option value="female">Female</option>
         </select>
       </div>
+
+      <button onclick="update()" class="w-full bg-brand hover:bg-orange-600 text-white font-bold py-4 rounded-2xl shadow-lg transition transform active:scale-95">
+        Save Profile
+      </button>
+
     </div>
   </main>
 
   <script>
     const API = "https://marketplace-5nn2.onrender.com";
-    let isEditing = {};
-
     async function load() {
       const token = localStorage.getItem("token");
       const res = await fetch(`${API}/api/auth/me`, { headers: { Authorization: token } });
       const user = await res.json();
-      document.getElementById("display-name").innerText = user.name || "Enter Name";
-      document.getElementById("input-name").value = user.name || "";
-      document.getElementById("display-location").innerText = user.location || "Not set";
-      document.getElementById("input-location").value = user.location || "";
-      document.getElementById("display-sex").innerText = user.sex || "Male";
-      document.getElementById("input-sex").value = user.sex || "male";
-    }
-
-    async function toggleEdit(field) {
-      const display = document.getElementById(`display-${field}`);
-      const input = document.getElementById(`input-${field}`);
-      const icon = document.getElementById(`icon-${field}`);
-
-      if (!isEditing[field]) {
-        // Switch to Edit Mode
-        display.classList.add('hidden');
-        input.classList.remove('hidden');
-        input.focus();
-        icon.outerHTML = `<svg class="w-6 h-6 text-green-500" id="icon-${field}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
-        isEditing[field] = true;
-      } else {
-        // Save and Switch to View Mode
-        const newValue = input.value;
-        const token = localStorage.getItem("token");
-        
-        await fetch(`${API}/api/auth/update`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json", Authorization: token },
-          body: JSON.stringify({ [field]: newValue })
-        });
-
-        display.innerText = (field === 'sex') ? newValue : (newValue || "Not set");
-        display.classList.remove('hidden');
-        input.classList.add('hidden');
-        icon.outerHTML = `<svg class="w-5 h-5" id="icon-${field}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
-        isEditing[field] = false;
+      if(user.name) {
+        const parts = user.name.split(' ');
+        document.getElementById("firstName").value = parts[0] || "";
+        document.getElementById("lastName").value = parts.slice(1).join(' ') || "";
       }
+      document.getElementById("location").value = user.location || "";
+      document.getElementById("sex").value = user.sex || "male";
     }
 
+    async function update() {
+      const token = localStorage.getItem("token");
+      const name = document.getElementById("firstName").value + " " + document.getElementById("lastName").value;
+      const res = await fetch(`${API}/api/auth/update`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: token },
+        body: JSON.stringify({ 
+          name, 
+          location: document.getElementById("location").value,
+          sex: document.getElementById("sex").value 
+        })
+      });
+      alert(res.ok ? "Profile Updated ✅" : "Failed ❌");
+    }
     load();
     if (localStorage.theme === 'dark') document.documentElement.classList.add('dark');
   </script>
