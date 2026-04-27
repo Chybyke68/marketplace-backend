@@ -1,22 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Personal Info</title>
+  <meta charset="UTF-8">
+  <title>Personal Info | Settings</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<body class="bg-gray-50 min-h-screen">
 
-<body class="bg-gray-100 p-6">
+<nav class="bg-white border-b border-gray-200 py-4 px-6 flex justify-between items-center sticky top-0 z-50">
+  <div class="flex items-center gap-8">
+    <div class="text-2xl font-bold text-orange-600">Marketplace</div>
+    <div class="hidden md:flex gap-6 text-sm font-medium text-gray-600">
+      <a href="personal.html" class="text-orange-600">Personal</a>
+      <a href="business.html" class="hover:text-orange-600 transition">Business</a>
+      <a href="email.html" class="hover:text-orange-600 transition">Email</a>
+      <a href="phone.html" class="hover:text-orange-600 transition">Phone</a>
+    </div>
+  </div>
+  <button class="text-sm font-semibold text-gray-500 hover:text-orange-600">Logout</button>
+</nav>
 
-<div class="max-w-md mx-auto bg-white p-6 rounded shadow">
+<div class="max-w-2xl mx-auto py-10 px-4">
+  <div class="mb-8">
+    <p class="text-sm text-orange-600 font-semibold mb-1">Account Settings</p>
+    <h1 class="text-3xl font-bold text-gray-900">Personal Information</h1>
+    <p class="text-gray-500 mt-2">Manage your public profile and identity details.</p>
+  </div>
 
-  <h1 class="text-xl font-bold mb-4">Personal Info</h1>
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+    <div class="mb-6 pb-6 border-b border-gray-100 flex items-center gap-4">
+      <div class="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-xl font-bold">U</div>
+      <div>
+        <h3 class="font-bold text-lg">Public Profile</h3>
+        <p class="text-sm text-gray-400 font-medium">This is how other users will see you.</p>
+      </div>
+    </div>
 
-  <input id="name" class="w-full border p-2 mb-4 rounded" placeholder="Name">
-
-  <button onclick="update()" class="w-full bg-orange-600 text-white py-2 rounded">
-    Save
-  </button>
-
+    <div class="space-y-6">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Display Name</label>
+        <input id="name" class="w-full border-gray-300 border-2 p-3 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition" placeholder="John Doe">
+      </div>
+      
+      <button onclick="update()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-lg shadow-md transition transform active:scale-[0.98]">
+        Save Changes
+      </button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -24,35 +54,21 @@ const API = "https://marketplace-5nn2.onrender.com";
 
 async function load() {
   const token = localStorage.getItem("token");
-
-  const res = await fetch(`${API}/api/auth/me`, {
-    headers: { Authorization: token }
-  });
-
+  const res = await fetch(`${API}/api/auth/me`, { headers: { Authorization: token } });
   const user = await res.json();
-
-  document.getElementById("name").value = user.name;
+  document.getElementById("name").value = user.name || "";
 }
 
 async function update() {
   const token = localStorage.getItem("token");
-
   const res = await fetch(`${API}/api/auth/update`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token
-    },
-    body: JSON.stringify({
-      name: document.getElementById("name").value
-    })
+    headers: { "Content-Type": "application/json", Authorization: token },
+    body: JSON.stringify({ name: document.getElementById("name").value })
   });
-
-  alert(res.ok ? "Saved ✅" : "Failed ❌");
+  alert(res.ok ? "Profile Saved ✅" : "Failed to update ❌");
 }
-
 load();
 </script>
-
 </body>
 </html>
