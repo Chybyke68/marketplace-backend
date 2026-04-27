@@ -87,42 +87,22 @@ const jwt = require("jsonwebtoken");
 
 // LOGIN
 router.post("/login", async (req, res) => {
-  const { email, password, role } = req.body;
+  const { email, password } = req.body;
 
   const { data: user } = await supabase
     .from("users")
     .select("*")
     .eq("email", email)
-    .single();
+    .maybeSingle();
 
   if (!user) return res.status(404).json({ message: "User not found" });
 
-  const bcrypt = require("bcrypt");
+  //const bcrypt = require("bcrypt");
   const isMatch = await bcrypt.compare(password, user.password);
 
   if (!isMatch) {
     return res.status(400).json({ message: "Wrong password" });
   }
-
-  const auth = require("../middleware/auth"); // make sure this exists
-
-router.get("/me", auth, async (req, res) => {
-  const userId = req.user.id;
-
-  const { data, error } = await supabase
-    .from("users")
-    .select("id, name, email, phone, store_name")
-   // .select("id, name, email")
-    .eq("id", userId)
-    .single();
-
-  if (error) {
-    console.log("ME ERROR:", error);
-    return res.status(500).json({ message: "Failed to fetch user" });
-  }
-
-  res.json(data);
-});
 
   // 🔐 CREATE TOKEN
   const token = jwt.sign(
@@ -138,7 +118,24 @@ router.get("/me", auth, async (req, res) => {
   });
 });
 
+const auth = require("../middleware/auth");
 
+router.get("/me", auth, async (req, res) => {
+  const userId = req.user.id;
+
+  const { data, error } = await supabase
+    .from("users")
+    .select("id, name, email, phone, store_name")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    console.log("ME ERROR:", error);
+    return res.status(500).json({ message: "Failed to fetch user" });
+  }
+
+  res.json(data);
+});
 
 router.put("/update", auth, async (req, res) => {
   const userId = req.user.id;
