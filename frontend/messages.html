@@ -48,7 +48,7 @@
     const API = "https://marketplace-5nn2.onrender.com";
     const token = localStorage.getItem("token");
 
-    async function loadChats() {
+ /*   async function loadChats() {
       const res = await fetch(`${API}/api/messages/chats`, {
         headers: { Authorization: token }
       });
@@ -83,10 +83,61 @@
         `;
       });
       lucide.createIcons();
+    }*/
+
+    async function loadChats() {
+  const container = document.getElementById("chats-container");
+
+  try {
+    const res = await fetch(`${API}/api/messages/conversations`, {
+      headers: { Authorization: token }
+    });
+
+    if (!res.ok) {
+      container.innerHTML = `<div class="text-center py-20 text-red-500 font-bold">Failed to load chats ❌</div>`;
+      return;
+    }
+
+    const chats = await res.json();
+
+    container.innerHTML = "";
+
+    if (!chats || chats.length === 0) {
+      container.innerHTML = `<div class="text-center py-20 opacity-50 font-bold">No conversations yet.</div>`;
+      return;
+    }
+
+    chats.forEach(chat => {
+      const timeString = new Date(chat.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+      container.innerHTML += `
+        <div onclick="openChat('${chat.product_id}', '${chat.other_user_id}')" 
+             class="glass-panel p-4 rounded-2xl flex items-center gap-4 cursor-pointer hover:border-brand transition-all active:scale-[0.98]">
+          
+          <img src="${chat.avatar || 'https://ui-avatars.com/api/?name=S'}"
+               class="w-12 h-12 rounded-xl object-cover">
+
+          <div class="flex-1 min-w-0">
+            <div class="flex justify-between items-start mb-0.5">
+              <h3 class="font-bold text-sm truncate">${chat.store_name || "Seller"}</h3>
+              <span class="text-[10px] text-gray-400 font-bold">${timeString}</span>
+            </div>
+            <p class="text-xs text-gray-500 truncate">${chat.last_message}</p>
+          </div>
+        </div>
+      `;
+    });
+
+    lucide.createIcons();
+
+  } catch (err) {
+    console.log(err);
+    container.innerHTML = `<div class="text-center py-20 text-red-500 font-bold">Network error ❌</div>`;
+  }
     }
 
     function openChat(prodId, otherId) {
-      window.location.href = `chat.html?product_id=${prodId}&receiver_id=${otherId}`;
+      window.location.href = `chat.html?product=${prodId}&seller=${otherId}`;
     }
 
     window.onload = () => {
