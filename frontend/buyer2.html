@@ -42,12 +42,15 @@
   </nav>
 
   <main class="max-w-7xl mx-auto px-4 pt-24">
-    <div class="flex gap-4 overflow-x-auto no-scrollbar pb-6 mb-8 border-b border-gray-100 dark:border-gray-800">
-        <button class="flex flex-col items-center min-w-[70px] group">
-            <div class="w-14 h-14 glass-panel rounded-2xl flex items-center justify-center group-hover:bg-brand/10 transition-all"><i data-lucide="laptop" class="text-gray-500 group-hover:text-brand"></i></div>
-            <span class="text-[11px] font-bold mt-2 text-gray-400 group-hover:text-brand">Laptops</span>
-        </button>
+    <div id="categoryBar" class="flex gap-4 overflow-x-auto no-scrollbar pb-4 mb-4 border-b border-gray-100 dark:border-gray-800">
         </div>
+
+    <div id="subcategoryBar" class="flex gap-2 overflow-x-auto no-scrollbar mb-8 items-center min-h-[40px]">
+        </div>
+
+    <h2 id="section-title" class="font-black text-lg mb-6 flex items-center gap-2">
+        Trending Ads <span class="w-2 h-2 bg-brand rounded-full animate-pulse"></span>
+    </h2>
 
     <div id="products-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-5">
       <div class="col-span-full py-20 flex justify-center"><i data-lucide="loader-2" class="w-8 h-8 text-brand animate-spin"></i></div>
@@ -64,18 +67,114 @@
 
   <script>
     const API = "https://marketplace-5nn2.onrender.com";
+
+    const subMap = {
+      books: { icon: 'book-open', subs: ["Textbooks"] },
+      computing: { icon: 'laptop', subs: ["Laptops", "Keyboards", "Mouses", "Storage_Devices"] },
+      phones: { icon: 'smartphone', subs: ["Androids", "iPhones"] },
+      phones_accessories: { icon: 'headphones', subs: ["Chargers", "Powerbanks", "Earbuds", "Headphones", "Cases", "ScreenProtectors"] },
+      fashion: { icon: 'shirt', subs: ["Clothes", "Shoes", "Bags", "Watches", "Jewelry", "Others"] },
+      hostel: { icon: 'bed', subs: ["Beds_Foam", "Tables_Chairs", "Buckets_Mirrors", "Others"] },
+      electronics: { icon: 'gamepad-2', subs: ["Speakers", "Smartwatches", "Gadgets", "Others"] },
+      beauty: { icon: 'sparkles', subs: ["Skincare", "Hair_Products", "Perfumes", "Makeup", "Others"] },
+      services: { icon: 'wrench', subs: ["Graphic_Design", "Hair_Barbing", "Laundry", "Phone_Repair", "Others"] }
+    };
+
     window.addEventListener('load', () => {
-      setTimeout(() => { document.getElementById('app-loader').style.opacity = '0'; setTimeout(() => document.getElementById('app-loader').remove(), 500); }, 600);
-      lucide.createIcons();
+      setTimeout(() => { 
+        document.getElementById('app-loader').style.opacity = '0'; 
+        setTimeout(() => document.getElementById('app-loader').remove(), 500); 
+      }, 600);
+      
+      initCategories();
       loadProducts();
     });
 
+    function initCategories() {
+      const bar = document.getElementById("categoryBar");
+      const params = new URLSearchParams(window.location.search);
+      const activeCat = params.get("category");
+
+      bar.innerHTML = "";
+      Object.keys(subMap).forEach(key => {
+        const isActive = activeCat === key;
+        const activeStyles = isActive ? 'text-brand' : 'text-gray-400';
+        const activeBg = isActive ? 'bg-brand/10 border-brand/50' : 'glass-panel';
+
+        bar.innerHTML += `
+          <button onclick="filterCategory('${key}')" class="flex flex-col items-center min-w-[72px] group transition-all">
+            <div class="w-14 h-14 ${activeBg} rounded-2xl flex items-center justify-center group-hover:bg-brand/10 transition-all border">
+              <i data-lucide="${subMap[key].icon}" class="${activeStyles} group-hover:text-brand transition-colors"></i>
+            </div>
+            <span class="text-[11px] font-bold mt-2 ${activeStyles} group-hover:text-brand capitalize">${key.replace('_', ' ')}</span>
+          </button>
+        `;
+      });
+      lucide.createIcons();
+    }
+
+    async function loadSubcategories(category) {
+      const bar = document.getElementById("subcategoryBar");
+      const params = new URLSearchParams(window.location.search);
+      const activeSub = params.get("subcategory");
+
+      if (!subMap[category]) {
+        bar.innerHTML = "";
+        return;
+      }
+
+      const subs = subMap[category].subs;
+      bar.innerHTML = "";
+
+      // "All" button
+      const allActive = !activeSub ? 'bg-brand text-white shadow-lg' : 'glass-panel text-gray-500';
+      bar.innerHTML += `
+        <button onclick="filterCategory('${category}')" 
+          class="px-5 py-2 ${allActive} rounded-xl text-xs font-bold whitespace-nowrap transition-all active:scale-95 border">
+          All
+        </button>
+      `;
+
+      subs.forEach(s => {
+        const isActive = activeSub === s;
+        const style = isActive ? 'bg-brand text-white shadow-lg' : 'glass-panel text-gray-500 hover:text-brand';
+        
+        bar.innerHTML += `
+          <button onclick="filterSub('${category}', '${s}')"
+            class="px-5 py-2 ${style} rounded-xl text-xs font-bold whitespace-nowrap transition-all active:scale-95 border">
+            ${s.replaceAll("_", " ")}
+          </button>
+        `;
+      });
+    }
+
     async function loadProducts() {
       const container = document.getElementById("products-container");
+      const params = new URLSearchParams(window.location.search);
+      const category = params.get("category");
+      const subcategory = params.get("subcategory");
+
+      if (category) {
+        loadSubcategories(category);
+        document.getElementById("section-title").innerHTML = `${category.replace('_', ' ')} <span class="text-brand text-sm font-medium">/ ${subcategory || 'All'}</span>`;
+      }
+
+      let url = `${API}/api/products`;
+      const queryParams = [];
+      if (category) queryParams.push(`category=${category}`);
+      if (subcategory) queryParams.push(`subcategory=${subcategory}`);
+      if (queryParams.length > 0) url += `?${queryParams.join('&')}`;
+
       try {
-        const res = await fetch(`${API}/api/products`);
+        const res = await fetch(url);
         const data = await res.json();
         container.innerHTML = "";
+
+        if (data.length === 0) {
+            container.innerHTML = `<p class="col-span-full text-center py-20 opacity-50 font-bold">No items found in this category.</p>`;
+            return;
+        }
+
         data.forEach((p, i) => {
           container.innerHTML += `
             <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md border border-gray-100 dark:border-gray-700/50 cursor-pointer group animate-fade-in" style="animation-delay:${i*50}ms" onclick="location.href='product.html?id=${p.id}'">
@@ -94,6 +193,14 @@
         });
         lucide.createIcons();
       } catch (e) { container.innerHTML = "<p class='col-span-full text-center py-10 opacity-50'>Connection failed.</p>"; }
+    }
+
+    function filterCategory(category) {
+      window.location.href = `buyer2.html?category=${category}`;
+    }
+
+    function filterSub(category, sub) {
+      window.location.href = `buyer2.html?category=${category}&subcategory=${sub}`;
     }
   </script>
 </body>
