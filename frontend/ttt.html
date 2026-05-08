@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EngageAI — Crypto P2P Social Engagement Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        surface: {
+                            0: '#0a0a0f',
+                            50: '#0f0f1a',
+                            100: '#141425',
+                            200: '#1a1a30',
+                            300: '#222240',
+                            400: '#2a2a4a',
+                            500: '#353560',
+                        },
+                        accent: {
+                            blue: '#3b82f6',
+                            purple: '#8b5cf6',
+                            cyan: '#06b6d4',
+                            orange: '#f97316',
+                            pink: '#ec4899',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #e2e8f0; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #141425; }
+        ::-webkit-scrollbar-thumb { background: #353560; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4a4a70; }
+
+        .glass { background: rgba(20, 20, 37, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); }
+        .glass-strong { background: rgba(26, 26, 48, 0.85); backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.08); }
+
+        .glow-green { box-shadow: 0 0 20px rgba(34, 197, 94, 0.15), 0 0 60px rgba(34, 197, 94, 0.05); }
+        .glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15), 0 0 60px rgba(59, 130, 246, 0.05); }
+        .glow-purple { box-shadow: 0 0 20px rgba(139, 92, 246, 0.15), 0 0 60px rgba(139, 92, 246, 0.05); }
+        .glow-orange { box-shadow: 0 0 20px rgba(249, 115, 22, 0.15); }
+        .glow-pink { box-shadow: 0 0 20px rgba(236, 72, 153, 0.15); }
+        .glow-cyan { box-shadow: 0 0 20px rgba(6, 182, 212, 0.15); }
+
+        .gradient-border {
+            position: relative;
+        }
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(34,197,94,0.3), rgba(59,130,246,0.3), rgba(139,92,246,0.3));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.5); } }
+        @keyframes slide-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        @keyframes count-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .animate-slide-in { animation: slide-in 0.3s ease-out; }
+        .animate-fade-in { animation: fade-in 0.4s ease-out; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .animate-pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+        .shimmer-bg {
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite;
+        }
+
+        .metric-card { transition: all 0.3s ease; }
+        .metric-card:hover { transform: translateY(-2px); }
+
+        .sidebar-item { transition: all 0.2s ease; position: relative; }
+        .sidebar-item.active { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+        .sidebar-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 60%; background: #22c55e; border-radius: 0 3px 3px 0; }
+        .sidebar-item:hover:not(.active) { background: rgba(255,255,255,0.03); color: #f1f5f9; }
+
+        .platform-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; }
+        .platform-twitter { background: rgba(29,161,242,0.15); color: #1da1f2; }
+        .platform-facebook { background: rgba(66,103,178,0.15); color: #4267b2; }
+        .platform-instagram { background: rgba(225,48,108,0.15); color: #e1306c; }
+        .platform-reddit { background: rgba(255,69,0,0.15); color: #ff4500; }
+        .platform-telegram { background: rgba(0,136,204,0.15); color: #0088cc; }
+        .platform-discord { background: rgba(88,101,242,0.15); color: #5865f2; }
+
+        .confidence-bar { height: 4px; border-radius: 2px; background: #1a1a30; overflow: hidden; }
+        .confidence-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fade-in 0.3s ease-out; }
+
+        .toggle-switch { position: relative; width: 44px; height: 24px; background: #2a2a4a; border-radius: 12px; cursor: pointer; transition: background 0.3s; }
+        .toggle-switch.active { background: #22c55e; }
+        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: transform 0.3s; }
+        .toggle-switch.active::after { transform: translateX(20px); }
+
+        .reply-card { border-left: 3px solid transparent; transition: all 0.2s ease; }
+        .reply-card:hover { border-left-color: #22c55e; background: rgba(255,255,255,0.02); }
+
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .status-dot.online { background: #22c55e; animation: pulse-dot 2s infinite; }
+        .status-dot.warning { background: #f97316; }
+        .status-dot.offline { background: #ef4444; }
+
+        .bg-mesh {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 10% 20%, rgba(34,197,94,0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 80%, rgba(59,130,246,0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .mobile-menu-btn { display: none; }
+        @media (max-width: 1024px) {
+            .mobile-menu-btn { display: flex; }
+            .sidebar { transform: translateX(-100%); position: fixed; z-index: 50; height: 100vh; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0 !important; }
+        }
+
+        .notification-badge {
+            position: absolute; top: -4px; right: -4px;
+            width: 18px; height: 18px; border-radius: 50%;
+            background: #ef4444; color: white;
+            font-size: 10px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .sparkline { display: inline-flex; align-items: flex-end; gap: 1px; height: 24px; }
+        .sparkline-bar { width: 3px; border-radius: 1px; background: #22c55e; transition: height 0.3s ease; }
+
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px); z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal-content { max-height: 85vh; overflow-y: auto; }
+
+        .queue-item { border-left: 3px solid; transition: all 0.2s; }
+        .queue-item.pending { border-left-color: #f97316; }
+        .queue-item.approved { border-left-color: #22c55e; }
+        .queue-item.rejected { border-left-color: #ef4444; }
+        .queue-item.sent { border-left-color: #3b82f6; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="bg-mesh"></div>
+
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn fixed top-4 left-4 z-50 p-2 rounded-lg glass" onclick="toggleSidebar()">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <aside class="sidebar fixed left-0 top-0 bottom-0 w-64 glass-strong flex flex-col transition-transform duration-300 z-40" id="sidebar">
+        <!-- Logo -->
+        <div class="p-5 border-b border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-accent-blue flex items-center justify-center glow-green">
+                    <i data-lucide="bot" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold text-white tracking-tight">EngageAI</h1>
+                    <p class="text-[10px] text-brand-400 font-mono uppercase tracking-wider">Crypto P2P Platform</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="px-5 py-3 border-b border-white/5">
+            <div class="flex items-center gap-2 text-xs">
+                <span class="status-dot online"></span>
+                <span class="text-brand-400 font-medium">System Active</span>
+                <span class="ml-auto text-gray-500 font-mono" id="uptime">99.7%</span>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+            <div class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">Main</div>
+            <button class="sidebar-item active w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400" data-tab="dashboard" onclick="switchTab('dashboard')">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                <span>Dashboard</span>
+            </button>
+            <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400" data-tab="conversations" onclick="switchTab('conversations')">
+                <i data-lucide="messages-square" class="w-4 h-4"></i>
+                <span>Conversations</span>
+                <span class="ml-auto bg-accent-blue/20 text-accent-blue text-[10px] font-bold px-1.5 py-0.5 rounded-full">24</span>
+            </button>
+            <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400" data-tab="leads" onclick="switchTab('leads')">
+                <i data-lucide="target" class="w-4 h-4"></i>
+                <span>Leads</span>
+                <span class="ml-auto bg-brand-500/20 text-brand-400 text-[10px] font-bold px-1.5 py-0.5 rounded-full">147</span>
+            </button>
+            <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400" data-tab="analytics" onclick="switchTab('analytics')">
+                <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                <span>Analytics</span>
+            </button>
+
+            <div class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-2 mt-4">Configuration</div>
+            <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400" data-tab="platforms" onclick="switchTab('platforms')">
+                <i data-lucide="share-2" class="w-4 h-4"></i>
+                <span>Platforms</span>
+            </button>
+            <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400" data-tab="ai-engine" onclick="switchTab('ai-engine')">
+                <i data-lucide="brain" class="w-4 h-4"></i>
+                <span>AI Engine</span>
+            </button>
+            <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400" data-tab="queue" onclick="switchTab('queue')">
+                <i data-lucide="list-checks" class="w-4 h-4"></i>
+                <span>Reply Queue</span>
+                <span class="relative ml-auto">
+                    <span class="notification-badge">5</span>
+                    <i data-lucide="bell" class="w-4 h-4 text-gray-400"></i>
+                </span>
+            </button>
+
+            <div class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-2 mt-4">System</div>
+            <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400" data-tab="memory" onclick="switchTab('memory')">
+                <i data-lucide="database" class="w-4 h-4"></i>
+                <span>AI Memory</span>
+            </button>
+            <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400" data-tab="logs" onclick="switchTab('logs')">
+                <i data-lucide="file-text" class="w-4 h-4"></i>
+                <span>Audit Logs</span>
+            </button>
+            <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400" data-tab="settings" onclick="switchTab('settings')">
+                <i data-lucide="settings" class="w-4 h-4"></i>
+                <span>Settings</span>
+            </button>
+        </nav>
+
+        <!-- User -->
+        <div class="p-4 border-t border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-accent-purple to-accent-pink flex items-center justify-center text-white text-xs font-bold">AD</div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-medium text-white truncate">Admin User</p>
+                    <p class="text-[10px] text-gray-500">Super Admin</p>
+                </div>
+                <button class="p-1.5 rounded-md hover:bg-white/5 text-gray-500 hover:text-gray-300 transition-colors">
+                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content ml-64 min-h-screen relative z-10">
+        <!-- Top Bar -->
+        <header class="sticky top-0 z-30 glass-strong border-b border-white/5">
+            <div class="flex items-center justify-between px-6 py-3">
+                <div class="flex items-center gap-4">
+                    <h2 class="text-lg font-semibold text-white" id="page-title">Dashboard</h2>
+                    <div class="hidden sm:flex items-center gap-2 text-xs text-gray-500">
+                        <i data-lucide="clock" class="w-3 h-3"></i>
+                        <span id="current-time"></span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <!-- Approval Mode Toggle -->
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-accent-orange/10 border border-accent-orange/20">
+                        <span class="text-[10px] font-semibold text-accent-orange uppercase">Manual Review</span>
+                        <div class="toggle-switch" id="approval-toggle" onclick="toggleApproval()"></div>
+                    </div>
+                    <!-- Live Indicator -->
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand-500/10 border border-brand-500/20">
+                        <span class="status-dot online"></span>
+                        <span class="text-[10px] font-semibold text-brand-400 uppercase">Live</span>
+                    </div>
+                    <!-- Notifications -->
+                    <button class="relative p-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-colors" onclick="showNotifications()">
+                        <i data-lucide="bell" class="w-4 h-4"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Tab Content Container -->
+        <div class="p-6">
+
+            <!-- ==================== DASHBOARD TAB ==================== -->
+            <div class="tab-content active" id="tab-dashboard">
+                <!-- Key Metrics -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <!-- Active Conversations -->
+                    <div class="metric-card glass rounded-xl p-4 glow-green">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-9 h-9 rounded-lg bg-brand-500/15 flex items-center justify-center">
+                                <i data-lucide="messages-square" class="w-4 h-4 text-brand-400"></i>
+                            </div>
+                            <div class="sparkline" id="spark-conversations"></div>
+                        </div>
+                        <p class="text-2xl font-bold text-white" id="metric-conversations">24</p>
+                        <p class="text-xs text-gray-500 mt-1">Active Conversations</p>
+                        <div class="flex items-center gap-1 mt-2">
+                            <i data-lucide="trending-up" class="w-3 h-3 text-brand-400"></i>
+                            <span class="text-[10px] text-brand-400 font-medium">+12% from yesterday</span>
+                        </div>
+                    </div>
+
+                    <!-- Leads Generated -->
+                    <div class="metric-card glass rounded-xl p-4 glow-blue">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-9 h-9 rounded-lg bg-accent-blue/15 flex items-center justify-center">
+                                <i data-lucide="target" class="w-4 h-4 text-accent-blue"></i>
+                            </div>
+                            <div class="sparkline" id="spark-leads"></div>
+                        </div>
+                        <p class="text-2xl font-bold text-white" id="metric-leads">147</p>
+                        <p class="text-xs text-gray-500 mt-1">Leads Generated</p>
+                        <div class="flex items-center gap-1 mt-2">
+                            <i data-lucide="trending-up" class="w-3 h-3 text-accent-blue"></i>
+                            <span class="text-[10px] text-accent-blue font-medium">+23% this week</span>
+                        </div>
+                    </div>
+
+                    <!-- Engagement Rate -->
+                    <div class="metric-card glass rounded-xl p-4 glow-purple">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-9 h-9 rounded-lg bg-accent-purple/15 flex items-center justify-center">
+                                <i data-lucide="zap" class="w-4 h-4 text-accent-purple"></i>
+                            </div>
+                            <div class="sparkline" id="spark-engagement"></div>
+                        </div>
+                        <p class="text-2xl font-bold text-white" id="metric-engagement">34.2%</p>
+                        <p class="text-xs text-gray-500 mt-1">Engagement Rate</p>
+                        <div class="flex items-center gap-1 mt-2">
+                            <i data-lucide="trending-up" class="w-3 h-3 text-accent-purple"></i>
+                            <span class="text-[10px] text-accent-purple font-medium">+5.8% improvement</span>
+                        </div>
+                    </div>
+
+                    <!-- Conversions -->
+                    <div class="metric-card glass rounded-xl p-4 glow-orange">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-9 h-9 rounded-lg bg-accent-orange/15 flex items-center justify-center">
+                                <i data-lucide="arrow-right-left" class="w-4 h-4 text-accent-orange"></i>
+                            </div>
+                            <div class="sparkline" id="spark-conversions"></div>
+                        </div>
+                        <p class="text-2xl font-bold text-white" id="metric-conversions">38</p>
+                        <p class="text-xs text-gray-500 mt-1">Conversions</p>
+                        <div class="flex items-center gap-1 mt-2">
+                            <i data-lucide="trending-up" class="w-3 h-3 text-accent-orange"></i>
+                            <span class="text-[10px] text-accent-orange font-medium">+18% this month</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                    <!-- Engagement Over Time -->
+                    <div class="lg:col-span-2 glass rounded-xl p-5">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-semibold text-white">Engagement Over Time</h3>
+                            <div class="flex items-center gap-2">
+                                <button class="text-[10px] px-2 py-1 rounded bg-brand-500/20 text-brand-400 font-medium" onclick="updateChart('7d')">7D</button>
+                                <button class="text-[10px] px-2 py-1 rounded text-gray-500 hover:text-gray-300" onclick="updateChart('30d')">30D</button>
+                                <button class="text-[10px] px-2 py-1 rounded text-gray-500 hover:text-gray-300" onclick="updateChart('90d')">90D</button>
+                            </div>
+                        </div>
+                        <canvas id="engagementChart" height="200"></canvas>
+                    </div>
+
+                    <!-- Platform Distribution -->
+                    <div class="glass rounded-xl p-5">
+                        <h3 class="text-sm font-semibold text-white mb-4">Platform Distribution</h3>
+                        <canvas id="platformChart" height="200"></canvas>
+                        <div class="grid grid-cols-2 gap-2 mt-4">
+                            <div class="flex items-center gap-2 text-xs"><span class="w-2 h-2 rounded-full bg-[#1da1f2]"></span><span class="text-gray-400">Twitter 32%</span></div>
+                            <div class="flex items-center gap-2 text-xs"><span class="w-2 h-2 rounded-full bg-[#5865f2]"></span><span class="text-gray-400">Discord 24%</span></div>
+                            <div class="flex items-center gap-2 text-xs"><span class="w-2 h-2 rounded-full bg-[#0088cc]"></span><span class="text-gray-400">Telegram 20%</span></div>
+                            <div class="flex items-center gap-2 text-xs"><span class="w-2 h-2 rounded-full bg-[#ff4500]"></span><span class="text-gray-400">Reddit 14%</span></div>
+                            <div class="flex items-center gap-2 text-xs"><span class="w-2 h-2 rounded-full bg-[#4267b2]"></span><span class="text-gray-400">Facebook 6%</span></div>
+                            <div class="flex items-center gap-2 text-xs"><span class="w-2 h-2 rounded-full bg-[#e1306c]"></span><span class="text-gray-400">Instagram 4%</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <!-- Recent Replies -->
+                    <div class="glass rounded-xl p-5">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-semibold text-white">Recent AI Replies</h3>
+                            <button class="text-[10px] text-brand-400 hover:text-brand-300 font-medium" onclick="switchTab('conversations')">View All</button>
+                        </div>
+                        <div class="space-y-3" id="recent-replies">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- AI Confidence & Queue Status -->
+                    <div class="glass rounded-xl p-5">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-semibold text-white">AI Confidence Scores</h3>
+                            <span class="text-[10px] text-gray-500 font-mono">Last 24h</span>
+                        </div>
+                        <div class="space-y-4" id="confidence-scores">
+                            <!-- Populated by JS -->
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-white/5">
+                            <h4 class="text-xs font-semibold text-gray-400 mb-3">Queue Status</h4>
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="text-center p-3 rounded-lg bg-accent-orange/10">
+                                    <p class="text-lg font-bold text-accent-orange" id="queue-pending">5</p>
+                                    <p class="text-[10px] text-gray-500">Pending</p>
+                                </div>
+                                <div class="text-center p-3 rounded-lg bg-brand-500/10">
+                                    <p class="text-lg font-bold text-brand-400" id="queue-processing">3</p>
+                                    <p class="text-[10px] text-gray-500">Processing</p>
+                                </div>
+                                <div class="text-center p-3 rounded-lg bg-accent-blue/10">
+                                    <p class="text-lg font-bold text-accent-blue" id="queue-sent">89</p>
+                                    <p class="text-[10px] text-gray-500">Sent Today</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== CONVERSATIONS TAB ==================== -->
+            <div class="tab-content" id="tab-conversations">
+                <div class="flex flex-col lg:flex-row gap-4">
+                    <!-- Conversation List -->
+                    <div class="lg:w-96 glass rounded-xl overflow-hidden">
+                        <div class="p-4 border-b border-white/5">
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="flex-1 relative">
+                                    <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                                    <input type="text" placeholder="Search conversations..." class="w-full bg-surface-200 border border-white/5 rounded-lg pl-9 pr-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-500/30">
+                                </div>
+                                <button class="p-2 rounded-lg bg-surface-200 border border-white/5 text-gray-400 hover:text-white transition-colors">
+                                    <i data-lucide="filter" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                            <div class="flex gap-1">
+                                <button class="text-[10px] px-2 py-1 rounded bg-brand-500/20 text-brand-400 font-medium">All</button>
+                                <button class="text-[10px] px-2 py-1 rounded text-gray-500 hover:text-gray-300">Active</button>
+                                <button class="text-[10px] px-2 py-1 rounded text-gray-500 hover:text-gray-300">Awaiting</button>
+                                <button class="text-[10px] px-2 py-1 rounded text-gray-500 hover:text-gray-300">Closed</button>
+                            </div>
+                        </div>
+                        <div class="overflow-y-auto max-h-[calc(100vh-240px)]" id="conversation-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Conversation Detail -->
+                    <div class="flex-1 glass rounded-xl overflow-hidden">
+                        <div class="p-4 border-b border-white/5 flex items-center justify-between" id="conv-detail-header">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-accent-blue to-accent-cyan flex items-center justify-center text-white text-xs font-bold">CA</div>
+                                <div>
+                                    <p class="text-sm font-semibold text-white">crypto_africa</p>
+                                    <div class="flex items-center gap-2">
+                                        <span class="platform-badge platform-twitter"><i data-lucide="twitter" class="w-2.5 h-2.5"></i> Twitter</span>
+                                        <span class="text-[10px] text-gray-500">2 min ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-1 rounded-full text-[10px] font-semibold bg-brand-500/20 text-brand-400">High Intent</span>
+                                <button class="p-2 rounded-lg hover:bg-white/5 text-gray-400"><i data-lucide="more-vertical" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                        <div class="p-5 overflow-y-auto max-h-[calc(100vh-320px)]" id="conv-detail-messages">
+                            <!-- Populated by JS -->
+                        </div>
+                        <div class="p-4 border-t border-white/5">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="text-[10px] text-gray-500 font-semibold uppercase">AI Generated Reply</span>
+                                <div class="flex items-center gap-1">
+                                    <span class="text-[10px] text-gray-500">Confidence:</span>
+                                    <span class="text-[10px] text-brand-400 font-semibold">92%</span>
+                                </div>
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-accent-purple/20 text-accent-purple">Casual Style</span>
+                            </div>
+                            <div class="bg-surface-200 rounded-lg p-3 mb-3 border border-white/5">
+                                <p class="text-sm text-gray-300" id="ai-draft-reply">Most people here use P2P now because bank restrictions make normal exchanges difficult. I've had smoother transactions using SwapNG, especially for NGN-USDT trades. The rates are pretty competitive too.</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button class="flex-1 py-2 rounded-lg bg-brand-500/20 text-brand-400 text-xs font-semibold hover:bg-brand-500/30 transition-colors flex items-center justify-center gap-1.5" onclick="approveReply()">
+                                    <i data-lucide="check" class="w-3.5 h-3.5"></i> Approve & Send
+                                </button>
+                                <button class="py-2 px-3 rounded-lg bg-accent-orange/20 text-accent-orange text-xs font-semibold hover:bg-accent-orange/30 transition-colors flex items-center gap-1.5" onclick="regenerateReply()">
+                                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Regenerate
+                                </button>
+                                <button class="py-2 px-3 rounded-lg bg-accent-purple/20 text-accent-purple text-xs font-semibold hover:bg-accent-purple/30 transition-colors flex items-center gap-1.5" onclick="editReply()">
+                                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i> Edit
+                                </button>
+                                <button class="py-2 px-3 rounded-lg bg-red-500/20 text-red-400 text-xs font-semibold hover:bg-red-500/30 transition-colors" onclick="rejectReply()">
+                                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== LEADS TAB ==================== -->
+            <div class="tab-content" id="tab-leads">
+                <div class="glass rounded-xl overflow-hidden">
+                    <div class="p-4 border-b border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <h3 class="text-sm font-semibold text-white">Lead Database</h3>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-500/20 text-brand-400">147 total</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="relative">
+                                <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                                <input type="text" placeholder="Search leads..." class="bg-surface-200 border border-white/5 rounded-lg pl-9 pr-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-500/30 w-48">
+                            </div>
+                            <select class="bg-surface-200 border border-white/5 rounded-lg px-3 py-1.5 text-xs text-gray-400 focus:outline-none">
+                                <option>All Platforms</option>
+                                <option>Twitter</option>
+                                <option>Discord</option>
+                                <option>Telegram</option>
+                                <option>Reddit</option>
+                            </select>
+                            <select class="bg-surface-200 border border-white/5 rounded-lg px-3 py-1.5 text-xs text-gray-400 focus:outline-none">
+                                <option>All Status</option>
+                                <option>New</option>
+                                <option>Engaged</option>
+                                <option>Converted</option>
+                                <option>Lost</option>
+                            </select>
+                            <button class="px-3 py-1.5 rounded-lg bg-brand-500 text-white text-xs font-semibold hover:bg-brand-600 transition-colors flex items-center gap-1.5">
+                                <i data-lucide="download" class="w-3 h-3"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-white/5">
+                                    <th class="px-4 py-3 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider">User</th>
+                                    <th class="px-4 py-3 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Platform</th>
+                                    <th class="px-4 py-3 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Keywords Matched</th>
+                                    <th class="px-4 py-3 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Sentiment</th>
+                                    <th class="px-4 py-3 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Intent Score</th>
+                                    <th class="px-4 py-3 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-4 py-3 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Last Contact</th>
+                                    <th class="px-4 py-3 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leads-table-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== ANALYTICS TAB ==================== -->
+            <div class="tab-content" id="tab-analytics">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                    <div class="glass rounded-xl p-5">
+                        <h3 class="text-sm font-semibold text-white mb-4">Reply Success Rate by Platform</h3>
+                        <canvas id="successRateChart" height="200"></canvas>
+                    </div>
+                    <div class="glass rounded-xl p-5">
+                        <h3 class="text-sm font-semibold text-white mb-4">Conversion Funnel</h3>
+                        <canvas id="funnelChart" height="200"></canvas>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                    <div class="glass rounded-xl p-5">
+                        <h3 class="text-sm font-semibold text-white mb-3">Top Performing Keywords</h3>
+                        <div class="space-y-2" id="top-keywords">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                    <div class="glass rounded-xl p-5">
+                        <h3 class="text-sm font-semibold text-white mb-3">Reply Style Performance</h3>
+                        <canvas id="styleChart" height="160"></canvas>
+                    </div>
+                    <div class="glass rounded-xl p-5">
+                        <h3 class="text-sm font-semibold text-white mb-3">Sentiment Distribution</h3>
+                        <canvas id="sentimentChart" height="160"></canvas>
+                    </div>
+                </div>
+                <div class="glass rounded-xl p-5">
+                    <h3 class="text-sm font-semibold text-white mb-4">Hourly Activity Heatmap</h3>
+                    <div class="grid grid-cols-24 gap-1" id="heatmap">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== PLATFORMS TAB ==================== -->
+            <div class="tab-content" id="tab-platforms">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Twitter/X -->
+                    <div class="glass rounded-xl p-5 gradient-border">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-[#1da1f2]/15 flex items-center justify-center">
+                                    <i data-lucide="twitter" class="w-5 h-5 text-[#1da1f2]"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-white">Twitter / X</p>
+                                    <p class="text-[10px] text-gray-500">API v2 Connected</p>
+                                </div>
+                            </div>
+                            <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Daily Replies</span><span class="text-white font-medium">34 / 50</span></div>
+                            <div class="confidence-bar"><div class="confidence-fill bg-[#1da1f2]" style="width:68%"></div></div>
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Rate Limit</span><span class="text-brand-400 font-medium">OK</span></div>
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Last Reply</span><span class="text-gray-400 font-mono">2m ago</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Facebook -->
+                    <div class="glass rounded-xl p-5 gradient-border">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-[#4267b2]/15 flex items-center justify-center">
+                                    <i data-lucide="facebook" class="w-5 h-5 text-[#4267b2]"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-white">Facebook</p>
+                                    <p class="text-[10px] text-gray-500">Graph API v18.0</p>
+                                </div>
+                            </div>
+                            <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Daily Replies</span><span class="text-white font-medium">12 / 30</span></div>
+                            <div class="confidence-bar"><div class="confidence-fill bg-[#4267b2]" style="width:40%"></div></div>
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Rate Limit</span><span class="text-brand-400 font-medium">OK</span></div>
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Last Reply</span><span class="text-gray-400 font-mono">15m ago</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Instagram -->
+                    <div class="glass rounded-xl p-5 gradient-border">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-[#e1306c]/15 flex items-center justify-center">
+                                    <i data-lucide="instagram" class="w-5 h-5 text-[#e1306c]"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-white">Instagram</p>
+                                    <p class="text-[10px] text-gray-500">Basic Display API</p>
+                                </div>
+                            </div>
+                            <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Daily Replies</span><span class="text-white font-medium">0 / 20</span></div>
+                            <div class="confidence-bar"><div class="confidence-fill bg-[#e1306c]" style="width:0%"></div></div>
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Status</span><span class="text-accent-orange font-medium">Paused</span></div>
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Last Reply</span><span class="text-gray-400 font-mono">2d ago</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Reddit -->
+                    <div class="glass rounded-xl p-5 gradient-border">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-[#ff4500]/15 flex items-center justify-center">
+                                    <i data-lucide="message-circle" class="w-5 h-5 text-[#ff4500]"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-white">Reddit</p>
+                                    <p class="text-[10px] text-gray-500">OAuth2 Connected</p>
+                                </div>
+                            </div>
+                            <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Daily Replies</span><span class="text-white font-medium">18 / 25</span></div>
+                            <div class="confidence-bar"><div class="confidence-fill bg-[#ff4500]" style="width:72%"></div></div>
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Rate Limit</span><span class="text-brand-400 font-medium">OK</span></div>
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Last Reply</span><span class="text-gray-400 font-mono">8m ago</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Telegram -->
+                    <div class="glass rounded-xl p-5 gradient-border">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-[#0088cc]/15 flex items-center justify-center">
+                                    <i data-lucide="send" class="w-5 h-5 text-[#0088cc]"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-white">Telegram</p>
+                                    <p class="text-[10px] text-gray-500">Bot API Connected</p>
+                                </div>
+                            </div>
+                            <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Daily Replies</span><span class="text-white font-medium">22 / 40</span></div>
+                            <div class="confidence-bar"><div class="confidence-fill bg-[#0088cc]" style="width:55%"></div></div>
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Rate Limit</span><span class="text-brand-400 font-medium">OK</span></div>
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Last Reply</span><span class="text-gray-400 font-mono">5m ago</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Discord -->
+                    <div class="glass rounded-xl p-5 gradient-border">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-[#5865f2]/15 flex items-center justify-center">
+                                    <i data-lucide="message-square" class="w-5 h-5 text-[#5865f2]"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-white">Discord</p>
+                                    <p class="text-[10px] text-gray-500">Bot Online — 12 Servers</p>
+                                </div>
+                            </div>
+                            <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Daily Replies</span><span class="text-white font-medium">28 / 50</span></div>
+                            <div class="confidence-bar"><div class="confidence-fill bg-[#5865f2]" style="width:56%"></div></div>
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Rate Limit</span><span class="text-brand-400 font-medium">OK</span></div>
+                            <div class="flex justify-between text-xs"><span class="text-gray-500">Last Reply</span><span class="text-gray-400 font-mono">1m ago</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== AI ENGINE TAB ==================== -->
+            <div class="tab-content" id="tab-ai-engine">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                    <!-- Reply Styles -->
+                    <div class="glass rounded-xl p-5">
+                        <h3 class="text-sm font-semibold text-white mb-4">Reply Style Configuration</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 rounded-lg bg-surface-200 border border-white/5">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-lg">💬</span>
+                                    <div>
+                                        <p class="text-xs font-semibold text-white">Casual</p>
+                                        <p class="text-[10px] text-gray-500">Relaxed, conversational tone</p>
+                                    </div>
+                                </div>
+                                <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded-lg bg-surface-200 border border-white/5">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-lg">👔</span>
+                                    <div>
+                                        <p class="text-xs font-semibold text-white">Professional</p>
+                                        <p class="text-[10px] text-gray-500">Business-appropriate language</p>
+                                    </div>
+                                </div>
+                                <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded-lg bg-surface-200 border border-white/5">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-lg">📈</span>
+                                    <div>
+                                        <p class="text-xs font-semibold text-white">Trader Style</p>
+                                        <p class="text-[10px] text-gray-500">Crypto-native, uses trading lingo</p>
+                                    </div>
+                                </div>
+                                <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded-lg bg-surface-200 border border-white/5">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-lg">🌱</span>
+                                    <div>
+                                        <p class="text-xs font-semibold text-white">Beginner-Friendly</p>
+                                        <p class="text-[10px] text-gray-500">Simple, educational tone</p>
+                                    </div>
+                                </div>
+                                <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded-lg bg-surface-200 border border-white/5">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-lg">🔥</span>
+                                    <div>
+                                        <p class="text-xs font-semibold text-white">Meme / Viral</p>
+                                        <p class="text-[10px] text-gray-500">Humor-driven, shareable content</p>
+                                    </div>
+                                </div>
+                                <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Strategy Rules -->
+                    <div class="glass rounded-xl p-5">
+                        <h3 class="text-sm font-semibold text-white mb-4">Reply Strategy Rules</h3>
+                        <div class="space-y-3">
+                            <div class="p-3 rounded-lg bg-brand-500/5 border border-brand-500/20">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i data-lucide="shield-check" class="w-4 h-4 text-brand-400"></i>
+                                    <p class="text-xs font-semibold text-brand-400">Anti-Spam Protection</p>
+                                </div>
+                                <p class="text-[10px] text-gray-400">Never post identical replies. Always vary wording and structure.</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-accent-blue/5 border border-accent-blue/20">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i data-lucide="heart-handshake" class="w-4 h-4 text-accent-blue"></i>
+                                    <p class="text-xs font-semibold text-accent-blue">Value-First Approach</p>
+                                </div>
+                                <p class="text-[10px] text-gray-400">Always provide help or value before mentioning the platform.</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-accent-purple/5 border border-accent-purple/20">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i data-lucide="feather" class="w-4 h-4 text-accent-purple"></i>
+                                    <p class="text-xs font-semibold text-accent-purple">Soft Call-to-Action</p>
+                                </div>
+                                <p class="text-[10px] text-gray-400">Natural platform mentions only. Never aggressive promotion.</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-accent-orange/5 border border-accent-orange/20">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i data-lucide="scan-face" class="w-4 h-4 text-accent-orange"></i>
+                                    <p class="text-xs font-semibold text-accent-orange">Human-like Behavior</p>
+                                </div>
+                                <p class="text-[10px] text-gray-400">Randomized timing, typos occasionally, varied response lengths.</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-accent-cyan/5 border border-accent-cyan/20">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i data-lucide="brain" class="w-4 h-4 text-accent-cyan"></i>
+                                    <p class="text-xs font-semibold text-accent-cyan">Context Awareness</p>
+                                </div>
+                                <p class="text-[10px] text-gray-400">Understand full thread before replying. Never reply out of context.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prompt Templates -->
+                <div class="glass rounded-xl p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-semibold text-white">AI Prompt Templates</h3>
+                        <button class="px-3 py-1.5 rounded-lg bg-brand-500/20 text-brand-400 text-xs font-semibold hover:bg-brand-500/30 transition-colors flex items-center gap-1.5" onclick="showPromptModal()">
+                            <i data-lucide="plus" class="w-3 h-3"></i> New Template
+                        </button>
+                    </div>
+                    <div class="space-y-3" id="prompt-templates">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== QUEUE TAB ==================== -->
+            <div class="tab-content" id="tab-queue">
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+                    <div class="glass rounded-xl p-4 text-center">
+                        <p class="text-2xl font-bold text-accent-orange">5</p>
+                        <p class="text-[10px] text-gray-500 mt-1">Pending Approval</p>
+                    </div>
+                    <div class="glass rounded-xl p-4 text-center">
+                        <p class="text-2xl font-bold text-brand-400">3</p>
+                        <p class="text-[10px] text-gray-500 mt-1">Processing</p>
+                    </div>
+                    <div class="glass rounded-xl p-4 text-center">
+                        <p class="text-2xl font-bold text-accent-blue">89</p>
+                        <p class="text-[10px] text-gray-500 mt-1">Sent Today</p>
+                    </div>
+                    <div class="glass rounded-xl p-4 text-center">
+                        <p class="text-2xl font-bold text-red-400">2</p>
+                        <p class="text-[10px] text-gray-500 mt-1">Failed</p>
+                    </div>
+                </div>
+
+                <div class="glass rounded-xl overflow-hidden">
+                    <div class="p-4 border-b border-white/5">
+                        <h3 class="text-sm font-semibold text-white">Reply Queue</h3>
+                    </div>
+                    <div class="divide-y divide-white/5" id="queue-items">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== MEMORY TAB ==================== -->
+            <div class="tab-content" id="tab-memory">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                    <div class="glass rounded-xl p-4 text-center">
+                        <p class="text-2xl font-bold text-accent-purple">2,847</p>
+                        <p class="text-[10px] text-gray-500 mt-1">Conversations Tracked</p>
+                    </div>
+                    <div class="glass rounded-xl p-4 text-center">
+                        <p class="text-2xl font-bold text-accent-cyan">1,203</p>
+                        <p class="text-[10px] text-gray-500 mt-1">Unique Users Remembered</p>
+                    </div>
+                    <div class="glass rounded-xl p-4 text-center">
+                        <p class="text-2xl font-bold text-brand-400">94.2%</p>
+                        <p class="text-[10px] text-gray-500 mt-1">No Duplicate Reply Rate</p>
+                    </div>
+                </div>
+                <div class="glass rounded-xl p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-semibold text-white">User Memory Store</h3>
+                        <div class="flex items-center gap-2">
+                            <input type="text" placeholder="Search users..." class="bg-surface-200 border border-white/5 rounded-lg px-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none w-48">
+                        </div>
+                    </div>
+                    <div class="space-y-2" id="memory-store">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== LOGS TAB ==================== -->
+            <div class="tab-content" id="tab-logs">
+                <div class="glass rounded-xl overflow-hidden">
+                    <div class="p-4 border-b border-white/5 flex items-center justify-between">
+                        <h3 class="text-sm font-semibold text-white">Audit Logs</h3>
+                        <div class="flex items-center gap-2">
+                            <select class="bg-surface-200 border border-white/5 rounded-lg px-3 py-1.5 text-xs text-gray-400 focus:outline-none">
+                                <option>All Types</option>
+                                <option>Reply Sent</option>
+                                <option>Reply Approved</option>
+                                <option>Reply Rejected</option>
+                                <option>Lead Created</option>
+                                <option>Error</option>
+                            </select>
+                            <button class="px-3 py-1.5 rounded-lg bg-surface-200 border border-white/5 text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-1.5">
+                                <i data-lucide="download" class="w-3 h-3"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-y-auto max-h-[calc(100vh-240px)] font-mono text-[11px]" id="audit-logs">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SETTINGS TAB ==================== -->
+            <div class="tab-content" id="tab-settings">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Safety Settings -->
+                    <div class="glass rounded-xl p-5">
+                        <h3 class="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+                            <i data-lucide="shield" class="w-4 h-4 text-brand-400"></i> Safety & Rate Limits
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs text-gray-400 mb-1 block">Max Replies Per Day (Global)</label>
+                                <input type="number" value="200" class="w-full bg-surface-200 border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500/30">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400 mb-1 block">Max Replies Per User (Lifetime)</label>
+                                <input type="number" value="3" class="w-full bg-surface-200 border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500/30">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400 mb-1 block">Cooldown Between Replies (minutes)</label>
+                                <input type="number" value="15" class="w-full bg-surface-200 border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500/30">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400 mb-1 block">Min Reply Delay (seconds)</label>
+                                <input type="number" value="30" class="w-full bg-surface-200 border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500/30">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400 mb-1 block">Max Reply Delay (seconds)</label>
+                                <input type="number" value="180" class="w-full bg-surface-200 border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500/30">
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-white font-medium">Manual Approval Mode</p>
+                                    <p class="text-[10px] text-gray-500">Require human approval before sending</p>
+                                </div>
+                                <div class="toggle-switch" id="settings-approval" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-white font-medium">Scam Detection</p>
+                                    <p class="text-[10px] text-gray-500">Auto-detect and avoid scam conversations</p>
+                                </div>
+                                <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-white font-medium">Duplicate Detection</p>
+                                    <p class="text-[10px] text-gray-500">Prevent replying twice to same user</p>
+                                </div>
+                                <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Configuration -->
+                    <div class="glass rounded-xl p-5">
+                        <h3 class="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+                            <i data-lucide="brain" class="w-4 h-4 text-accent-purple"></i> AI Configuration
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs text-gray-400 mb-1 block">AI Provider</label>
+                                <select class="w-full bg-surface-200 border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
+                                    <option>OpenAI GPT-4.1</option>
+                                    <option>Anthropic Claude 3.5</option>
+                                    <option>OpenAI GPT-4o</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400 mb-1 block">Temperature (Creativity)</label>
+                                <input type="range" min="0" max="100" value="75" class="w-full accent-brand-500">
+                                <div class="flex justify-between text-[10px] text-gray-500"><span>Conservative</span><span>Creative</span></div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400 mb-1 block">Platform Name</label>
+                                <input type="text" value="SwapNG" class="w-full bg-surface-200 border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500/30">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400 mb-1 block">Platform URL</label>
+                                <input type="text" value="https://swapng.com" class="w-full bg-surface-200 border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500/30">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400 mb-1 block">Platform Description</label>
+                                <textarea rows="3" class="w-full bg-surface-200 border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500/30 resize-none">SwapNG is a leading P2P crypto marketplace for NGN-USDT trades, offering competitive rates, fast settlement, and bank-grade security for Nigerian traders.</textarea>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400 mb-1 block">Target Keywords</label>
+                                <input type="text" value="how to buy crypto, P2P exchange, USDT, Bitcoin payment, best crypto exchange, send money, crypto in Nigeria, Binance alternative, buy and sell USDT" class="w-full bg-surface-200 border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500/30">
+                            </div>
+                        </div>
+                        <button class="mt-6 w-full py-2.5 rounded-lg bg-brand-500 text-white text-xs font-semibold hover:bg-brand-600 transition-colors">Save Settings</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Notification Modal -->
+    <div class="modal-overlay" id="notification-modal" onclick="if(event.target===this)this.classList.remove('active')">
+        <div class="modal-content glass-strong rounded-xl w-full max-w-md p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-white">Notifications</h3>
+                <button class="text-gray-400 hover:text-white" onclick="document.getElementById('notification-modal').classList.remove('active')">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="space-y-3">
+                <div class="p-3 rounded-lg bg-brand-500/10 border border-brand-500/20">
+                    <p class="text-xs text-white font-medium">High-intent lead detected on Twitter</p>
+                    <p class="text-[10px] text-gray-400 mt-1">User @naija_trader asked "best P2P for USDT in Lagos" — 2 min ago</p>
+                </div>
+                <div class="p-3 rounded-lg bg-accent-orange/10 border border-accent-orange/20">
+                    <p class="text-xs text-white font-medium">5 replies pending approval</p>
+                    <p class="text-[10px] text-gray-400 mt-1">Manual review mode is active — 15 min ago</p>
+                </div>
+                <div class="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                    <p class="text-xs text-white font-medium">Reddit rate limit warning</p>
+                    <p class="text-[10px] text-gray-400 mt-1">Approaching daily limit (18/25 replies) — 30 min ago</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prompt Template Modal -->
+    <div class="modal-overlay" id="prompt-modal" onclick="if(event.target===this)this.classList.remove('active')">
+        <div class="modal-content glass-strong rounded-xl w-full max-w-lg p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-white">New Prompt Template</h3>
+                <button class="text-gray-400 hover:text-white" onclick="document.getElementById('prompt-modal').classList.remove('active')">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-gray-400 mb-1 block">Template Name</label>
+                    <input type="text" placeholder="e.g., P2P Recommendation Casual" class="w-full bg-surface-200 border border-white/5 rounded-lg px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-500/30">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 mb-1 block">Style</label>
+                    <select class="w-full bg-surface-200 border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
+                        <option>Casual</option>
+                        <option>Professional</option>
+                        <option>Trader</option>
+                        <option>Beginner-Friendly</option>
+                        <option>Meme/Viral</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 mb-1 block">System Prompt</label>
+                    <textarea rows="6" placeholder="You are a helpful community member who naturally recommends P2P crypto platforms..." class="w-full bg-surface-200 border border-white/5 rounded-lg px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-500/30 resize-none font-mono"></textarea>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 mb-1 block">Context Variables</label>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 rounded bg-surface-300 text-[10px] text-gray-300 font-mono">{platform_name}</span>
+                        <span class="px-2 py-1 rounded bg-surface-300 text-[10px] text-gray-300 font-mono">{platform_url}</span>
+                        <span class="px-2 py-1 rounded bg-surface-300 text-[10px] text-gray-300 font-mono">{user_message}</span>
+                        <span class="px-2 py-1 rounded bg-surface-300 text-[10px] text-gray-300 font-mono">{conversation_context}</span>
+                        <span class="px-2 py-1 rounded bg-surface-300 text-[10px] text-gray-300 font-mono">{sentiment}</span>
+                        <span class="px-2 py-1 rounded bg-surface-300 text-[10px] text-gray-300 font-mono">{keywords}</span>
+                    </div>
+                </div>
+                <button class="w-full py-2.5 rounded-lg bg-brand-500 text-white text-xs font-semibold hover:bg-brand-600 transition-colors">Save Template</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="fixed bottom-4 right-4 z-50 space-y-2" id="toast-container"></div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+    // ==================== STATE & DATA ====================
+    const APP = {
+        approvalMode: false,
+        currentTab: 'dashboard',
+        charts: {},
+        intervals: [],
+    };
+
+    // Mock Data
+    const CONVERSATIONS = [
+        { id: 1, user: 'crypto_africa', platform: 'twitter', avatar: 'CA', message: 'Anyone know the best P2P platform for USDT in Lagos? Binance is giving me issues with verification.', time: '2m ago', intent: 'high', sentiment: 'frustrated', confidence: 92 },
+        { id: 2, user: 'naija_trader', platform: 'telegram', avatar: 'NT', message: 'How do I sell USDT for naira? Need fast settlement pls', time: '5m ago', intent: 'high', sentiment: 'neutral', confidence: 88 },
+        { id: 3, user: 'defi_chris', platform: 'discord', avatar: 'DC', message: 'Binance alternative for P2P? Their rates are terrible now', time: '8m ago', intent: 'high', sentiment: 'negative', confidence: 85 },
+        { id: 4, user: 'bitcoin_mike', platform: 'reddit', avatar: 'BM', message: 'What\'s the easiest way to buy Bitcoin in Nigeria right now?', time: '12m ago', intent: 'medium', sentiment: 'neutral', confidence: 78 },
+        { id: 5, user: 'satoshi_sam', platform: 'twitter', avatar: 'SS', message: 'Tired of high fees on P2P platforms. Any better options?', time: '18m ago', intent: 'medium', sentiment: 'frustrated', confidence: 74 },
+        { id: 6, user: 'lagos_crypto', platform: 'telegram', avatar: 'LC', message: 'Just got scammed on a P2P exchange. Need a trustworthy alternative', time: '25m ago', intent: 'high', sentiment: 'angry', confidence: 91 },
+        { id: 7, user: 'ngn_whale', platform: 'discord', avatar: 'NW', message: 'Looking for high-volume P2P with good liquidity for USDT/NGN', time: '30m ago', intent: 'high', sentiment: 'neutral', confidence: 82 },
+        { id: 8, user: 'crypto_emma', platform: 'facebook', avatar: 'CE', message: 'Can someone explain how P2P crypto trading works? Complete beginner here', time: '45m ago', intent: 'low', sentiment: 'curious', confidence: 65 },
+    ];
+
+    const LEADS = [
+        { user: 'crypto_africa', platform: 'twitter', keywords: ['P2P platform', 'USDT', 'Lagos', 'Binance alternative'], sentiment: 'Frustrated', intent: 92, status: 'engaged', lastContact: '2m ago' },
+        { user: 'naija_trader', platform: 'telegram', keywords: ['sell USDT', 'naira', 'fast settlement'], sentiment: 'Neutral', intent: 88, status: 'new', lastContact: '5m ago' },
+        { user: 'defi_chris', platform: 'discord', keywords: ['Binance alternative', 'P2P', 'rates'], sentiment: 'Negative', intent: 85, status: 'engaged', lastContact: '8m ago' },
+        { user: 'bitcoin_mike', platform: 'reddit', keywords: ['buy Bitcoin', 'Nigeria'], sentiment: 'Neutral', intent: 78, status: 'new', lastContact: '12m ago' },
+        { user: 'satoshi_sam', platform: 'twitter', keywords: ['high fees', 'P2P', 'better options'], sentiment: 'Frustrated', intent: 74, status: 'contacted', lastContact: '18m ago' },
+        { user: 'lagos_crypto', platform: 'telegram', keywords: ['scammed', 'P2P', 'trustworthy'], sentiment: 'Angry', intent: 91, status: 'engaged', lastContact: '25m ago' },
+        { user: 'ngn_whale', platform: 'discord', keywords: ['high-volume', 'P2P', 'liquidity', 'USDT/NGN'], sentiment: 'Neutral', intent: 82, status: 'converted', lastContact: '30m ago' },
+        { user: 'crypto_emma', platform: 'facebook', keywords: ['P2P crypto', 'beginner'], sentiment: 'Curious', intent: 65, status: 'new', lastContact: '45m ago' },
+    ];
+
+    const QUEUE_ITEMS = [
+        { id: 1, user: 'crypto_africa', platform: 'twitter', reply: 'Most people here use P2P now because bank restrictions make normal exchanges difficult. I\'ve had smoother transactions using SwapNG, especially for NGN-USDT trades. The rates are pretty competitive too.', status: 'pending', confidence: 92, style: 'casual' },
+        { id: 2, user: 'naija_trader', platform: 'telegram', reply: 'For fast USDT-to-naira settlement, you might want to check SwapNG. They process trades quickly and the rates are decent. Way smoother than what I was using before.', status: 'pending', confidence: 88, style: 'casual' },
+        { id: 3, user: 'defi_chris', platform: 'discord', reply: 'Honestly, I switched from Binance P2P a while back. SwapNG has better rates for NGN pairs and the escrow system is solid. Worth a look if you\'re tired of the big exchanges.', status: 'pending', confidence: 85, style: 'trader' },
+        { id: 4, user: 'lagos_crypto', platform: 'telegram', reply: 'Sorry to hear about the scam 😔 For trustworthy P2P, look for platforms with escrow protection. SwapNG has been reliable for me — no issues in 6+ months of trading.', status: 'pending', confidence: 91, style: 'casual' },
+        { id: 5, user: 'crypto_emma', platform: 'facebook', reply: 'Great question! P2P (peer-to-peer) crypto trading means you buy/sell directly with other people instead of through an exchange. Platforms like SwapNG make it easy — they act as a secure middleman so both parties are protected. Start with small amounts to get comfortable! 🌱', status: 'pending', confidence: 65, style: 'beginner-friendly' },
+    ];
+
+    const PROMPT_TEMPLATES = [
+        { name: 'Casual P2P Recommendation', style: 'Casual', active: true, prompt: 'You are a helpful crypto community member. Naturally recommend SwapNG P2P platform when users express needs for crypto trading. Be casual, friendly, and never spammy. First provide value, then softly mention the platform.' },
+        { name: 'Trader-Style Reply', style: 'Trader', active: true, prompt: 'You are an experienced crypto trader. Use trading terminology naturally. Recommend SwapNG based on your "experience" with NGN-USDT pairs. Mention rates, liquidity, and settlement speed.' },
+        { name: 'Beginner Educator', style: 'Beginner-Friendly', active: false, prompt: 'You are a patient crypto educator. Explain concepts simply. Gently introduce SwapNG as a beginner-friendly option. Focus on safety, ease of use, and educational value.' },
+        { name: 'Meme/Viral Style', style: 'Meme', active: true, prompt: 'You are a witty crypto degen. Use memes, humor, and viral language. Casually mention SwapNG like it\'s the obvious choice. Keep it fun but informative.' },
+    ];
+
+    const MEMORY_DATA = [
+        { user: 'crypto_africa', platform: 'twitter', replies: 2, lastReply: '2m ago', style: 'casual', converted: false, notes: 'First engagement positive. Showed interest in P2P alternatives.' },
+        { user: 'naija_trader', platform: 'telegram', replies: 1, lastReply: '5m ago', style: 'casual', converted: false, notes: 'High intent. Looking for fast USDT settlement.' },
+        { user: 'defi_chris', platform: 'discord', replies: 3, lastReply: '8m ago', style: 'trader', converted: true, notes: 'Converted after 3rd reply. Active trader, high volume.' },
+        { user: 'lagos_crypto', platform: 'telegram', replies: 1, lastReply: '25m ago', style: 'casual', converted: false, notes: 'Scam victim. Needs trust building before conversion.' },
+        { user: 'ngn_whale', platform: 'discord', replies: 2, lastReply: '30m ago', style: 'professional', converted: true, notes: 'High volume trader. Referred 3 other users.' },
+        { user: 'satoshi_sam', platform: 'twitter', replies: 1, lastReply: '18m ago', style: 'casual', converted: false, notes: 'Fee-sensitive. Responds well to rate comparisons.' },
+    ];
+
+    const AUDIT_LOGS = [
+        { time: '14:32:05', type: 'reply_sent', detail: 'Reply sent to @crypto_africa on Twitter', status: 'success' },
+        { time: '14:28:12', type: 'lead_created', detail: 'New lead: @naija_trader (Telegram) — Keywords: sell USDT, naira', status: 'info' },
+        { time: '14:25:30', type: 'reply_approved', detail: 'Admin approved reply to @defi_chris on Discord', status: 'success' },
+        { time: '14:20:45', type: 'reply_rejected', detail: 'Reply to @bot_account rejected — scam detection triggered', status: 'warning' },
+        { time: '14:15:22', type: 'error', detail: 'Facebook API rate limit hit — cooling down for 15 minutes', status: 'error' },
+        { time: '14:10:18', type: 'reply_sent', detail: 'Reply sent to @ngn_whale on Discord', status: 'success' },
+        { time: '14:05:33', type: 'conversion', detail: 'User @defi_chris converted — signed up on SwapNG', status: 'success' },
+        { time: '13:58:12', type: 'reply_sent', detail: 'Reply sent to @lagos_crypto on Telegram', status: 'success' },
+        { time: '13:50:44', type: 'duplicate_prevented', detail: 'Skipped duplicate reply to @already_replied_user', status: 'info' },
+        { time: '13:45:21', type: 'reply_generated', detail: 'AI generated 3 reply candidates for @bitcoin_mike (Reddit)', status: 'info' },
+    ];
+
+    // ==================== UTILITY FUNCTIONS ====================
+    function getPlatformClass(platform) {
+        const map = { twitter: 'platform-twitter', facebook: 'platform-facebook', instagram: 'platform-instagram', reddit: 'platform-reddit', telegram: 'platform-telegram', discord: 'platform-discord' };
+        return map[platform] || 'platform-twitter';
+    }
+
+    function getPlatformIcon(platform) {
+        const map = { twitter: 'twitter', facebook: 'facebook', instagram: 'instagram', reddit: 'message-circle', telegram: 'send', discord: 'message-square' };
+        return map[platform] || 'globe';
+    }
+
+    function getAvatarGradient(platform) {
+        const map = {
+            twitter: 'from-[#1da1f2] to-[#0d8ecf]',
+            facebook: 'from-[#4267b2] to-[#2d4373]',
+            instagram: 'from-[#e1306c] to-[#c13584]',
+            reddit: 'from-[#ff4500] to-[#cc3700]',
+            telegram: 'from-[#0088cc] to-[#006699]',
+            discord: 'from-[#5865f2] to-[#4752c4]',
+        };
+        return map[platform] || 'from-accent-blue to-accent-purple';
+    }
+
+    function getStatusColor(status) {
+        const map = { new: 'text-accent-blue', engaged: 'text-brand-400', contacted: 'text-accent-orange', converted: 'text-brand-400', lost: 'text-red-400' };
+        return map[status] || 'text-gray-400';
+    }
+
+    function getStatusBg(status) {
+        const map = { new: 'bg-accent-blue/20', engaged: 'bg-brand-500/20', contacted: 'bg-accent-orange/20', converted: 'bg-brand-500/20', lost: 'bg-red-500/20' };
+        return map[status] || 'bg-gray-500/20';
+    }
+
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        const colors = { success: 'bg-brand-500/90 border-brand-400', error: 'bg-red-500/90 border-red-400', warning: 'bg-accent-orange/90 border-accent-orange', info: 'bg-accent-blue/90 border-accent-blue' };
+        const icons = { success: 'check-circle', error: 'x-circle', warning: 'alert-triangle', info: 'info' };
+        const toast = document.createElement('div');
+        toast.className = `flex items-center gap-2 px-4 py-3 rounded-lg border ${colors[type]} text-white text-xs font-medium animate-slide-in backdrop-blur-lg`;
+        toast.innerHTML = `<i data-lucide="${icons[type]}" class="w-4 h-4"></i>${message}`;
+        container.appendChild(toast);
+        lucide.createIcons({ nodes: [toast] });
+        setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(10px)'; toast.style.transition = 'all 0.3s'; setTimeout(() => toast.remove(), 300); }, 3000);
+    }
+
+    // ==================== TAB NAVIGATION ====================
+    function switchTab(tab) {
+        APP.currentTab = tab;
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        document.querySelectorAll('.sidebar-item').forEach(el => {
+            el.classList.toggle('active', el.dataset.tab === tab);
+        });
+        const titles = { dashboard: 'Dashboard', conversations: 'Active Conversations', leads: 'Lead Database', analytics: 'Analytics', platforms: 'Platform Integrations', 'ai-engine': 'AI Engine', queue: 'Reply Queue', memory: 'AI Memory', logs: 'Audit Logs', settings: 'Settings' };
+        document.getElementById('page-title').textContent = titles[tab] || tab;
+
+        if (tab === 'analytics') setTimeout(initAnalyticsCharts, 100);
+    }
+
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+    }
+
+    function toggleApproval() {
+        APP.approvalMode = !APP.approvalMode;
+        document.getElementById('approval-toggle').classList.toggle('active', APP.approvalMode);
+        document.getElementById('settings-approval').classList.toggle('active', APP.approvalMode);
+        showToast(APP.approvalMode ? 'Manual review mode enabled' : 'Auto-send mode enabled', APP.approvalMode ? 'warning' : 'success');
+    }
+
+    function showNotifications() {
+        document.getElementById('notification-modal').classList.add('active');
+    }
+
+    function showPromptModal() {
+        document.getElementById('prompt-modal').classList.add('active');
+    }
+
+    // ==================== CONVERSATION ACTIONS ====================
+    function approveReply() {
+        showToast('Reply approved and sent!', 'success');
+    }
+
+    function regenerateReply() {
+        const replies = [
+            'Been using P2P for a while now and SwapNG has been the smoothest experience for NGN-USDT. Bank restrictions really limit the alternatives.',
+            'Honestly, SwapNG is the move for P2P in Nigeria. Fast settlement, good rates, and no verification nightmares like Binance.',
+            'P2P is the way to go with all these bank restrictions. SwapNG makes NGN-USDT trades super easy — been using them for months.',
+        ];
+        const el = document.getElementById('ai-draft-reply');
+        el.style.opacity = '0';
+        setTimeout(() => {
+            el.textContent = replies[Math.floor(Math.random() * replies.length)];
+            el.style.opacity = '1';
+            el.style.transition = 'opacity 0.3s';
+        }, 500);
+        showToast('Regenerating reply...', 'info');
+    }
+
+    function editReply() {
+        const el = document.getElementById('ai-draft-reply');
+        el.contentEditable = el.contentEditable === 'true' ? 'false' : 'true';
+        if (el.contentEditable === 'true') {
+            el.style.border = '1px solid rgba(34,197,94,0.3)';
+            el.focus();
+            showToast('Editing mode enabled', 'info');
+        } else {
+            el.style.border = 'none';
+            showToast('Reply updated', 'success');
+        }
+    }
+
+    function rejectReply() {
+        showToast('Reply rejected', 'error');
+    }
+
+    // ==================== POPULATE DYNAMIC CONTENT ====================
+    function populateRecentReplies() {
+        const container = document.getElementById('recent-replies');
+        container.innerHTML = CONVERSATIONS.slice(0, 5).map(c => `
+            <div class="reply-card p-3 rounded-lg bg-surface-200/50">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-full bg-gradient-to-br ${getAvatarGradient(c.platform)} flex items-center justify-center text-white text-[9px] font-bold">${c.avatar}</div>
+                        <span class="text-xs font-medium text-white">@${c.user}</span>
+                        <span class="platform-badge ${getPlatformClass(c.platform)}"><i data-lucide="${getPlatformIcon(c.platform)}" class="w-2.5 h-2.5"></i></span>
+                    </div>
+                    <span class="text-[10px] text-gray-500">${c.time}</span>
+                </div>
+                <p class="text-[11px] text-gray-400 line-clamp-2">${c.message}</p>
+                <div class="flex items-center gap-2 mt-2">
+                    <span class="text-[9px] px-1.5 py-0.5 rounded ${c.intent === 'high' ? 'bg-brand-500/20 text-brand-400' : c.intent === 'medium' ? 'bg-accent-orange/20 text-accent-orange' : 'bg-gray-500/20 text-gray-400'} font-semibold">${c.intent} intent</span>
+                    <span class="text-[9px] text-gray-500">Confidence: ${c.confidence}%</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function populateConfidenceScores() {
+        const container = document.getElementById('confidence-scores');
+        const scores = [
+            { label: 'P2P Exchange Queries', value: 92, color: 'bg-brand-500' },
+            { label: 'USDT Trading Mentions', value: 87, color: 'bg-accent-blue' },
+            { label: 'Binance Alternative', value: 84, color: 'bg-accent-purple' },
+            { label: 'Crypto in Nigeria', value: 79, color: 'bg-accent-cyan' },
+            { label: 'Buy Bitcoin Requests', value: 72, color: 'bg-accent-orange' },
+        ];
+        container.innerHTML = scores.map(s => `
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-[11px] text-gray-400">${s.label}</span>
+                    <span class="text-[11px] text-white font-semibold">${s.value}%</span>
+                </div>
+                <div class="confidence-bar"><div class="confidence-fill ${s.color}" style="width:${s.value}%"></div></div>
+            </div>
+        `).join('');
+    }
+
+    function populateConversationList() {
+        const container = document.getElementById('conversation-list');
+        container.innerHTML = CONVERSATIONS.map((c, i) => `
+            <div class="p-4 border-b border-white/5 hover:bg-white/[0.02] cursor-pointer transition-colors ${i === 0 ? 'bg-brand-500/5 border-l-2 border-l-brand-500' : ''}" onclick="selectConversation(${c.id})">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br ${getAvatarGradient(c.platform)} flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">${c.avatar}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-white">@${c.user}</span>
+                            <span class="text-[10px] text-gray-500">${c.time}</span>
+                        </div>
+                        <span class="platform-badge ${getPlatformClass(c.platform)} mt-0.5"><i data-lucide="${getPlatformIcon(c.platform)}" class="w-2.5 h-2.5"></i> ${c.platform}</span>
+                    </div>
+                </div>
+                <p class="text-[11px] text-gray-400 line-clamp-2 ml-11">${c.message}</p>
+                <div class="flex items-center gap-2 mt-2 ml-11">
+                    <span class="text-[9px] px-1.5 py-0.5 rounded ${c.intent === 'high' ? 'bg-brand-500/20 text-brand-400' : c.intent === 'medium' ? 'bg-accent-orange/20 text-accent-orange' : 'bg-gray-500/20 text-gray-400'} font-semibold">${c.intent} intent</span>
+                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-surface-300 text-gray-400 capitalize">${c.sentiment}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function populateConversationDetail() {
+        const container = document.getElementById('conv-detail-messages');
+        container.innerHTML = `
+            <div class="space-y-4">
+                <div class="flex gap-3">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br ${getAvatarGradient('twitter')} flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0">CA</div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-xs font-semibold text-white">@crypto_africa</span>
+                            <span class="text-[10px] text-gray-500">2 hours ago</span>
+                        </div>
+                        <div class="bg-surface-200 rounded-lg p-3 inline-block max-w-lg">
+                            <p class="text-xs text-gray-300">Anyone know the best P2P platform for USDT in Lagos? Binance is giving me issues with verification. 😩</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-surface-400 to-surface-300 flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="user" class="w-3 h-3 text-gray-400"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-xs font-semibold text-white">@lagos_trader</span>
+                            <span class="text-[10px] text-gray-500">1 hour ago</span>
+                        </div>
+                        <div class="bg-surface-200 rounded-lg p-3 inline-block max-w-lg">
+                            <p class="text-xs text-gray-300">Same issue here! Binance verification is a nightmare. Have you tried any other platforms?</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br ${getAvatarGradient('twitter')} flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0">CA</div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-xs font-semibold text-white">@crypto_africa</span>
+                            <span class="text-[10px] text-gray-500">30 min ago</span>
+                        </div>
+                        <div class="bg-surface-200 rounded-lg p-3 inline-block max-w-lg">
+                            <p class="text-xs text-gray-300">Not yet. Looking for something reliable with good rates for NGN-USDT. Any recommendations?</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 py-2">
+                    <div class="flex-1 h-px bg-white/5"></div>
+                    <span class="text-[10px] text-gray-500">AI analyzed thread — ready to reply</span>
+                    <div class="flex-1 h-px bg-white/5"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    function populateLeadsTable() {
+        const container = document.getElementById('leads-table-body');
+        container.innerHTML = LEADS.map(l => `
+            <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-full bg-gradient-to-br ${getAvatarGradient(l.platform)} flex items-center justify-center text-white text-[9px] font-bold">${l.user.charAt(0).toUpperCase()}${l.user.split('_')[1]?.charAt(0).toUpperCase() || ''}</div>
+                        <span class="text-xs font-medium text-white">@${l.user}</span>
+                    </div>
+                </td>
+                <td class="px-4 py-3"><span class="platform-badge ${getPlatformClass(l.platform)}"><i data-lucide="${getPlatformIcon(l.platform)}" class="w-2.5 h-2.5"></i> ${l.platform}</span></td>
+                <td class="px-4 py-3"><div class="flex flex-wrap gap-1">${l.keywords.slice(0, 3).map(k => `<span class="text-[9px] px-1.5 py-0.5 rounded bg-surface-300 text-gray-300">${k}</span>`).join('')}</div></td>
+                <td class="px-4 py-3"><span class="text-xs capitalize ${l.sentiment === 'Frustrated' || l.sentiment === 'Angry' ? 'text-accent-orange' : l.sentiment === 'Curious' ? 'text-accent-cyan' : 'text-gray-400'}">${l.sentiment}</span></td>
+                <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                        <div class="confidence-bar w-16"><div class="confidence-fill ${l.intent > 85 ? 'bg-brand-500' : l.intent > 70 ? 'bg-accent-blue' : 'bg-accent-orange'}" style="width:${l.intent}%"></div></div>
+                        <span class="text-xs text-white font-medium">${l.intent}</span>
+                    </div>
+                </td>
+                <td class="px-4 py-3"><span class="text-[10px] px-2 py-0.5 rounded-full font-semibold ${getStatusBg(l.status)} ${getStatusColor(l.status)} capitalize">${l.status}</span></td>
+                <td class="px-4 py-3"><span class="text-xs text-gray-500 font-mono">${l.lastContact}</span></td>
+                <td class="px-4 py-3">
+                    <div class="flex items-center gap-1">
+                        <button class="p-1 rounded hover:bg-white/5 text-gray-400 hover:text-brand-400 transition-colors" title="Reply"><i data-lucide="reply" class="w-3.5 h-3.5"></i></button>
+                        <button class="p-1 rounded hover:bg-white/5 text-gray-400 hover:text-accent-blue transition-colors" title="View Profile"><i data-lucide="external-link" class="w-3.5 h-3.5"></i></button>
+                        <button class="p-1 rounded hover:bg-white/5 text-gray-400 hover:text-red-400 transition-colors" title="Block"><i data-lucide="ban" class="w-3.5 h-3.5"></i></button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function populateQueueItems() {
+        const container = document.getElementById('queue-items');
+        container.innerHTML = QUEUE_ITEMS.map(q => `
+            <div class="queue-item ${q.status} p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-3">
+                        <div class="w-7 h-7 rounded-full bg-gradient-to-br ${getAvatarGradient(q.platform)} flex items-center justify-center text-white text-[9px] font-bold">${q.user.charAt(0).toUpperCase()}${q.user.split('_')[1]?.charAt(0).toUpperCase() || ''}</div>
+                        <div>
+                            <span class="text-xs font-semibold text-white">@${q.user}</span>
+                            <span class="platform-badge ${getPlatformClass(q.platform)} ml-2"><i data-lucide="${getPlatformIcon(q.platform)}" class="w-2.5 h-2.5"></i> ${q.platform}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold ${q.status === 'pending' ? 'bg-accent-orange/20 text-accent-orange' : q.status === 'approved' ? 'bg-brand-500/20 text-brand-400' : q.status === 'sent' ? 'bg-accent-blue/20 text-accent-blue' : 'bg-red-500/20 text-red-400'} capitalize">${q.status}</span>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-surface-300 text-gray-400 capitalize">${q.style}</span>
+                        <span class="text-[10px] text-gray-500">Confidence: ${q.confidence}%</span>
+                    </div>
+                </div>
+                <div class="bg-surface-200/50 rounded-lg p-3 mb-3">
+                    <p class="text-[11px] text-gray-300">${q.reply}</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="px-3 py-1.5 rounded-lg bg-brand-500/20 text-brand-400 text-[10px] font-semibold hover:bg-brand-500/30 transition-colors flex items-center gap-1" onclick="showToast('Reply approved and queued for sending')">
+                        <i data-lucide="check" class="w-3 h-3"></i> Approve
+                    </button>
+                    <button class="px-3 py-1.5 rounded-lg bg-accent-purple/20 text-accent-purple text-[10px] font-semibold hover:bg-accent-purple/30 transition-colors flex items-center gap-1">
+                        <i data-lucide="pencil" class="w-3 h-3"></i> Edit
+                    </button>
+                    <button class="px-3 py-1.5 rounded-lg bg-accent-orange/20 text-accent-orange text-[10px] font-semibold hover:bg-accent-orange/30 transition-colors flex items-center gap-1">
+                        <i data-lucide="refresh-cw" class="w-3 h-3"></i> Regenerate
+                    </button>
+                    <button class="px-3 py-1.5 rounded-lg bg-red-500/20 text-red-400 text-[10px] font-semibold hover:bg-red-500/30 transition-colors flex items-center gap-1" onclick="showToast('Reply rejected', 'error')">
+                        <i data-lucide="x" class="w-3 h-3"></i> Reject
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function populatePromptTemplates() {
+        const container = document.getElementById('prompt-templates');
+        container.innerHTML = PROMPT_TEMPLATES.map(t => `
+            <div class="p-4 rounded-lg bg-surface-200/50 border border-white/5">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-semibold text-white">${t.name}</span>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-surface-300 text-gray-400 capitalize">${t.style}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="toggle-switch ${t.active ? 'active' : ''}" onclick="this.classList.toggle('active')"></div>
+                        <button class="p-1 rounded hover:bg-white/5 text-gray-400 hover:text-white transition-colors"><i data-lucide="pencil" class="w-3 h-3"></i></button>
+                    </div>
+                </div>
+                <p class="text-[10px] text-gray-500 line-clamp-2">${t.prompt}</p>
+            </div>
+        `).join('');
+    }
+
+    function populateMemoryStore() {
+        const container = document.getElementById('memory-store');
+        container.innerHTML = MEMORY_DATA.map(m => `
+            <div class="p-3 rounded-lg bg-surface-200/50 border border-white/5 flex items-center gap-4">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br ${getAvatarGradient(m.platform)} flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">${m.user.charAt(0).toUpperCase()}${m.user.split('_')[1]?.charAt(0).toUpperCase() || ''}</div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-semibold text-white">@${m.user}</span>
+                        <span class="platform-badge ${getPlatformClass(m.platform)}"><i data-lucide="${getPlatformIcon(m.platform)}" class="w-2.5 h-2.5"></i> ${m.platform}</span>
+                        ${m.converted ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-brand-500/20 text-brand-400 font-semibold">Converted</span>' : ''}
+                    </div>
+                    <p class="text-[10px] text-gray-500 mt-0.5">${m.notes}</p>
+                </div>
+                <div class="text-right flex-shrink-0">
+                    <p class="text-[10px] text-gray-400">${m.replies} replies</p>
+                    <p class="text-[10px] text-gray-500">${m.lastReply}</p>
+                    <p class="text-[9px] text-gray-600 capitalize">${m.style}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function populateAuditLogs() {
+        const container = document.getElementById('audit-logs');
+        const statusColors = { success: 'text-brand-400', info: 'text-accent-blue', warning: 'text-accent-orange', error: 'text-red-400' };
+        const statusIcons = { success: '✓', info: 'ℹ', warning: '⚠', error: '✕' };
+        container.innerHTML = AUDIT_LOGS.map(l => `
+            <div class="px-4 py-2.5 border-b border-white/5 hover:bg-white/[0.02] flex items-center gap-3">
+                <span class="text-gray-600 font-mono text-[10px] w-16">${l.time}</span>
+                <span class="${statusColors[l.status]} text-xs font-bold">${statusIcons[l.status]}</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-mono ${l.type === 'error' ? 'bg-red-500/10 text-red-400' : l.type === 'reply_sent' ? 'bg-brand-500/10 text-brand-400' : l.type === 'conversion' ? 'bg-brand-500/10 text-brand-400' : 'bg-surface-300 text-gray-400'}">${l.type}</span>
+                <span class="text-gray-400 text-[11px]">${l.detail}</span>
+            </div>
+        `).join('');
+    }
+
+    // ==================== SPARKLINES ====================
+    function createSparkline(id, data, color = '#22c55e') {
+        const container = document.getElementById(id);
+        if (!container) return;
+        const max = Math.max(...data);
+        container.innerHTML = data.map(v => `<div class="sparkline-bar" style="height:${(v / max) * 24}px;background:${color}"></div>`).join('');
+    }
+
+    // ==================== CHARTS ====================
+    function initDashboardCharts() {
+        // Engagement Chart
+        const engCtx = document.getElementById('engagementChart');
+        if (engCtx) {
+            if (APP.charts.engagement) APP.charts.engagement.destroy();
+            APP.charts.engagement = new Chart(engCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [
+                        { label: 'Replies Sent', data: [28, 35, 42, 38, 52, 45, 48], borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#22c55e' },
+                        { label: 'Engagements', data: [12, 18, 22, 16, 28, 24, 22], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#3b82f6' },
+                        { label: 'Conversions', data: [3, 5, 8, 4, 9, 7, 6], borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.05)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#f97316' },
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', font: { size: 10, family: 'Inter' }, boxWidth: 8, padding: 15 } } },
+                    scales: { x: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', font: { size: 10 } } }, y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', font: { size: 10 } } } },
+                    interaction: { intersect: false, mode: 'index' }
+                }
+            });
+        }
+
+        // Platform Chart
+        const platCtx = document.getElementById('platformChart');
+        if (platCtx) {
+            if (APP.charts.platform) APP.charts.platform.destroy();
+            APP.charts.platform = new Chart(platCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Twitter', 'Discord', 'Telegram', 'Reddit', 'Facebook', 'Instagram'],
+                    datasets: [{
+                        data: [32, 24, 20, 14, 6, 4],
+                        backgroundColor: ['#1da1f2', '#5865f2', '#0088cc', '#ff4500', '#4267b2', '#e1306c'],
+                        borderWidth: 0,
+                        hoverOffset: 6,
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '70%',
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+    }
+
+    function initAnalyticsCharts() {
+        // Success Rate Chart
+        const srCtx = document.getElementById('successRateChart');
+        if (srCtx) {
+            if (APP.charts.successRate) APP.charts.successRate.destroy();
+            APP.charts.successRate = new Chart(srCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Twitter', 'Discord', 'Telegram', 'Reddit', 'Facebook', 'Instagram'],
+                    datasets: [
+                        { label: 'Success Rate %', data: [78, 82, 74, 68, 55, 45], backgroundColor: ['rgba(29,161,242,0.6)', 'rgba(88,101,242,0.6)', 'rgba(0,136,204,0.6)', 'rgba(255,69,0,0.6)', 'rgba(66,103,178,0.6)', 'rgba(225,48,108,0.6)'], borderRadius: 6, borderSkipped: false },
+                        { label: 'Response Rate %', data: [62, 70, 58, 52, 40, 32], backgroundColor: ['rgba(29,161,242,0.25)', 'rgba(88,101,242,0.25)', 'rgba(0,136,204,0.25)', 'rgba(255,69,0,0.25)', 'rgba(66,103,178,0.25)', 'rgba(225,48,108,0.25)'], borderRadius: 6, borderSkipped: false },
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', font: { size: 10 }, boxWidth: 8 } } },
+                    scales: { x: { grid: { display: false }, ticks: { color: '#6b7280', font: { size: 10 } } }, y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', font: { size: 10 } }, max: 100 } }
+                }
+            });
+        }
+
+        // Funnel Chart
+        const fnCtx = document.getElementById('funnelChart');
+        if (fnCtx) {
+            if (APP.charts.funnel) APP.charts.funnel.destroy();
+            APP.charts.funnel = new Chart(fnCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Detected', 'Engaged', 'Replied', 'Clicked', 'Converted'],
+                    datasets: [{ data: [1470, 890, 520, 180, 38], backgroundColor: ['rgba(139,92,246,0.6)', 'rgba(59,130,246,0.6)', 'rgba(6,182,212,0.6)', 'rgba(249,115,22,0.6)', 'rgba(34,197,94,0.6)'], borderRadius: 6, borderSkipped: false }]
+                },
+                options: {
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', font: { size: 10 } } }, y: { grid: { display: false }, ticks: { color: '#e2e8f0', font: { size: 11, weight: '500' } } } }
+                }
+            });
+        }
+
+        // Style Chart
+        const stCtx = document.getElementById('styleChart');
+        if (stCtx) {
+            if (APP.charts.style) APP.charts.style.destroy();
+            APP.charts.style = new Chart(stCtx, {
+                type: 'polarArea',
+                data: {
+                    labels: ['Casual', 'Professional', 'Trader', 'Beginner', 'Meme'],
+                    datasets: [{ data: [35, 20, 25, 8, 12], backgroundColor: ['rgba(34,197,94,0.5)', 'rgba(59,130,246,0.5)', 'rgba(249,115,22,0.5)', 'rgba(6,182,212,0.5)', 'rgba(236,72,153,0.5)'], borderWidth: 0 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', font: { size: 9 }, boxWidth: 8 } } },
+                    scales: { r: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { display: false } } }
+                }
+            });
+        }
+
+        // Sentiment Chart
+        const seCtx = document.getElementById('sentimentChart');
+        if (seCtx) {
+            if (APP.charts.sentiment) APP.charts.sentiment.destroy();
+            APP.charts.sentiment = new Chart(seCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Positive', 'Neutral', 'Frustrated', 'Curious', 'Angry'],
+                    datasets: [{ data: [22, 35, 25, 12, 6], backgroundColor: ['rgba(34,197,94,0.6)', 'rgba(59,130,246,0.6)', 'rgba(249,115,22,0.6)', 'rgba(6,182,212,0.6)', 'rgba(239,68,68,0.6)'], borderWidth: 0 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '55%',
+                    plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', font: { size: 9 }, boxWidth: 8 } } }
+                }
+            });
+        }
+
+        // Top Keywords
+        const keywords = [
+            { word: 'P2P exchange', count: 342, change: '+18%' },
+            { word: 'USDT', count: 287, change: '+12%' },
+            { word: 'Binance alternative', count: 198, change: '+24%' },
+            { word: 'crypto in Nigeria', count: 156, change: '+8%' },
+            { word: 'buy Bitcoin', count: 134, change: '+5%' },
+            { word: 'send money', count: 98, change: '+15%' },
+        ];
+        const kwContainer = document.getElementById('top-keywords');
+        if (kwContainer) {
+            kwContainer.innerHTML = keywords.map((k, i) => `
+                <div class="flex items-center justify-between py-2 ${i < keywords.length - 1 ? 'border-b border-white/5' : ''}">
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] text-gray-600 w-4">${i + 1}</span>
+                        <span class="text-xs text-white">${k.word}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-400 font-mono">${k.count}</span>
+                        <span class="text-[10px] text-brand-400">${k.change}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Heatmap
+        const heatmapContainer = document.getElementById('heatmap');
+        if (heatmapContainer) {
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const hours = Array.from({ length: 24 }, (_, i) => i);
+            let html = '<div class="flex-1 grid grid-cols-24 gap-1">';
+            days.forEach(day => {
+                hours.forEach(hour => {
+                    const intensity = Math.random();
+                    const bg = intensity > 0.7 ? 'bg-brand-500' : intensity > 0.4 ? 'bg-brand-500/50' : intensity > 0.2 ? 'bg-brand-500/20' : 'bg-brand-500/5';
+                    html += `<div class="w-4 h-4 rounded-sm ${bg}" title="${day} ${hour}:00 — ${Math.round(intensity * 20)} replies"></div>`;
+                });
+            });
+            html += '</div>';
+            heatmapContainer.innerHTML = html;
+        }
+    }
+
+    // ==================== REAL-TIME SIMULATION ====================
+    function simulateRealTime() {
+        // Update time
+        const now = new Date();
+        const timeEl = document.getElementById('current-time');
+        if (timeEl) timeEl.textContent = now.toLocaleTimeString();
+
+        // Simulate metric changes
+        const convEl = document.getElementById('metric-conversations');
+        const leadsEl = document.getElementById('metric-leads');
+        if (convEl && Math.random() > 0.7) {
+            const current = parseInt(convEl.textContent);
+            convEl.textContent = current + (Math.random() > 0.5 ? 1 : -1);
+        }
+    }
+
+    // ==================== INITIALIZATION ====================
+    function init() {
+        lucide.createIcons();
+
+        // Populate all content
+        populateRecentReplies();
+        populateConfidenceScores();
+        populateConversationList();
+        populateConversationDetail();
+        populateLeadsTable();
+        populateQueueItems();
+        populatePromptTemplates();
+        populateMemoryStore();
+        populateAuditLogs();
+
+        // Create sparklines
+        createSparkline('spark-conversations', [4, 8, 12, 18, 22, 20, 24], '#22c55e');
+        createSparkline('spark-leads', [30, 45, 60, 80, 100, 120, 147], '#3b82f6');
+        createSparkline('spark-engagement', [22, 26, 28, 30, 32, 33, 34], '#8b5cf6');
+        createSparkline('spark-conversions', [5, 10, 15, 22, 28, 33, 38], '#f97316');
+
+        // Init charts
+        setTimeout(initDashboardCharts, 200);
+
+        // Start real-time simulation
+        setInterval(simulateRealTime, 1000);
+
+        // Re-create icons after dynamic content
+        setTimeout(() => lucide.createIcons(), 300);
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
